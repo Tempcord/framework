@@ -163,59 +163,19 @@ class UserCommand
 
 ## Contributing
 
-We welcome contributions to Tempcord! Here's how you can help:
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to Tempcord.
 
 ### Development Setup
 
-#### For Framework Development
-
-1. **Fork the framework repository**
-   ```bash
-   git clone https://github.com/your-username/tempcord-framework.git
-   cd tempcord-framework
-   ```
-
-2. **Install dependencies**
-   ```bash
-   composer install
-   ```
-
-#### For Application Development
-
-1. **Create a new application**
-   ```bash
-   composer create-project tempcord/app my-bot-project
-   cd my-bot-project
-   ```
-
-2. **Set up development environment**
-   ```bash
-   cp .env.example .env.local
-   # Edit .env.local with your development settings
-   ```
-
-3. **Run tests**
-   ```bash
-   composer test
-   ```
-
-4. **Code analysis**
-   ```bash
-   composer analyse
-   ```
-
-5. **Fix code style**
-   ```bash
-   composer cs-fix
-   ```
-
-### Contribution Guidelines
-
-- **Code Style**: Follow PSR-12 coding standards
-- **Testing**: Write tests for new features
-- **Documentation**: Update documentation for any API changes
-- **Commit Messages**: Use conventional commit format
-- **Pull Requests**: Create detailed PRs with clear descriptions
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/your-username/framework.git`
+3. Install dependencies: `composer install`
+4. Create a feature branch: `git checkout -b feature/amazing-feature`
+5. Make your changes and add tests
+6. Run the test suite: `composer test`
+7. Commit your changes: `git commit -m 'Add amazing feature'`
+8. Push to your branch: `git push origin feature/amazing-feature`
+9. Open a Pull Request
 
 ### Reporting Issues
 
@@ -240,5 +200,6 @@ We're always looking for ways to improve Tempcord. Feel free to:
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 **Built with ❤️ by [CyberWolf.Studio](https://cyberwolf.studio) team.**
+using [Tempest](https://tempestphp.com)
 
 For more information, visit our [documentation](https://tempcord.dev) or join our [Discord community](https://discord.gg/tempcord).
