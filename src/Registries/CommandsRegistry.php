@@ -58,7 +58,7 @@ final class CommandsRegistry
             try {
                 $command = await($discord->rest->{$through}->createApplicationCommand(
                     $applicationId,
-                    $command->build
+                    $command->build()
                 ));
                 $console->success('Command "' . $command->name . '" registered.');
             } catch (Throwable $throwable) {

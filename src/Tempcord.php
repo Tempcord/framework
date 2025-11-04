@@ -20,8 +20,8 @@ final class Tempcord
     public function __construct(
         public readonly Discord  $discord,
         private readonly Console $console,
-    ) {
-        //@todo: Maybe move to  Interface
+    )
+    {
         $this->commandsRegistry = get(CommandsRegistry::class);
         $this->eventsRegistry = get(EventsRegistry::class);
 

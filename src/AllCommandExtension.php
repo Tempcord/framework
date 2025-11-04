@@ -14,7 +14,6 @@ use function Freezemage\ArrayUtils\find;
 
 final class AllCommandExtension extends \Ragnarok\Fenrir\Command\AllCommandExtension
 {
-
     public function initialize(Discord $discord): void
     {
         $this->commandListener = new FilteredEventEmitter(

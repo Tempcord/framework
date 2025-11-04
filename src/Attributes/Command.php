@@ -57,35 +57,6 @@ final class Command
         }
     }
 
-    /**
-     * @throws InvalidCommandNameException
-     */
-    public CommandBuilder $build {
-        get {
-            $command = CommandBuilder::new()
-                ->setName($this->name)
-                ->setNsfw($this->isNsfw)
-                ->setDmPermission($this->directMessage)
-                ->setType($this->type);
-
-            if ($this->type === ApplicationCommandTypes::CHAT_INPUT) {
-
-                if (!$this->description) {
-                    throw new \LogicException("Description for command [$this->name] is required when type=CHAT_INPUT");
-                }
-
-                $command->setDescription($this->description);
-            }
-
-
-            foreach ($this->options as $option) {
-                $command->addOption($option->build);
-            }
-
-            return $command;
-        }
-    }
-
     /** @var array<SubcommandGroup|Subcommand|Option> */
     public array $options {
         get {
@@ -148,5 +119,33 @@ final class Command
     public function mergeOptions(Command $command): void
     {
         $this->options = $command->options;
+    }
+
+    /**
+     * @throws InvalidCommandNameException
+     */
+    public function build(): CommandBuilder
+    {
+        $command = CommandBuilder::new()
+            ->setName($this->name)
+            ->setNsfw($this->isNsfw)
+            ->setDmPermission($this->directMessage)
+            ->setType($this->type);
+
+        if ($this->type === ApplicationCommandTypes::CHAT_INPUT) {
+
+            if (!$this->description) {
+                throw new \LogicException("Description for command [$this->name] is required when type=CHAT_INPUT");
+            }
+
+            $command->setDescription($this->description);
+        }
+
+
+        foreach ($this->options as $option) {
+            $command->addOption($option->build);
+        }
+
+        return $command;
     }
 }
