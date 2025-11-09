@@ -2,6 +2,7 @@
 
 namespace Tempcord\Registries;
 
+use Ragnarok\Fenrir\Discord;
 use Tempcord\Attributes\Event;
 use Tempcord\Tempcord;
 use Tempest\Console\Console;
@@ -13,6 +14,7 @@ final class EventsRegistry
 {
     /** @var array<array<string, callable>> */
     private array $eventListeners = [];
+
 
 
     public function add(Event $event): void

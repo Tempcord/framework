@@ -65,7 +65,6 @@ final  class SubcommandGroup
         }
     }
 
-
     public function __construct(
         string|BackedEnum $name,
         public string     $description

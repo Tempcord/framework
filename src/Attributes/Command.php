@@ -7,9 +7,9 @@ use BackedEnum;
 use Ragnarok\Fenrir\Enums\ApplicationCommandTypes;
 use Ragnarok\Fenrir\Exceptions\Rest\Helpers\Command\InvalidCommandNameException;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandBuilder;
-use RuntimeException;
 use Tempcord\Traits\HasAttributes;
 use Tempest\Reflection\ClassReflector;
+use Tempest\Reflection\MethodReflector;
 use function Tempest\Support\Arr\dot;
 use function Tempest\Support\str;
 
@@ -18,90 +18,162 @@ final class Command
 {
     use HasAttributes;
 
-    /**
-     * Computed getter for command name
-     *
-     * If none command is provided - it will take name from the classname
-     *
-     * @var string
-     */
+    public ClassReflector $reflector;
+
     public string $name {
         get {
-            if ($this->hasAttribute('name')) {
-                return $this->getAttribute('name') instanceof BackedEnum ? $this->getAttribute('name')->value : $this->getAttribute('name');
+            if ($this->getAttribute('name')) {
+                $name = $this->getAttribute('name');
+                return $name instanceof BackedEnum ? $name->value : $name;
             }
 
-            $commandName = str($this->reflector->getShortName())
+            return str($this->reflector->getShortName())
                 ->replaceEnd('Command', '')
                 ->replaceStart('Command', '')
                 ->snake('_')
-                ->lower();
-
-            return $commandName->toString();
+                ->lower()
+                ->toString();
+        }
+    }
+    public $hasSubcommands {
+        get {
+            return count($this->subCommands) > 0;
         }
     }
 
-    public array $handlers {
+    /**
+     * Determine if command has subcommands.
+     */
+    public bool $isParentCommand {
         get {
-            $keys[$this->name] = [];
-            foreach ($this->options as $option) {
-                if (in_array(get_class($option), [SubcommandGroup::class, Subcommand::class])) {
-                    $keys[$this->name][$option->name] = $option->key;
-                } else {
-                    $fakeSubcommand = new Subcommand(name: $option->name, description: $option->description);
-                    $fakeSubcommand->reflector = $this->reflector->getMethod('__invoke');
-                    $keys[$this->name] = $fakeSubcommand->key;
-                }
+            return array_any($this->reflector->getPublicMethods(), fn($method) => $method->hasAttribute(Subcommand::class));
+        }
+    }
+
+    /**
+     * If command is a "parent" command - it should contain subcommands
+     */
+    public array $subCommands {
+        get {
+            if (!$this->isParentCommand) {
+                return [];
             }
-            return dot($keys);
-        }
-    }
 
-    /** @var array<SubcommandGroup|Subcommand|Option> */
-    public array $options {
-        get {
-            $options = $this->getAttribute('options');
-
-            if ($this->reflector->hasAttribute(SubcommandGroup::class)) {
-                /** @var SubcommandGroup $subcommandGroup */
-                $subcommandGroup = $this->reflector->getAttribute(SubcommandGroup::class);
-                $subcommandGroup->reflector = $this->reflector;
-                $options[$subcommandGroup->name] = $subcommandGroup;
-            } else {
-                // This is subcommands without a group
-                $fakeSubcommandGroup = new SubcommandGroup(name: 'fake', description: 'fake');
-                $fakeSubcommandGroup->reflector = $this->reflector;
-                foreach ($fakeSubcommandGroup->options as $option) {
-                    $options[$option->name] = $option;
-                }
-
-                if (empty($options)) {
-                    /*
-                     * We assume that there is no Subcommands found and this is an invokable command
-                     * User should provide the __invoke command, so we actually can read the method options (if there are some)
-                     */
-                    if (!$this->reflector->getReflection()->hasMethod('__invoke')) {
-                        throw new RuntimeException('Class [' . $this->reflector->getName() . '] should declare public sub-commands or have an __invoke method');
-                    }
-
-                    $fakeSubcommand = new Subcommand(name: 'fake', description: 'fake');
-                    $fakeSubcommand->reflector = $this->reflector->getMethod('__invoke');
-                    foreach ($fakeSubcommand->options as $option) {
-                        $options[$option->name] = $option;
-                    }
+            $subCommands = [];
+            foreach ($this->reflector->getPublicMethods() as $method) {
+                if ($method->hasAttribute(Subcommand::class)) {
+                    /** @var Subcommand $subCommand */
+                    $subCommand = $method->getAttribute(Subcommand::class);
+                    $subCommand->reflector = $method;
+                    $subCommands[$subCommand->name] = $subCommand;
                 }
             }
 
-            $this->setAttribute('options', $options);
-
-            return $this->getAttribute('options');
-        }
-        set {
-            $this->setAttribute('options', array_merge($this->getAttribute('options') ?? [], $value));
+            return $subCommands;
         }
     }
 
-    public ClassReflector $reflector;
+
+    public MethodReflector $handler {
+        get {
+
+            /**
+             * Let determine how command handler is declared.
+             *
+             * We can declare command handler with a custom handler using HandledBy attribute.
+             * We can declare command with Subcommands, so any Subcommand should have own handler, and command is not
+             * registering own handler.
+             *
+             * By default, we assume that it's an invokable command
+             */
+            switch (true) {
+                case $this->reflector->hasAttribute(HandledBy::class):
+                    $handledBy = $this->reflector->getAttribute(HandledBy::class);
+                    return $this->reflector->getMethod($handledBy->method);
+                default:
+                    return $this->reflector->getMethod('__invoke');
+            }
+        }
+    }
+
+    public bool $isGuildCommand {
+        get {
+            return isset($this->guildId);
+        }
+    }
+
+//    public array $handlers {
+//        get {
+//            $keys[$this->name] = [];
+//            foreach ($this->options as $option) {
+//                if (in_array(get_class($option), [SubcommandGroup::class, Subcommand::class])) {
+//                    $keys[$this->name][$option->name] = $option->key;
+//                } else {
+//                    $fakeSubcommand = new Subcommand(name: $option->name, description: $option->description);
+//                    $fakeSubcommand->reflector = $this->reflector->getMethod('__invoke');
+//                    $keys[$this->name] = $fakeSubcommand->key;
+//                }
+//            }
+//            return dot($keys);
+//        }
+//    }
+//
+//    /** @var array<SubcommandGroup|Subcommand|Option> */
+//    public array $options {
+//        get {
+//            $options = [];
+//            /**
+//             * Let determine how command is declared.
+//             * We can declare command with a custom handler using HandledBy attribute
+//             * We can declare command with SubcommandGroup attribute
+//             * We can declare command as invokable class
+//             */
+//            switch (true) {
+//                case $this->reflector->hasAttribute(HandledBy::class):
+//                    $handledBy = $this->reflector->getAttribute(HandledBy::class);
+//                    $subcommand = new Subcommand(
+//                        name: $this->reflector::class,
+//                        description: $this->reflector::class,
+//                    );
+//                    $subcommand->reflector = $this->reflector->getMethod($handledBy->method);
+//                    foreach ($subcommand->options as $option) {
+//                        $options[$option->name] = $option;
+//                    }
+//                    break;
+//                case $this->reflector->hasAttribute(SubcommandGroup::class):
+//                    $subcommandGroup = $this->reflector->getAttribute(SubcommandGroup::class);
+//                    $subcommandGroup->reflector = $this->reflector;
+//                    $options[$subcommandGroup->name] = $subcommandGroup;
+//                    break;
+//                default:
+//                    $fakeSubcommandGroup = new SubcommandGroup(name: 'fake', description: 'fake');
+//                    $fakeSubcommandGroup->reflector = $this->reflector;
+//                    foreach ($fakeSubcommandGroup->options as $option) {
+//                        $options[$option->name] = $option;
+//                    }
+//
+//                    if (empty($options)) {
+//
+//                        /*
+//                         * We assume that there is no Subcommands found and this is an invokable command
+//                         * User should provide the __invoke command, so we actually can read the method options (if there are some)
+//                         */
+//                        if (!$this->reflector->getReflection()->hasMethod('__invoke')) {
+//                            throw new RuntimeException('Class [' . $this->reflector->getName() . '] should declare public sub-commands or have an __invoke method');
+//                        }
+//
+//                        $fakeSubcommand = new Subcommand(name: 'fake', description: 'fake');
+//                        $fakeSubcommand->reflector = $this->reflector->getMethod('__invoke');
+//                        foreach ($fakeSubcommand->options as $option) {
+//                            $options[$option->name] = $option;
+//                        }
+//                    }
+//            }
+//
+//            return $options;
+//        }
+//    }
+
 
     public function __construct(
         string|BackedEnum|null         $name = null,
@@ -114,18 +186,19 @@ final class Command
     )
     {
         $this->setAttribute('name', $name);
-    }
 
-    public function mergeOptions(Command $command): void
-    {
-        $this->options = $command->options;
+        if (($this->type === ApplicationCommandTypes::CHAT_INPUT) && !$this->description) {
+            throw new \InvalidArgumentException("Description for command is required when type=CHAT_INPUT");
+        }
     }
 
     /**
      * @throws InvalidCommandNameException
      */
-    public function build(): CommandBuilder
+    public function build(ClassReflector $class): CommandBuilder
     {
+        $this->reflector = $class;
+
         $command = CommandBuilder::new()
             ->setName($this->name)
             ->setNsfw($this->isNsfw)
@@ -134,17 +207,18 @@ final class Command
 
         if ($this->type === ApplicationCommandTypes::CHAT_INPUT) {
 
-            if (!$this->description) {
-                throw new \LogicException("Description for command [$this->name] is required when type=CHAT_INPUT");
-            }
+//            if (!$this->description) {
+//                throw new \LogicException("Description for command [$this->command] is required when type=CHAT_INPUT");
+//            }
 
-            $command->setDescription($this->description);
+            $command->setDescription($this->description ?? '');
         }
 
 
-        foreach ($this->options as $option) {
-            $command->addOption($option->build);
-        }
+//        foreach ($this->options as $option) {
+//            $command->addOption($option->build);
+//        }
+
 
         return $command;
     }

@@ -14,26 +14,24 @@ final class CommandsDiscovery implements Discovery
     use IsDiscovery;
 
     public function __construct(
-        private readonly CommandsRegistry $commandRegistry,
+        private readonly CommandsRegistry $registry
     )
     {
+
     }
 
     public function discover(DiscoveryLocation $location, ClassReflector $class): void
     {
-        foreach ($class->getAttributes(Command::class) as $attribute) {
-            $attribute->reflector = $class;
-            $this->discoveryItems->add($location, $attribute);
+        foreach ($class->getAttributes(Command::class) as $command) {
+            $command->reflector = $class;
+            $this->discoveryItems->add($location, $command);
         }
     }
 
-    /**
-     * @mago-expect best-practices/no-empty-loop
-     */
     public function apply(): void
     {
         foreach ($this->discoveryItems as $command) {
-            $this->commandRegistry->add($command);
+            $this->registry->bucket->add($command);
         }
     }
 }

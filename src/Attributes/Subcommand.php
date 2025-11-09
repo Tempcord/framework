@@ -14,6 +14,7 @@ use Tempest\Reflection\MethodReflector;
 use function React\Async\async;
 use function React\Async\await;
 use function Tempest\get;
+use function Tempest\Support\str;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 final class Subcommand
@@ -22,8 +23,18 @@ final class Subcommand
 
     public string $name {
         get {
-            $name = $this->getAttribute('name');
-            return $name instanceof BackedEnum ? $name->value : $name;
+
+            if ($this->getAttribute('name')) {
+                $name = $this->getAttribute('name');
+                return $name instanceof BackedEnum ? $name->value : $name;
+            }
+
+            return str($this->reflector->getShortName())
+                ->replaceEnd('Command', '')
+                ->replaceStart('Command', '')
+                ->snake('_')
+                ->lower()
+                ->toString();
         }
     }
     public MethodReflector $reflector;
@@ -89,9 +100,15 @@ final class Subcommand
         }
     }
 
+    public bool $isGuildCommand {
+        get {
+            return false;
+        }
+    }
+
     public function __construct(
-        string|BackedEnum $name,
-        public string     $description
+        string|BackedEnum|null $name = null,
+        public string|null            $description = null,
     )
     {
         $this->setAttribute('name', $name);
