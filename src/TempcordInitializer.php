@@ -4,7 +4,6 @@ namespace Tempcord;
 
 use Ragnarok\Fenrir\Discord;
 use Tempcord\Registries\CommandsRegistry;
-use Tempest\Console\Console;
 use Tempest\Container\Container;
 use Tempest\Container\Initializer;
 use Tempest\Container\Singleton;
@@ -18,18 +17,21 @@ final readonly class TempcordInitializer implements Initializer
         $config = $container->get(TempcordConfig::class);
 
         return new Tempcord(
+
             discord: new Discord(
                 token: $config->token,
                 logger: $container->get(Logger::class),
             )->withGateway(
                 intents: $config->intents
             )->withRest(),
+
             commandsRegistry: $container->get(
                 className: CommandsRegistry::class,
                 params: [
                     'devGuildId' => $config->devGuildId,
                 ]
             )
-    );
+
+        );
     }
 }

@@ -72,8 +72,7 @@ The boilerplate includes example commands. Create a new command in any folder, f
 
 namespace App\Commands;
 
-use Tempcord\Attributes\Command;
-use Ragnarok\Fenrir\Gateway\Events\InteractionCreate;
+use Ragnarok\Fenrir\Gateway\Events\InteractionCreate;use Tempcord\Attributes\Commands\Command;
 
 #[Command(name: 'hello', description: 'Say hello!')]
 class HelloCommand

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tempcord\Attributes;
+namespace Tempcord\Attributes\Commands;
 
 use Attribute;
 use LogicException;

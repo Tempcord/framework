@@ -14,17 +14,17 @@ final class ConsoleLogChannel implements LogChannel
         private array $except = [],
     ) {
         $this->except = array_merge($this->except, [
-            'Fenrir initialized.',
-            'sending heartbeat',
-            'received heartbeat',
-            'http not checking',
-            'resetting payload count',
-            'Client: Connection esablished',
-            'Client: Attempting connection',
-            'Server: New message',
-            'Client: New message',
-            'Client: Queued message',
-            'Started heartbeat timer'
+//            'Fenrir initialized.',
+//            'sending heartbeat',
+//            'received heartbeat',
+//            'http not checking',
+//            'resetting payload count',
+//            'Client: Connection established',
+//            'Client: Attempting connection',
+//            'Server: New message',
+//            'Client: New message',
+//            'Client: Queued message',
+//            'Started heartbeat timer'
         ]);
     }
 

@@ -2,7 +2,7 @@
 
 namespace Tempcord\Support\Commands;
 
-use Tempcord\Attributes\Command;
+use Tempcord\Attributes\Commands\Command;
 use Tempest\Support\Arr\ImmutableArray;
 
 class CommandsBucket
@@ -17,6 +17,12 @@ class CommandsBucket
 
     public function add(Command $command): void
     {
-        $this->items = $this->items->put($command->name, $command);
+        if ($this->items->hasKey($command->name)) {
+            /** @var Command $existingCommand */
+            $existingCommand = $this->items[$command->name];
+            $existingCommand->merge($command);
+        } else {
+            $this->items = $this->items->put($command->name, $command);
+        }
     }
 }

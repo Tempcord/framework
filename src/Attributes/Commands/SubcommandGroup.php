@@ -1,6 +1,6 @@
 <?php
 
-namespace Tempcord\Attributes;
+namespace Tempcord\Attributes\Commands;
 
 use Attribute;
 use BackedEnum;
@@ -8,7 +8,6 @@ use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandOptionBuilder;
 use Tempcord\Traits\HasAttributes;
 use Tempest\Reflection\ClassReflector;
-use function Tempest\Support\Arr\dot;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 final  class SubcommandGroup
@@ -64,6 +63,7 @@ final  class SubcommandGroup
             return $options;
         }
     }
+
 
     public function __construct(
         string|BackedEnum $name,

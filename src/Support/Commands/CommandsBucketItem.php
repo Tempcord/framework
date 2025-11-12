@@ -2,7 +2,7 @@
 
 namespace Tempcord\Support\Commands;
 
-use Tempcord\Attributes\Command;
+use Tempcord\Attributes\Commands\Command;
 use Tempest\Reflection\ClassReflector;
 
 class CommandsBucketItem

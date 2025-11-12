@@ -16,7 +16,6 @@ final class ConsoleLogHandler extends AbstractProcessingHandler
         private readonly Console $console,
         private readonly array   $except = [],
         private readonly bool    $includeTimestamp = true,
-        private readonly bool    $includeContext = true,
                                  $level = Level::Debug,
                                  $bubble = true
     )
@@ -31,38 +30,36 @@ final class ConsoleLogHandler extends AbstractProcessingHandler
             return;
         }
 
-        $type = $this->getLogLevel($record->level);
         $message = $this->formatMessage($record);
         $component = $this->getComponent($record->level);
 
         // Use the appropriate console method based on log level
         $this->console->{$component}($message);
     }
-    
+
     private function shouldSkipMessage(string $message): bool
     {
         if (empty($this->except)) {
             return false;
         }
-        
-        $messageLower = str($message)->lower();
-        return $messageLower->contains(
+
+        return str($message)->lower()->contains(
             map_iterable($this->except, fn(string $pattern) => str($pattern)->lower())
         );
     }
-    
+
     private function formatMessage(LogRecord $record): string
     {
         $message = ucfirst($record->message);
-        
+
         if ($this->includeTimestamp) {
             $timestamp = $record->datetime->format('Y-m-d H:i:s');
             $message = "[{$timestamp}] {$message}";
         }
-        
+
         return $message;
     }
-    
+
     private function getLogLevel(Level $level): string
     {
         return match ($level) {
@@ -75,7 +72,7 @@ final class ConsoleLogHandler extends AbstractProcessingHandler
             default => LogLevel::INFO,
         };
     }
-    
+
     private function getComponent(Level $level): string
     {
         return match ($level) {

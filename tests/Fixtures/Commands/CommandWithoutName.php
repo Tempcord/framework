@@ -2,7 +2,7 @@
 
 namespace Tests\Fixtures\Commands;
 
-#[\Tempcord\Attributes\Command(description: 'fake')]
+#[\Tempcord\Attributes\Commands\Command(description: 'fake')]
 class CommandWithoutName
 {
 

@@ -2,8 +2,8 @@
 
 namespace Tests\Fixtures\Commands;
 
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Subcommand;
+use Tempcord\Attributes\Commands\Command;
+use Tempcord\Attributes\Commands\Subcommand;
 
 #[Command(description: 'test')]
 class CommandWithSubcommand

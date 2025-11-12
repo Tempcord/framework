@@ -2,7 +2,7 @@
 
 namespace Tests\Fixtures\Commands;
 
-use Tempcord\Attributes\Command;
+use Tempcord\Attributes\Commands\Command;
 use Tempcord\Attributes\HandledBy;
 
 #[Command(description: 'test')]

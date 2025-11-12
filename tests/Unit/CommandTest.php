@@ -1,6 +1,6 @@
 <?php
 
-use Tempcord\Attributes\Command;
+use Tempcord\Attributes\Commands\Command;
 use Tempcord\Registries\CommandsRegistry;
 use Tests\Fixtures\Commands\CommandChatInputWithoutDescription;
 use Tests\Fixtures\Commands\CommandWithDefinedName;
@@ -42,9 +42,9 @@ describe('Basic Commands', function (): void {
         $command = $this->registry->bucket->items->get('invokable');
         $expectedMethod = new ReflectionMethod(new InvokableCommand(), '__invoke');
 
-        expect($command->handler->getReflection()->getName())
+        expect($command->handlers->getReflection()->getName())
             ->toBe($expectedMethod->getName())
-            ->and($command->handler->getReflection()->isPublic())
+            ->and($command->handlers->getReflection()->isPublic())
             ->toBeTrue();
     });
 
@@ -55,9 +55,9 @@ describe('Basic Commands', function (): void {
         $command = $this->registry->bucket->items->get('handled_by');
         $expectedMethod = new ReflectionMethod(new HandledByCommand(), 'handler_method');
 
-        expect($command->handler->getReflection()->getName())
+        expect($command->handlers->getReflection()->getName())
             ->toBe($expectedMethod->getName())
-            ->and($command->handler->getReflection()->isPublic())
+            ->and($command->handlers->getReflection()->isPublic())              
             ->toBeTrue();
     });
 
