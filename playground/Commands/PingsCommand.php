@@ -5,10 +5,12 @@ namespace Playground\Commands;
 use Ragnarok\Fenrir\Parts\User;
 use Tempcord\Attributes\Commands\Command;
 use Tempcord\Attributes\Commands\Option;
+use Tempcord\Attributes\Commands\SubcommandGroup;
 use Tempest\Console\Console;
 
-#[Command]
-readonly class PingCommand
+#[Command(description: "Ping command")]
+#[SubcommandGroup(name: 'test', description: 'as')]
+readonly class PingsCommand
 {
     public function __construct(
         private Console $console

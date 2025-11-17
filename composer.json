@@ -27,7 +27,7 @@
     "phpunit/phpunit": "^10.0"
   },
   "scripts": {
-    "test": "phpunit",
+    "test": "pest",
     "analyse": "phpstan analyse",
     "cs-fix": "php-cs-fixer fix"
   },

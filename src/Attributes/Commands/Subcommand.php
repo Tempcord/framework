@@ -6,7 +6,7 @@ use Attribute;
 use BackedEnum;
 use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandOptionBuilder;
-use Tempcord\Traits\HasAttributes;
+use Tempcord\Support\Traits\HasAttributes;
 use Tempest\Reflection\MethodReflector;
 use function Tempest\Support\str;
 
@@ -60,8 +60,8 @@ final class Subcommand
     }
 
     public function __construct(
+        public string     $description,
         string|BackedEnum|null $name = null,
-        public string|null     $description = null,
     )
     {
         $this->setAttribute('name', $name);

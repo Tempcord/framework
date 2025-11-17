@@ -5,16 +5,15 @@ namespace Tempcord;
 use Ragnarok\Fenrir\Discord;
 use Tempcord\Registries\CommandsRegistry;
 
-final class Tempcord
+final readonly class Tempcord
 {
     public function __construct(
-        public readonly Discord           $discord,
-        private readonly CommandsRegistry $commandsRegistry
+        public Discord           $discord,
+        private CommandsRegistry $commandsRegistry
     )
     {
         $this->discord->registerExtension($this->commandsRegistry);
     }
-
 
     public function boot(): void
     {

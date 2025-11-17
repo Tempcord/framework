@@ -2,20 +2,20 @@
 
 [![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](https://github.com/tempcord/framework)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![PHP Version](https://img.shields.io/badge/php-%5E8.3-blue.svg)](https://php.net)
+[![PHP Version](https://img.shields.io/badge/php-%5E8.4-blue.svg)](https://php.net)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
 
 ## Description
 
 Tempcord is a modern, elegant PHP framework designed specifically for building Discord bots with ease. Built on top of the powerful Tempest Console framework and Ragnarok Fenrir Discord library, Tempcord provides a clean, attribute-based approach to creating sophisticated Discord bots with minimal boilerplate code.
 
-The framework leverages PHP 8.3+ features and modern development practices to deliver a robust foundation for Discord bot development, featuring automatic command registration, event handling, and seamless integration with Discord's API.
+The framework leverages PHP 8.4+ features and modern development practices to deliver a robust foundation for Discord bot development, featuring automatic command registration, event handling, and seamless integration with Discord's API.
 
 > **Getting Started**: Use the `tempcord/tempcord` boilerplate to quickly create new Discord bot applications. This repository contains the core framework - for building applications, use `composer create-project tempcord/tempcord your-bot-name`.
 
 ## Features
 
-- 🚀 **Modern PHP 8.3+** - Leverages the latest PHP features and syntax
+- 🚀 **Modern PHP 8.4+** - Leverages the latest PHP features and syntax
 - 🎯 **Attribute-Based Commands** - Define Discord commands using PHP attributes
 - 📡 **Event-Driven Architecture** - Handle Discord events with clean, organized handlers
 - 🔧 **Auto-Discovery** - Automatic command and event registration
@@ -30,7 +30,7 @@ The framework leverages PHP 8.3+ features and modern development practices to de
 
 ### Prerequisites
 
-- PHP 8.3 or higher
+- PHP 8.4 or higher
 - Composer
 - A Discord Bot Token (from [Discord Developer Portal](https://discord.com/developers/applications))
 

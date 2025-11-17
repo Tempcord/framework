@@ -44,7 +44,7 @@ describe('Basic Commands', function (): void {
 
         expect($command->handlers->getReflection()->getName())
             ->toBe($expectedMethod->getName())
-            ->and($command->handlers->getReflection()->isPublic())
+            ->and($command->handlers->getReflection()->getReflection()->isPublic())
             ->toBeTrue();
     });
 
@@ -57,7 +57,7 @@ describe('Basic Commands', function (): void {
 
         expect($command->handlers->getReflection()->getName())
             ->toBe($expectedMethod->getName())
-            ->and($command->handlers->getReflection()->isPublic())              
+            ->and($command->handlers->getReflection()->getReflection()->isPublic())              
             ->toBeTrue();
     });
 
@@ -80,7 +80,7 @@ describe('Commands With Subcommands', function (): void {
 
         expect($command->hasSubcommands)->toBeTrue()
             ->and($command->subCommands)->toHaveCount(1)
-            ->and(array_shift($subcommands)->name)->toBe('with_subcommand_subcommand');
+            ->and(array_shift($subcommands)->name)->toBe('subcommand');
     });
 
     it('discovers all subcommands of the command', function (): void {
@@ -91,8 +91,8 @@ describe('Commands With Subcommands', function (): void {
 
         expect($command->hasSubcommands)->toBeTrue()
             ->and($command->subCommands)->toHaveCount(2)
-            ->and(array_shift($subcommands)->name)->toBe('with_two_subcommands_subcommand')
-            ->and(array_shift($subcommands)->name)->toBe('with_two_subcommands_subcommand_two');
+            ->and(array_shift($subcommands)->name)->toBe('subcommand')
+            ->and(array_shift($subcommands)->name)->toBe('subcommand_two');
 
     });
 });

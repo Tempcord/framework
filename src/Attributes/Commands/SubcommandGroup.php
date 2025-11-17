@@ -6,7 +6,7 @@ use Attribute;
 use BackedEnum;
 use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandOptionBuilder;
-use Tempcord\Traits\HasAttributes;
+use Tempcord\Support\Traits\HasAttributes;
 use Tempest\Reflection\ClassReflector;
 
 #[Attribute(Attribute::TARGET_CLASS)]

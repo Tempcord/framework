@@ -83,7 +83,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::tearDown();
 
-//        unset($this->root, $this->container, $this->kernel);
+        unset($this->root, $this->container, $this->kernel);
     }
 
 }

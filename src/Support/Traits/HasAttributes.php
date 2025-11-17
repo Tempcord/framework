@@ -1,6 +1,6 @@
 <?php
 
-namespace Tempcord\Traits;
+namespace Tempcord\Support\Traits;
 
 use BackedEnum;
 

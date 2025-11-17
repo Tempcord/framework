@@ -5,17 +5,16 @@ namespace Tempcord\Attributes\Commands;
 use Attribute;
 use BackedEnum;
 use Ragnarok\Fenrir\Enums\ApplicationCommandTypes;
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandBuilder;
-use Tempcord\Attributes\HandledBy;
+use Tempcord\Contract\Buildable;
+use Tempcord\Contract\CanBeHandled;
 use Tempcord\Support\Commands\CommandHandler;
-use Tempcord\Traits\HasAttributes;
+use Tempcord\Support\Traits\HasAttributes;
 use Tempest\Reflection\ClassReflector;
-use Tempest\Support\Str\ImmutableString;
 use function Tempest\Support\str;
 
 #[Attribute(Attribute::TARGET_CLASS)]
-final class Command
+final class Command implements Buildable, CanBeHandled
 {
     use HasAttributes;
 
@@ -39,94 +38,30 @@ final class Command
         }
     }
 
-    /**
-     * Is Command marked as grouped
-     *
-     * Checks if command has SubcommandGroup attribute
-     */
-    public bool $isGrouped {
-        get {
-            return $this->rememberAttribute('isGrouped', $this->reflector->hasAttribute(SubcommandGroup::class));
-        }
-    }
-
-    /**
-     * List of commands subcommands if there are any
-     *
-     * @var array<Subcommand>
-     */
-    public array $subCommands {
-        get {
-            $subCommands = [];
-            foreach ($this->reflector->getPublicMethods() as $method) {
-                if ($method->hasAttribute(Subcommand::class)) {
-                    /** @var Subcommand $subCommand */
-                    $subCommand = $method->getAttribute(Subcommand::class);
-                    $subCommand->reflector = $method;
-                    $subCommands[str($subCommand->name)->when(
-                        $this->isGrouped,
-                        fn(ImmutableString $name) => $name->prepend($this->reflector->getAttribute(SubcommandGroup::class)->name . ':')
-                    )->toString()] = $subCommand;
-                }
-            }
-
-            return $subCommands;
-        }
-    }
 
     /**
      * Command's handler
      *
-     * Finds any kind of command handler.
-     * Command handler could be defined inside HandledBy attribute
-     * Command handler could be defined as only 1 public method of the command class
-     * Command handler could be defined as invokable method
-     *
-     * If none is provided - route::defaultHandler method would be passed
      * @var CommandHandler
      */
     public CommandHandler $handler {
         get {
+            $method = null;
 
-            $handler = new CommandHandler($this);
-
-            if ($handledBy = $this->reflector->getAttribute(HandledBy::class)) {
-                $handler->method = $this->reflector->getMethod($handledBy->method);
+            if (count($this->reflector->getPublicMethods()) === 1 && $this->reflector->getPublicMethods()[0]->getName() !== '__construct') {
+                $method = $this->reflector->getPublicMethods()[0];
             }
 
-            //Class contains only 1 method - then it's handler
-            if (count($this->reflector->getPublicMethods()) === 1) {
-                $handler->method = $this->reflector->getPublicMethods()[0];
-            }
-
-            //Is that class invokable
             if ($this->reflector->getReflection()->hasMethod('__invoke')) {
-                $handler->method = $this->reflector->getMethod('__invoke');
+                $method = $this->reflector->getMethod('__invoke');
             }
 
-            if (count($this->subCommands)) {
-                /**
-                 * Default handler.
-                 *
-                 * Actually we are just making sure that Command with Subcommands would be handled property.
-                 * If command has no subcommands - this handler would throw exception, informing that we do not
-                 * know how to handle this command, and user should define own command handler.
-                 */
-                $handler->method = new ClassReflector(new class {
-
-                    public function __invoke(CommandInteraction $interaction)
-                    {
-
-                    }
-
-                })->getMethod('__invoke');
-            }
-
-            if (!$handler->method) {
+            if (!$method) {
                 throw new \InvalidArgumentException('Command must have handler method.');
             }
 
-            return $handler;
+
+            return new CommandHandler($this, $method);
         }
     }
 
@@ -147,11 +82,11 @@ final class Command
             $options = $this->getAttribute('options', default: []);
 
             switch (true) {
-                case $this->isGrouped:
-                    $subcommandGroup = $this->reflector->getAttribute(SubcommandGroup::class);
-                    $subcommandGroup->reflector = $this->reflector;
-                    $options[] = $subcommandGroup;
-                    break;
+//                case $this->isGrouped:
+//                    $subcommandGroup = $this->reflector->getAttribute(SubcommandGroup::class);
+//                    $subcommandGroup->reflector = $this->reflector;
+//                    $options[] = $subcommandGroup;
+//                    break;
                 case !empty($this->subCommands):
                     foreach ($this->subCommands as $subCommand) {
                         $options[] = $subCommand;

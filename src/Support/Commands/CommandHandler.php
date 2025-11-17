@@ -6,22 +6,23 @@ use Ragnarok\Fenrir\Interaction\CommandInteraction;
 use Tempcord\Attributes\Commands\Command;
 use Tempcord\Attributes\Commands\Option;
 use Tempest\Reflection\MethodReflector;
+use Throwable;
 use function React\Async\async;
 use function Tempest\get;
 use function Tempest\Support\Arr\is_empty;
 
-class CommandHandler
+readonly class CommandHandler
 {
-    public ?MethodReflector $method = null;
 
     public function __construct(
-        private readonly Command $command
+        private Command         $command,
+        private MethodReflector $method
     )
     {
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(CommandInteraction $interaction): void
     {
@@ -29,14 +30,13 @@ class CommandHandler
         $options = $this->command->options;
         $handledBy = $this->method;
 
-        if (!is_empty($this->command->subCommands)) {
-            $subCommandName = $interaction->getSubCommandName();
-            $subCommand = $this->command->subCommands[$subCommandName];
-            $options = $subCommand->options;
-            $handledBy = $subCommand->reflector;
-
-        }
-
+//        if (!is_empty($this->command->subCommands)) {
+//            $subCommandName = $interaction->getSubCommandName();
+//            $subCommand = $this->command->subCommands[$subCommandName];
+//            $options = $subCommand->options;
+//            $handledBy = $subCommand->reflector;
+//
+//        }
 
         $this->mapArguments($options, $interaction, $subCommandName)()->then(function (array $args) use ($handledBy) {
             $command = get($this->command->reflector->getName());
