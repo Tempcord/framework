@@ -26,21 +26,6 @@ final class Subcommand
         }
     }
 
-    public CommandOptionBuilder $build {
-        get {
-            $subcommand = new CommandOptionBuilder()
-                ->setName($this->name)
-                ->setDescription($this->description)
-                ->setType(ApplicationCommandOptionType::SUB_COMMAND);
-
-            foreach ($this->options as $option) {
-                $subcommand->addOption($option->build);
-            }
-
-            return $subcommand;
-        }
-    }
-
     /**
      * @var array<string, Option>
      */
@@ -59,11 +44,32 @@ final class Subcommand
         }
     }
 
+    public CommandOptionBuilder $builder {
+        get {
+            $subcommand = new CommandOptionBuilder()
+                ->setName($this->name)
+                ->setDescription($this->description)
+                ->setType(ApplicationCommandOptionType::SUB_COMMAND);
+
+            foreach ($this->options as $option) {
+                $subcommand->addOption($option->build);
+            }
+
+            return $subcommand;
+        }
+    }
+
     public function __construct(
-        public string     $description,
+        public string          $description,
         string|BackedEnum|null $name = null,
     )
     {
         $this->setAttribute('name', $name);
+    }
+
+    public function withReflector(MethodReflector $reflector): Subcommand
+    {
+        $this->reflector = $reflector;
+        return $this;
     }
 }

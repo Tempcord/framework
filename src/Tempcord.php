@@ -4,19 +4,31 @@ namespace Tempcord;
 
 use Ragnarok\Fenrir\Discord;
 use Tempcord\Registries\CommandsRegistry;
+use Tempest\Container\Container;
+use Tempest\Log\Logger;
 
 final readonly class Tempcord
 {
     public function __construct(
-        public Discord           $discord,
-        private CommandsRegistry $commandsRegistry
+        private(set) CommandsRegistry $commandsRegistry,
+        private(set) Container $container
     )
     {
-        $this->discord->registerExtension($this->commandsRegistry);
     }
 
-    public function boot(): void
+    public function boot(Logger $logger, TempcordConfig $config): void
     {
-        $this->discord->gateway->open();
+        $discord = new Discord(
+            token: $config->token,
+            logger: $logger,
+        )->withGateway(
+            intents: $config->intents
+        )->withRest();
+
+        $this->container->singleton(Discord::class, $discord);
+
+        $discord->registerExtension($this->commandsRegistry);
+
+        $discord->gateway->open();
     }
 }

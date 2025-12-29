@@ -2,20 +2,14 @@
 
 <?php
 
+use Tempcord\Support\TempcordConsoleApplication;
 use Tempest\Console\ConsoleApplication;
-use Tempest\Discovery\DiscoveryLocation;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
 try {
     ConsoleApplication::boot(
             name: 'Tempcord',
-            discoveryLocations: [
-                    new DiscoveryLocation(
-                            namespace: 'Playground\\',
-                            path: __DIR__ . '/playground'
-                    )
-            ]
     )->run();
 } catch (\Tempest\Console\ExitCodeWasInvalid $e) {
 

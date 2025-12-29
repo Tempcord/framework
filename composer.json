@@ -1,12 +1,12 @@
 {
   "name": "tempcord/framework",
-  "version": "0.6.0",
+  "version": "0.6.135",
   "description": "A modern, elegant PHP framework for building Discord bots with ease",
   "type": "library",
   "require": {
-    "php": "^8.4",
-    "tempest/console": "^2",
+    "php": "^8.5",
     "ragnarok/fenrir": "^1",
+    "tempest/console": "^2",
     "tempest/core": "^2"
   },
   "license": "MIT",
@@ -20,17 +20,6 @@
   ],
   "minimum-stability": "dev",
   "prefer-stable": true,
-  "require-dev": {
-    "friendsofphp/php-cs-fixer": "^3.0",
-    "pestphp/pest": "^2.36",
-    "phpstan/phpstan": "^1.0",
-    "phpunit/phpunit": "^10.0"
-  },
-  "scripts": {
-    "test": "pest",
-    "analyse": "phpstan analyse",
-    "cs-fix": "php-cs-fixer fix"
-  },
   "config": {
     "sort-packages": true,
     "optimize-autoloader": true,
@@ -45,14 +34,11 @@
     "php"
   ],
   "autoload": {
+    "files": [
+      "src/functions.php"
+    ],
     "psr-4": {
       "Tempcord\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Playground\\": "playground/",
-      "Tests\\": "tests/"
     }
   }
 }

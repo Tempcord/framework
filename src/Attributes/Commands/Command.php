@@ -6,25 +6,28 @@ use Attribute;
 use BackedEnum;
 use Ragnarok\Fenrir\Enums\ApplicationCommandTypes;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandBuilder;
+use Ragnarok\Fenrir\Rest\Helpers\Command\CommandOptionBuilder;
+use Tempcord\Attributes\HasSubcommands;
 use Tempcord\Contract\Buildable;
 use Tempcord\Contract\CanBeHandled;
 use Tempcord\Support\Commands\CommandHandler;
 use Tempcord\Support\Traits\HasAttributes;
 use Tempest\Reflection\ClassReflector;
+use function Tempest\Support\arr;
 use function Tempest\Support\str;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 final class Command implements Buildable, CanBeHandled
 {
-    use HasAttributes;
+    use HasAttributes, HasSubcommands;
 
     public ClassReflector $reflector;
 
     /**
      * Command name
      *
-     * If none is provided from constructor - name would be created from class name,
-     * removing "Command" from beginning and end of the class name.
+     * If none is provided from constructor - name would be created from the class name,
+     * removing "Command" from the beginning and end of the class name.
      * Additionally, it will be snake_case.
      */
     public string $name {
@@ -38,7 +41,6 @@ final class Command implements Buildable, CanBeHandled
         }
     }
 
-
     /**
      * Command's handler
      *
@@ -48,18 +50,14 @@ final class Command implements Buildable, CanBeHandled
         get {
             $method = null;
 
-            if (count($this->reflector->getPublicMethods()) === 1 && $this->reflector->getPublicMethods()[0]->getName() !== '__construct') {
+            $publicMethods = arr($this->reflector->getPublicMethods());
+            if ($publicMethods->count() === 1 && $publicMethods->first()->getName() !== '__construct') {
                 $method = $this->reflector->getPublicMethods()[0];
             }
 
             if ($this->reflector->getReflection()->hasMethod('__invoke')) {
                 $method = $this->reflector->getMethod('__invoke');
             }
-
-            if (!$method) {
-                throw new \InvalidArgumentException('Command must have handler method.');
-            }
-
 
             return new CommandHandler($this, $method);
         }
@@ -74,36 +72,22 @@ final class Command implements Buildable, CanBeHandled
      *
      * Options can be merged (if another command with the same base name is defined in another class)
      *
-     * @var array<SubcommandGroup|Subcommand|Option>
+     * @var array<Option|Subcommand>
      */
     public array $options {
         get {
-            //Get command options from memory
-            $options = $this->getAttribute('options', default: []);
+            $options = [];
 
-            switch (true) {
-//                case $this->isGrouped:
-//                    $subcommandGroup = $this->reflector->getAttribute(SubcommandGroup::class);
-//                    $subcommandGroup->reflector = $this->reflector;
-//                    $options[] = $subcommandGroup;
-//                    break;
-                case !empty($this->subCommands):
-                    foreach ($this->subCommands as $subCommand) {
-                        $options[] = $subCommand;
+            if ($this->hasSubcommands) {
+                $options = $this->subcommands;
+            } else {
+                foreach ($this->handler->method?->getParameters() as $parameter) {
+                    if ($parameter->hasAttribute(Option::class)) {
+                        $options[] = $parameter->getAttribute(Option::class)
+                            ?->withReflector($parameter);
                     }
-                    break;
-                default:
-                    foreach ($this->handler->method->getParameters() as $parameter) {
-                        if ($parameter->hasAttribute(Option::class)) {
-                            /** @var Option $option */
-                            $option = $parameter->getAttribute(Option::class);
-                            $option->reflector = $parameter;
-                            $options[] = $option;
-                        }
-                    }
+                }
             }
-
-            $this->setAttribute('options', $options);
 
             return $options;
         }
@@ -125,13 +109,12 @@ final class Command implements Buildable, CanBeHandled
 
 
             foreach ($this->options as $option) {
-                $builder->addOption($option->build);
+                $builder->addOption($option->builder);
             }
 
             return $builder;
         }
     }
-
 
     public function __construct(
         string|BackedEnum|null         $name = null,
@@ -145,12 +128,12 @@ final class Command implements Buildable, CanBeHandled
     {
         $this->setAttribute('name', $name);
 
-        if (($this->type === ApplicationCommandTypes::CHAT_INPUT) && !$this->description) {
+        if (($this->type === ApplicationCommandTypes::CHAT_INPUT) && $this->description === null) {
             throw new \InvalidArgumentException("Description for command is required when type=CHAT_INPUT");
         }
     }
 
-    public function useReflector(ClassReflector $class): Command
+    public function withReflector(ClassReflector $class): Command
     {
         $this->reflector = $class;
         return $this;

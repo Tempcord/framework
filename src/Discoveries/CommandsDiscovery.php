@@ -14,7 +14,7 @@ final class CommandsDiscovery implements Discovery
     use IsDiscovery;
 
     public function __construct(
-        private readonly CommandsRegistry $registry
+        private readonly CommandsRegistry $registry,
     )
     {
 
@@ -24,7 +24,7 @@ final class CommandsDiscovery implements Discovery
     {
         /** @var Command $command */
         foreach ($class->getAttributes(Command::class) as $command) {
-            $this->discoveryItems->add($location, $command->useReflector($class));
+            $this->discoveryItems->add($location, $command->withReflector($class));
         }
     }
 

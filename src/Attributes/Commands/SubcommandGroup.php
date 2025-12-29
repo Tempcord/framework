@@ -5,7 +5,9 @@ namespace Tempcord\Attributes\Commands;
 use Attribute;
 use BackedEnum;
 use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
+use Ragnarok\Fenrir\Rest\Helpers\Command\CommandBuilder;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandOptionBuilder;
+use Tempcord\Contract\Buildable;
 use Tempcord\Support\Traits\HasAttributes;
 use Tempest\Reflection\ClassReflector;
 
@@ -13,6 +15,8 @@ use Tempest\Reflection\ClassReflector;
 final  class SubcommandGroup
 {
     use HasAttributes;
+
+    public ClassReflector $reflector;
 
     public string $name {
         get {
@@ -30,9 +34,6 @@ final  class SubcommandGroup
             return $keys;
         }
     }
-
-    public ClassReflector $reflector;
-
     public CommandOptionBuilder $build {
         get {
             $subcommandGroup = CommandOptionBuilder::new()
@@ -67,10 +68,9 @@ final  class SubcommandGroup
 
     public function __construct(
         string|BackedEnum $name,
-        public string     $description
+        public string $description
     )
     {
         $this->setAttribute('name', $name);
     }
-
 }

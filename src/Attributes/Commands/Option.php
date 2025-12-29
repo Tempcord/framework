@@ -3,11 +3,14 @@
 namespace Tempcord\Attributes\Commands;
 
 use Attribute;
+use Closure;
 use LogicException;
+use Ragnarok\Fenrir\Discord;
 use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
 use Ragnarok\Fenrir\Interaction\CommandInteraction;
 use Ragnarok\Fenrir\Parts\ApplicationCommandInteractionDataOptionStructure;
 use Ragnarok\Fenrir\Parts\Channel;
+use Ragnarok\Fenrir\Parts\GuildMember;
 use Ragnarok\Fenrir\Parts\Role;
 use Ragnarok\Fenrir\Parts\User;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandOptionBuilder;
@@ -52,7 +55,7 @@ final class Option
                 'int' => ApplicationCommandOptionType::INTEGER,
                 'float' => ApplicationCommandOptionType::NUMBER,
                 'bool' => ApplicationCommandOptionType::BOOLEAN,
-                User::class => ApplicationCommandOptionType::USER,
+                User::class, GuildMember::class => ApplicationCommandOptionType::USER,
                 Channel::class => ApplicationCommandOptionType::CHANNEL,
                 Role::class => ApplicationCommandOptionType::ROLE,
                 //@todo Add more options: Mentionable
@@ -80,13 +83,19 @@ final class Option
     }
 
     public function __construct(
-        //@todo Add more options for building the Option (from DiscordPHP)
-        public string        $description,
-        ?string              $name = null,
-        public ?Autocomplete $autocomplete = null,
+        public string   $description,
+        ?string         $name = null,
+        public ?Closure $autocomplete = null,
     )
     {
         $this->setAttribute('name', $name);
+    }
+
+    public function withReflector(ParameterReflector $reflector): Option
+    {
+        $this->reflector = $reflector;
+        return $this;
+
     }
 
     /**
@@ -101,17 +110,17 @@ final class Option
             return null;
         }
 
-        $tempcord = get(Tempcord::class);
+        $discord = get(Discord::class);
 
 
         if ($option->type === ApplicationCommandOptionType::USER) {
-            await($tempcord->discord->rest->user->get($option->value));
+            await($discord->rest->user->get($option->value));
         }
 
         return match ($option->type) {
-            ApplicationCommandOptionType::USER => await($tempcord->discord->rest->user->get($option->value)),
-            ApplicationCommandOptionType::CHANNEL => await($tempcord->discord->rest->channel->get($option->value)),
-            ApplicationCommandOptionType::ROLE => await($tempcord->discord->rest->guild->getRole($interaction->interaction->guild_id, $option->value)),
+            ApplicationCommandOptionType::USER => await($discord->rest->user->get($option->value)),
+            ApplicationCommandOptionType::CHANNEL => await($discord->rest->channel->get($option->value)),
+            ApplicationCommandOptionType::ROLE => await($discord->rest->guild->getRole($interaction->interaction->guild_id, $option->value)),
             //@todo need a proxy object that will proxy all props to Channel or User
             ApplicationCommandOptionType::MENTIONABLE => throw new RuntimeException('Not implemented'),
             default => $option->value,
