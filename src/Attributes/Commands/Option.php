@@ -16,6 +16,7 @@ use Ragnarok\Fenrir\Parts\User;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandOptionBuilder;
 use RuntimeException;
 use Tempcord\Interfaces\Autocomplete;
+use Tempcord\Support\Localization\CommandTranslator;
 use Tempcord\Support\Traits\HasAttributes;
 use Tempcord\Tempcord;
 use Tempest\Reflection\ParameterReflector;
@@ -30,6 +31,12 @@ final class Option
     use HasAttributes;
 
     public ParameterReflector $reflector;
+
+    /** @var string|null Command translation key for localization context */
+    private ?string $commandTranslationKey = null;
+
+    /** @var bool Whether localization is enabled */
+    private bool $localizationEnabled = false;
 
     public string $name {
         get {
@@ -69,15 +76,67 @@ final class Option
         }
     }
 
-    public CommandOptionBuilder $build {
+    public CommandOptionBuilder $builder {
         get {
-            return CommandOptionBuilder::new()
+            $builder = CommandOptionBuilder::new()
                 ->setName($this->name)
                 ->setDescription($this->description)
                 ->setRequired($this->isRequired)
                 ->setType($this->type)
                 ->setAutoComplete($this->autocomplete !== null);
+
+            // Apply localizations if enabled
+            if ($this->localizationEnabled && $this->commandTranslationKey !== null) {
+                $this->applyLocalizations($builder);
+            }
+
+            return $builder;
         }
+    }
+
+    /**
+     * Apply localizations to the option builder
+     */
+    private function applyLocalizations(CommandOptionBuilder $builder): void
+    {
+        try {
+            $translator = get(CommandTranslator::class);
+            $localizations = $translator->getOptionLocalizations(
+                $this->commandTranslationKey,
+                $this->name
+            );
+
+            $nameLocalizations = [];
+            $descriptionLocalizations = [];
+
+            foreach ($localizations as $locale => $translation) {
+                if (isset($translation['name'])) {
+                    $nameLocalizations[$locale] = $translation['name'];
+                }
+                if (isset($translation['description'])) {
+                    $descriptionLocalizations[$locale] = $translation['description'];
+                }
+            }
+
+            if (!empty($nameLocalizations)) {
+                $builder->setNameLocalizations($nameLocalizations);
+            }
+
+            if (!empty($descriptionLocalizations)) {
+                $builder->setDescriptionLocalizations($descriptionLocalizations);
+            }
+        } catch (\Throwable) {
+            // Silently ignore if translator is not available
+        }
+    }
+
+    /**
+     * Set localization context from parent command
+     */
+    public function setLocalizationContext(string $commandKey, bool $enabled): void
+    {
+        $this->commandTranslationKey = $commandKey;
+        $this->localizationEnabled = $enabled;
     }
 
     public function __construct(
