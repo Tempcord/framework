@@ -35,9 +35,9 @@ final readonly class PluginsListCommand
             $this->console->writeln(sprintf(
                 '  <em>%s</em> <comment>v%s</comment>',
                 $name,
-                $plugin->version()
+                $plugin->version
             ));
-            $this->console->writeln(sprintf('    %s', $plugin->description()));
+            $this->console->writeln(sprintf('    %s', $plugin->description));
 
             $middleware = $plugin->middleware();
             if (!empty($middleware)) {

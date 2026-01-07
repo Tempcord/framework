@@ -32,8 +32,10 @@ class Registry implements Extension
 
     public function __construct(
         private readonly Container $container,
-        private readonly Logger $logger,
-    ) {}
+        private readonly Logger    $logger,
+    )
+    {
+    }
 
     /**
      * Register a plugin from its discovery attribute.
@@ -76,15 +78,10 @@ class Registry implements Extension
     /**
      * Instantiate a plugin from its attribute.
      */
-    private function instantiatePlugin(Plugin $attribute): void
+    private function instantiatePlugin(Plugin $plugin): void
     {
-        $className = $attribute->getPluginClass();
-
         try {
-            /** @var Plugin $plugin */
-            $plugin = $this->container->get($className);
-
-            $name = $plugin->name();
+            $name = $plugin->name;
 
             if (isset($this->plugins[$name])) {
                 $this->logger->warning("Plugin '{$name}' is already registered, skipping duplicate");
@@ -92,19 +89,13 @@ class Registry implements Extension
             }
 
             // Let plugin register its services
-            $plugin->register($this->container);
-
-            // Collect global middleware
-            $this->globalMiddleware = array_merge(
-                $this->globalMiddleware,
-                $plugin->middleware()
-            );
+            $plugin->register();
 
             $this->plugins[$name] = $plugin;
 
-            $this->logger->debug("Registered plugin: {$name} v{$plugin->version()}");
+            $this->logger->debug("Registered plugin: {$name} v{$plugin->version}");
         } catch (\Throwable $e) {
-            $this->logger->error("Failed to instantiate plugin {$className}: {$e->getMessage()}");
+            $this->logger->error("Failed to instantiate plugin " . $plugin::class . ": {$e->getMessage()}");
         }
     }
 
@@ -114,9 +105,9 @@ class Registry implements Extension
     private function bootPlugin(Plugin $plugin, Discord $discord): void
     {
         try {
-            $plugin->boot($discord);
+            $plugin->boot();
         } catch (\Throwable $e) {
-            $this->logger->error("Failed to boot plugin {$plugin->name()}: {$e->getMessage()}");
+            $this->logger->error("Failed to boot plugin {$plugin->name}: {$e->getMessage()}");
         }
     }
 

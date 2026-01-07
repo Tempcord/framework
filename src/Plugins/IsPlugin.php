@@ -21,25 +21,28 @@ trait IsPlugin
     /**
      * Get the plugin name from composer.json.
      */
-    public function name(): string
-    {
-        return $this->getComposerData()['name'] ?? static::class;
+    public string $name {
+        get {
+            return $this->getComposerData()['name'] ?? static::class;
+        }
     }
 
     /**
      * Get the plugin version from composer.json.
      */
-    public function version(): string
-    {
-        return $this->getComposerData()['version'] ?? 'dev';
+    public string $version {
+        get {
+            return $this->getComposerData()['version'] ?? 'dev';
+        }
     }
 
     /**
      * Get the plugin description from composer.json.
      */
-    public function description(): string
-    {
-        return $this->getComposerData()['description'] ?? '';
+    public string $description {
+        get {
+            return $this->getComposerData()['description'] ?? '';
+        }
     }
 
     public function register(Container $container): void

@@ -19,27 +19,18 @@ final class Discovery implements \Tempest\Discovery\Discovery
 {
     use IsDiscovery;
 
-    public function __construct()
-    {
-    }
-
     public function discover(DiscoveryLocation $location, ClassReflector $class): void
     {
-        foreach ($class->getAttributes(Plugin::class) as $attribute) {
-            /** @var Plugin $pluginAttribute */
-            $pluginAttribute = $attribute->withReflector($class);
-
-            if ($pluginAttribute->enabled && $pluginAttribute->isValidPlugin()) {
-                $this->discoveryItems->add($location, $pluginAttribute);
-            }
+        if ($class->implements(Plugin::class)) {
+            $this->discoveryItems->add($location, $class);
         }
     }
 
     public function apply(): void
     {
         $registry = get(Registry::class);
-        foreach ($this->discoveryItems as $pluginAttribute) {
-            $registry->register($pluginAttribute);
+        foreach ($this->discoveryItems as $plugin) {
+            $registry->register(get($plugin->getName()));
         }
     }
 }
