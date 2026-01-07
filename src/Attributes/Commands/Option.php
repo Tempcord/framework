@@ -16,6 +16,7 @@ use Ragnarok\Fenrir\Parts\User;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandOptionBuilder;
 use RuntimeException;
 use Tempcord\Interfaces\Autocomplete;
+use Tempcord\Support\Localization\CommandTranslator;
 use Tempcord\Support\Traits\HasAttributes;
 use Tempcord\Tempcord;
 use Tempest\Reflection\ParameterReflector;
@@ -69,14 +70,41 @@ final class Option
         }
     }
 
-    public CommandOptionBuilder $build {
+    public CommandOptionBuilder $builder {
         get {
-            return CommandOptionBuilder::new()
+            $translator = $this->getTranslator();
+
+            // Resolve description (auto-detect translation key)
+            $resolvedDescription = $translator?->resolve($this->description) ?? $this->description;
+
+            $builder = CommandOptionBuilder::new()
                 ->setName($this->name)
-                ->setDescription($this->description)
+                ->setDescription($resolvedDescription)
                 ->setRequired($this->isRequired)
                 ->setType($this->type)
                 ->setAutoComplete($this->autocomplete !== null);
+
+            // Auto-add localizations if description is a translation key
+            if ($translator?->isTranslationKey($this->description)) {
+                $descLocalizations = $translator->getLocalizations($this->description);
+                if (!empty($descLocalizations)) {
+                    $builder->setDescriptionLocalizations($descLocalizations);
+                }
+            }
+
+            return $builder;
+        }
+    }
+
+    /**
+     * Get translator instance (null if not available)
+     */
+    private function getTranslator(): ?CommandTranslator
+    {
+        try {
+            return get(CommandTranslator::class);
+        } catch (\Throwable) {
+            return null;
         }
     }
 

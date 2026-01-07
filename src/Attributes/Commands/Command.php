@@ -12,6 +12,7 @@ use Tempcord\Contract\Buildable;
 use Tempcord\Contract\CanBeHandled;
 use Tempcord\Middleware\CommandMiddleware;
 use Tempcord\Support\Commands\CommandHandler;
+use Tempcord\Support\Localization\CommandTranslator;
 use Tempcord\Support\Traits\HasAttributes;
 use Tempcord\TempcordConfig;
 use Tempest\Reflection\ClassReflector;
@@ -103,13 +104,25 @@ final class Command implements Buildable, CanBeHandled
      */
     public CommandBuilder $builder {
         get {
+            $translator = $this->getTranslator();
+
+            // Resolve description (auto-detect translation key)
+            $resolvedDescription = $translator?->resolve($this->description) ?? $this->description;
+
             $builder = CommandBuilder::new()
                 ->setName($this->name)
                 ->setNsfw($this->isNsfw)
                 ->setDmPermission($this->directMessage)
                 ->setType($this->type)
-                ->setDescription($this->description);
+                ->setDescription($resolvedDescription);
 
+            // Auto-add localizations if description is a translation key
+            if ($translator?->isTranslationKey($this->description)) {
+                $descLocalizations = $translator->getLocalizations($this->description);
+                if (!empty($descLocalizations)) {
+                    $builder->setDescriptionLocalizations($descLocalizations);
+                }
+            }
 
             foreach ($this->options as $option) {
                 $builder->addOption($option->builder);
@@ -120,14 +133,26 @@ final class Command implements Buildable, CanBeHandled
     }
 
     /**
-     * @param string|BackedEnum|null $name
-     * @param string|null $description
-     * @param int|null $guildId
-     * @param bool $isNsfw
-     * @param array $permissions
-     * @param bool $directMessage
-     * @param ApplicationCommandTypes $type
-     * @param array<class-string<CommandMiddleware>> $middleware
+     * Get translator instance (null if not available)
+     */
+    private function getTranslator(): ?CommandTranslator
+    {
+        try {
+            return get(CommandTranslator::class);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * @param string|BackedEnum|null $name Command name
+     * @param string|null $description Command description or translation key (e.g., 'commands.ping')
+     * @param int|null $guildId Guild ID for guild-specific commands
+     * @param bool $isNsfw Whether the command is NSFW
+     * @param array $permissions Required permissions
+     * @param bool $directMessage Whether command works in DMs
+     * @param ApplicationCommandTypes $type Command type
+     * @param array<class-string<CommandMiddleware>> $middleware Middleware classes
      */
     public function __construct(
         string|BackedEnum|null         $name = null,
