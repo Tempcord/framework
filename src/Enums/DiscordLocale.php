@@ -10,13 +10,14 @@ namespace Tempcord\Enums;
  */
 enum DiscordLocale: string
 {
+    //TODO: Commentd out locales are not yet supported by Tempest Intl (@see Tempest\Intl\Locale)
     case Indonesian = 'id';
     case Danish = 'da';
     case German = 'de';
     case EnglishUK = 'en-GB';
     case EnglishUS = 'en-US';
     case Spanish = 'es-ES';
-    case SpanishLATAM = 'es-419';
+//    case SpanishLATAM = 'es-419';
     case French = 'fr';
     case Croatian = 'hr';
     case Italian = 'it';
@@ -38,9 +39,9 @@ enum DiscordLocale: string
     case Ukrainian = 'uk';
     case Hindi = 'hi';
     case Thai = 'th';
-    case ChineseChina = 'zh-CN';
+//    case ChineseChina = 'zh-CN';
     case Japanese = 'ja';
-    case ChineseTaiwan = 'zh-TW';
+//    case ChineseTaiwan = 'zh-TW';
     case Korean = 'ko';
 
     /**

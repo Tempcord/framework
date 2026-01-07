@@ -14,7 +14,7 @@ use Tempest\Container\Container;
  * Name, version, and description are automatically read from the plugin's
  * composer.json file. Override these methods if you need custom behavior.
  */
-abstract class AbstractPlugin implements Plugin
+trait IsPlugin
 {
     private ?array $composerData = null;
 

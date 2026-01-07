@@ -6,6 +6,7 @@ namespace Tempcord\Support\Localization;
 
 use Tempcord\Enums\DiscordLocale;
 use Tempest\Container\Singleton;
+use Tempest\Intl\Locale;
 use Tempest\Intl\Translator;
 
 /**
@@ -19,7 +20,9 @@ class CommandTranslator
 {
     public function __construct(
         private readonly Translator $translator
-    ) {}
+    )
+    {
+    }
 
     /**
      * Check if a string looks like a translation key
@@ -39,7 +42,8 @@ class CommandTranslator
             return $value;
         }
 
-        return $this->translator->translate($value, locale: $locale) ?? $value;
+
+        return $this->translator->translate($value, $locale) ?? $value;
     }
 
     /**
@@ -56,35 +60,19 @@ class CommandTranslator
 
         foreach (DiscordLocale::cases() as $discordLocale) {
             // Map Discord locale to Tempest locale (e.g., 'en-US' -> 'en', 'uk' -> 'uk')
-            $tempestLocale = $this->mapToTempestLocale($discordLocale->value);
+            $tempestLocale = str_replace(['-'], ['_'], $discordLocale->value);
 
-            $translation = $this->translator->translate($key, locale: $tempestLocale);
+            $translation = $this->translator->translateForLocale(
+                locale: Locale::from($tempestLocale),
+                key: $key
+            );
 
             // Only add if translation exists and differs from key
-            if ($translation !== null && $translation !== $key) {
+            if ($translation !== $key) {
                 $localizations[$discordLocale->value] = $translation;
             }
         }
 
         return $localizations;
-    }
-
-    /**
-     * Map Discord locale code to Tempest locale code
-     * Discord uses 'en-US', Tempest typically uses 'en'
-     */
-    private function mapToTempestLocale(string $discordLocale): string
-    {
-        // Try exact match first
-        // Then try base language (e.g., 'en-US' -> 'en')
-        return match ($discordLocale) {
-            'en-US', 'en-GB' => 'en',
-            'es-ES', 'es-419' => 'es',
-            'pt-BR' => 'pt',
-            'zh-CN' => 'zh',
-            'zh-TW' => 'zh-TW',
-            'sv-SE' => 'sv',
-            default => $discordLocale,
-        };
     }
 }

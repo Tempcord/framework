@@ -7,9 +7,9 @@ namespace Tempcord\Discoveries;
 use Tempcord\Attributes\Task;
 use Tempcord\Registries\TasksRegistry;
 use Tempest\Container\Container;
-use Tempest\Core\Discovery;
-use Tempest\Core\DiscoveryLocation;
-use Tempest\Core\IsDiscovery;
+use Tempest\Discovery\Discovery;
+use Tempest\Discovery\DiscoveryLocation;
+use Tempest\Discovery\IsDiscovery;
 use Tempest\Reflection\ClassReflector;
 
 final class TasksDiscovery implements Discovery
@@ -46,5 +46,9 @@ final class TasksDiscovery implements Discovery
         foreach ($tasks as $task) {
             $this->registry->register($task);
         }
+    }
+
+    public function apply(): void
+    {
     }
 }

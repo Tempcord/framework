@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tempcord\ConsoleCommands;
 
-use Tempcord\Plugins\PluginRegistry;
+use Tempcord\Plugins\Registry;
 use Tempest\Console\Console;
 use Tempest\Console\ConsoleCommand;
 
 final readonly class PluginsListCommand
 {
     public function __construct(
-        private PluginRegistry $registry,
-        private Console $console,
+        private Registry $registry,
+        private Console  $console,
     ) {}
 
     #[ConsoleCommand(name: 'plugins:list', description: 'List all registered Tempcord plugins')]

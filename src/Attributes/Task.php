@@ -113,4 +113,10 @@ final class Task implements CanBeHandled
         $days = (int) ($seconds / 86400);
         return "every {$days} day" . ($days > 1 ? 's' : '');
     }
+
+    public \Tempcord\Support\Commands\CommandHandler $handler {
+        get {
+            return $this->handler;
+        }
+    }
 }

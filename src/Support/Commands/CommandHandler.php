@@ -7,7 +7,7 @@ use Tempcord\Attributes\Commands\Option;
 use Tempcord\Attributes\Commands\Subcommand;
 use Tempcord\CommandInteraction;
 use Tempcord\Middleware\MiddlewarePipeline;
-use Tempcord\Plugins\PluginRegistry;
+use Tempcord\Plugins\Registry;
 use Tempcord\Support\Responses\InteractionResponse;
 use Tempcord\TempcordConfig;
 use Tempest\Container\Container;
@@ -43,7 +43,7 @@ readonly class CommandHandler
 
         // 1. Plugin middleware (from registered plugins)
         try {
-            $pluginRegistry = get(PluginRegistry::class);
+            $pluginRegistry = get(Registry::class);
             $middleware = array_merge($middleware, $pluginRegistry->getGlobalMiddleware());
         } catch (Throwable) {
             // Plugin registry not available yet, skip

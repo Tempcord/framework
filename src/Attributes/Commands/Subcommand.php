@@ -6,8 +6,10 @@ use Attribute;
 use BackedEnum;
 use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandOptionBuilder;
+use Tempcord\Support\Localization\CommandTranslator;
 use Tempcord\Support\Traits\HasAttributes;
 use Tempest\Reflection\MethodReflector;
+use function Tempest\get;
 use function Tempest\Support\str;
 
 #[Attribute(Attribute::TARGET_METHOD)]
@@ -46,13 +48,23 @@ final class Subcommand
 
     public CommandOptionBuilder $builder {
         get {
+            /** @var CommandTranslator $translator */
+            $translator = get(CommandTranslator::class);
             $subcommand = new CommandOptionBuilder()
                 ->setName($this->name)
-                ->setDescription($this->description)
+                ->setDescription($translator->resolve($this->description) ?? $this->description)
                 ->setType(ApplicationCommandOptionType::SUB_COMMAND);
 
             foreach ($this->options as $option) {
-                $subcommand->addOption($option->build);
+                $subcommand->addOption($option->builder);
+            }
+
+            // Auto-add localizations if description is a translation key
+            if ($translator->isTranslationKey($this->description)) {
+                $descLocalizations = $translator->getLocalizations($this->description);
+                if (!empty($descLocalizations)) {
+                    $subcommand->setDescriptionLocalizations($descLocalizations);
+                }
             }
 
             return $subcommand;

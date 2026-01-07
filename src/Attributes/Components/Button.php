@@ -64,4 +64,10 @@ final class Button implements CanBeHandled
 
         return [];
     }
+
+    public \Tempcord\Support\Commands\CommandHandler $handler {
+        get {
+            return $this->handler;
+        }
+    }
 }

@@ -9,9 +9,9 @@ use Tempcord\Attributes\Components\Modal;
 use Tempcord\Attributes\Components\SelectMenu;
 use Tempcord\Registries\ComponentsRegistry;
 use Tempest\Container\Container;
-use Tempest\Core\Discovery;
-use Tempest\Core\DiscoveryLocation;
-use Tempest\Core\IsDiscovery;
+use Tempest\Discovery\Discovery;
+use Tempest\Discovery\DiscoveryLocation;
+use Tempest\Discovery\IsDiscovery;
 use Tempest\Reflection\ClassReflector;
 use Tempest\Reflection\MethodReflector;
 
@@ -92,5 +92,9 @@ final class ComponentsDiscovery implements Discovery
         foreach ($data['modals'] ?? [] as $modal) {
             $this->registry->registerModal($modal);
         }
+    }
+
+    public function apply(): void
+    {
     }
 }

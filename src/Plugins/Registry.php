@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Tempcord\Plugins;
 
 use Ragnarok\Fenrir\Discord;
-use Ragnarok\Fenrir\Extension;
-use Tempcord\Attributes\TempcordPlugin;
+use Ragnarok\Fenrir\Extension\Extension;
 use Tempest\Container\Container;
 use Tempest\Container\Singleton;
 use Tempest\Log\Logger;
@@ -17,12 +16,12 @@ use Tempest\Log\Logger;
  * Plugins are discovered automatically and initialized in priority order.
  */
 #[Singleton]
-class PluginRegistry implements Extension
+class Registry implements Extension
 {
     /** @var array<string, Plugin> Registered plugins indexed by name */
     private array $plugins = [];
 
-    /** @var array<TempcordPlugin> Plugin attributes pending instantiation */
+    /** @var array<Plugin> Plugin attributes pending instantiation */
     private array $pending = [];
 
     /** @var array<class-string> Global middleware from all plugins */
@@ -39,7 +38,7 @@ class PluginRegistry implements Extension
     /**
      * Register a plugin from its discovery attribute.
      */
-    public function register(TempcordPlugin $attribute): void
+    public function register(Plugin $attribute): void
     {
         $this->pending[] = $attribute;
     }
@@ -77,7 +76,7 @@ class PluginRegistry implements Extension
     /**
      * Instantiate a plugin from its attribute.
      */
-    private function instantiatePlugin(TempcordPlugin $attribute): void
+    private function instantiatePlugin(Plugin $attribute): void
     {
         $className = $attribute->getPluginClass();
 

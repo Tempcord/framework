@@ -154,9 +154,9 @@ namespace Tempcord {
     /**
      * Get the plugin registry
      */
-    function plugins(): \Tempcord\Plugins\PluginRegistry
+    function plugins(): \Tempcord\Plugins\Registry
     {
-        return get(\Tempcord\Plugins\PluginRegistry::class);
+        return get(\Tempcord\Plugins\Registry::class);
     }
 
     /**

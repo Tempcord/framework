@@ -2,7 +2,7 @@
 
 namespace Tempcord;
 
-use Tempcord\Plugins\PluginRegistry;
+use Tempcord\Plugins\Registry;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\ComponentsRegistry;
 use Tempcord\Registries\TasksRegistry;
@@ -19,7 +19,7 @@ final readonly class TempcordInitializer implements Initializer
             commandsRegistry: $container->get(CommandsRegistry::class),
             componentsRegistry: $container->get(ComponentsRegistry::class),
             tasksRegistry: $container->get(TasksRegistry::class),
-            pluginRegistry: $container->get(PluginRegistry::class),
+            pluginRegistry: $container->get(Registry::class),
             container: $container,
         );
     }

@@ -4,61 +4,59 @@ declare(strict_types=1);
 
 namespace Tempcord\Plugins;
 
-use Ragnarok\Fenrir\Discord;
-use Tempest\Container\Container;
+use Attribute;
+use Tempest\Reflection\ClassReflector;
 
 /**
- * Interface for Tempcord plugins.
+ * Marks a class as a Tempcord plugin for auto-discovery.
  *
- * Plugins are auto-discovered packages that extend Tempcord's functionality.
- * They can provide commands, components, tasks, middleware, and event handlers.
+ * The class must implement the Plugin interface.
+ *
+ * @example
+ * ```php
+ * #[TempcordPlugin]
+ * class CommonPlugin extends AbstractPlugin
+ * {
+ *     // name, version, description read from composer.json
+ * }
+ * ```
  */
-interface Plugin
+#[Attribute(Attribute::TARGET_CLASS)]
+final class Plugin
 {
-    /**
-     * Get the plugin's unique identifier.
-     *
-     * @return string A unique name like "tempcord/common"
-     */
-    public function name(): string;
+    public ClassReflector $reflector;
 
     /**
-     * Get the plugin's version.
+     * @param bool $enabled Whether this plugin is enabled. Default: true
      */
-    public function version(): string;
+    public function __construct(
+        public bool $enabled = true,
+    )
+    {
+    }
+
+    public function withReflector(ClassReflector $reflector): self
+    {
+        $clone = clone $this;
+        $clone->reflector = $reflector;
+
+        return $clone;
+    }
 
     /**
-     * Get the plugin's description.
+     * Get the plugin class name.
      */
-    public function description(): string;
+    public function getPluginClass(): string
+    {
+        return $this->reflector->getName();
+    }
 
     /**
-     * Called when the plugin is registered with the framework.
-     *
-     * Use this to register services, middleware, or configuration.
+     * Check if the class implements the Plugin interface.
      */
-    public function register(Container $container): void;
-
-    /**
-     * Called when the Discord gateway is initialized.
-     *
-     * Use this to set up event listeners or perform Discord-specific setup.
-     */
-    public function boot(Discord $discord): void;
-
-    /**
-     * Get global middleware classes provided by this plugin.
-     *
-     * @return array<class-string> Array of CommandMiddleware class names
-     */
-    public function middleware(): array;
-
-    /**
-     * Get the namespaces this plugin provides for discovery.
-     *
-     * Commands, components, and tasks in these namespaces will be auto-discovered.
-     *
-     * @return array<string> Array of namespace prefixes
-     */
-    public function discoveryNamespaces(): array;
+    public function isValidPlugin(): bool
+    {
+        return $this->reflector->getReflection()->hasMethod('register') ||
+            $this->reflector->getReflection()->hasMethod('boot');
+    }
 }

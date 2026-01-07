@@ -61,4 +61,10 @@ final class SelectMenu implements CanBeHandled
 
         return [];
     }
+
+    public \Tempcord\Support\Commands\CommandHandler $handler {
+        get {
+            return $this->handler;
+        }
+    }
 }

@@ -2,33 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Tempcord\Discoveries;
+namespace Tempcord\Plugins;
 
-use Tempcord\Attributes\TempcordPlugin;
-use Tempcord\Plugins\PluginRegistry;
-use Tempest\Discovery\Discovery;
 use Tempest\Discovery\DiscoveryLocation;
 use Tempest\Discovery\IsDiscovery;
 use Tempest\Reflection\ClassReflector;
+use function Tempest\get;
 
 /**
- * Discovers classes marked with #[TempcordPlugin] attribute.
+ * Discovers classes marked with #[Plugin] attribute.
  *
  * Plugins are automatically discovered from all Composer packages
  * that require Tempcord, following Tempest's discovery conventions.
  */
-final class PluginDiscovery implements Discovery
+final class Discovery implements \Tempest\Discovery\Discovery
 {
     use IsDiscovery;
 
-    public function __construct(
-        private readonly PluginRegistry $registry,
-    ) {}
+    public function __construct()
+    {
+    }
 
     public function discover(DiscoveryLocation $location, ClassReflector $class): void
     {
-        foreach ($class->getAttributes(TempcordPlugin::class) as $attribute) {
-            /** @var TempcordPlugin $pluginAttribute */
+        foreach ($class->getAttributes(Plugin::class) as $attribute) {
+            /** @var Plugin $pluginAttribute */
             $pluginAttribute = $attribute->withReflector($class);
 
             if ($pluginAttribute->enabled && $pluginAttribute->isValidPlugin()) {
@@ -39,8 +37,9 @@ final class PluginDiscovery implements Discovery
 
     public function apply(): void
     {
+        $registry = get(Registry::class);
         foreach ($this->discoveryItems as $pluginAttribute) {
-            $this->registry->register($pluginAttribute);
+            $registry->register($pluginAttribute);
         }
     }
 }
