@@ -19,7 +19,8 @@ This document analyzes what Tempcord currently implements, what Discord official
 | **Middleware** | Complete | `AdminMiddleware`, `PermissionMiddleware`, `RateLimitMiddleware`, `LoggingMiddleware`, `ErrorHandlingMiddleware` |
 | **Scheduled Tasks** | Complete | `#[Task]` with interval and cron scheduling |
 | **Localization** | Complete | `CommandTranslator` supporting 31 Discord locales |
-| **Console Commands** | Complete | `boot`, `register`, `commands:list`, `tasks:list` |
+| **Console Commands** | Complete | `boot`, `register`, `commands:list`, `tasks:list`, `plugins:list` |
+| **Plugin System** | Complete | Auto-discovery, lifecycle hooks, middleware injection |
 
 ### Known Gaps in Current Implementation
 
@@ -337,6 +338,60 @@ Would require significant Fenrir extensions or integration with Lavalink.
 3. **Improve Error Messages** - Better DX for misconfiguration
 4. **Documentation** - Align docs with actual implementation
 5. **Add `MENTIONABLE` Option Type** - Currently throws RuntimeException
+
+---
+
+## Plugin System
+
+Tempcord now includes a plugin system that allows extending the framework with reusable packages.
+
+### Creating a Plugin
+
+```php
+#[TempcordPlugin(priority: 50)]
+class MyPlugin extends AbstractPlugin
+{
+    public function name(): string { return 'my/plugin'; }
+    public function version(): string { return '1.0.0'; }
+    public function description(): string { return 'My awesome plugin'; }
+
+    public function register(Container $container): void {
+        // Register services
+    }
+
+    public function boot(Discord $discord): void {
+        // Discord-specific setup
+    }
+
+    public function middleware(): array {
+        // Global middleware
+        return [MyMiddleware::class];
+    }
+
+    public function discoveryNamespaces(): array {
+        // Namespaces for commands/components/tasks
+        return ['My\\Plugin\\'];
+    }
+}
+```
+
+### Official Plugin: tempcord/common
+
+The `tempcord/common` plugin provides essential middleware and tasks:
+
+**Middleware:**
+- `GuildOnlyMiddleware` - Commands only in servers
+- `DirectMessageOnlyMiddleware` - Commands only in DMs
+- `BotOwnerOnlyMiddleware` - Restrict to bot owners
+- `MaintenanceModeMiddleware` - Block commands during maintenance
+- `CooldownMiddleware` - Prevent command spam
+- `NsfwChannelMiddleware` - Age-restricted channels only
+- `RequireRoleMiddleware` - Base class for role requirements
+
+**Tasks:**
+- `StatusRotationTask` - Rotate bot activity status
+- `HeartbeatLogTask` - Log uptime and memory stats
+- `CooldownCleanupTask` - Clear expired cooldowns
 
 ---
 

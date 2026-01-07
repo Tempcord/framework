@@ -7,6 +7,7 @@ use Tempcord\Attributes\Commands\Option;
 use Tempcord\Attributes\Commands\Subcommand;
 use Tempcord\CommandInteraction;
 use Tempcord\Middleware\MiddlewarePipeline;
+use Tempcord\Plugins\PluginRegistry;
 use Tempcord\Support\Responses\InteractionResponse;
 use Tempcord\TempcordConfig;
 use Tempest\Container\Container;
@@ -31,7 +32,7 @@ readonly class CommandHandler
     }
 
     /**
-     * Merge middleware in execution order: Global → Command → Subcommand
+     * Merge middleware in execution order: Plugin → Global → Command → Subcommand
      *
      * @param Subcommand|null $subcommand
      * @return array<class-string<CommandMiddleware>>
@@ -40,13 +41,21 @@ readonly class CommandHandler
     {
         $middleware = [];
 
-        // 1. Global middleware (from config)
+        // 1. Plugin middleware (from registered plugins)
+        try {
+            $pluginRegistry = get(PluginRegistry::class);
+            $middleware = array_merge($middleware, $pluginRegistry->getGlobalMiddleware());
+        } catch (Throwable) {
+            // Plugin registry not available yet, skip
+        }
+
+        // 2. Global middleware (from config)
         $middleware = array_merge($middleware, $this->config->globalMiddleware);
 
-        // 2. Command-level middleware
+        // 3. Command-level middleware
         $middleware = array_merge($middleware, $this->command->middleware);
 
-        // 3. Subcommand-level middleware (if handling subcommand)
+        // 4. Subcommand-level middleware (if handling subcommand)
         if ($subcommand !== null) {
             $middleware = array_merge($middleware, $subcommand->middleware);
         }

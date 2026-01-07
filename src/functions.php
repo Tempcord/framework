@@ -149,4 +149,30 @@ namespace Tempcord {
         return tasks()->getStats();
     }
 
+    // ============ Plugin Helper Functions ============
+
+    /**
+     * Get the plugin registry
+     */
+    function plugins(): \Tempcord\Plugins\PluginRegistry
+    {
+        return get(\Tempcord\Plugins\PluginRegistry::class);
+    }
+
+    /**
+     * Get a specific plugin by name
+     */
+    function plugin(string $name): ?\Tempcord\Plugins\Plugin
+    {
+        return plugins()->get($name);
+    }
+
+    /**
+     * Check if a plugin is registered
+     */
+    function hasPlugin(string $name): bool
+    {
+        return plugins()->has($name);
+    }
+
 }
