@@ -49,18 +49,16 @@ final class Option
 
             $type = $this->reflector->getType();
 
-            //array, bool, callable, float, int, null, object, false, iterable, mixed, never, true, void,
+
             return match ($type->getName()) {
-                'string' => ApplicationCommandOptionType::STRING,
+                //@TODO: maybe add some DTO mapper!? To map modal data to an object
                 'int' => ApplicationCommandOptionType::INTEGER,
                 'float' => ApplicationCommandOptionType::NUMBER,
                 'bool' => ApplicationCommandOptionType::BOOLEAN,
                 User::class, GuildMember::class => ApplicationCommandOptionType::USER,
                 Channel::class => ApplicationCommandOptionType::CHANNEL,
                 Role::class => ApplicationCommandOptionType::ROLE,
-                //@todo Add more options: Mentionable
-                default => throw new LogicException('Command option type not supported'),
-                //@todo maybe add some DTO mapper!? To map modal data to an object
+                default => ApplicationCommandOptionType::STRING,
             };
         }
     }
@@ -110,19 +108,30 @@ final class Option
             return null;
         }
 
-        $discord = get(Discord::class);
+        $resolved = $interaction->interaction->data->resolved;
+        $logger = get(\Tempest\Log\Logger::class);
 
-
-        if ($option->type === ApplicationCommandOptionType::USER) {
-            await($discord->rest->user->get($option->value));
+        if ($this->reflector->getType()->equals(GuildMember::class)) {
+            if (isset($resolved?->members[$option->value])) {
+                return $resolved->members[$option->value];
+            }
+            $discord = get(Discord::class);
+            return await($discord->rest->guild->getMember($interaction->interaction->guild_id, $option->value));
         }
 
         return match ($option->type) {
-            ApplicationCommandOptionType::USER => await($discord->rest->user->get($option->value)),
-            ApplicationCommandOptionType::CHANNEL => await($discord->rest->channel->get($option->value)),
-            ApplicationCommandOptionType::ROLE => await($discord->rest->guild->getRole($interaction->interaction->guild_id, $option->value)),
-            //@todo need a proxy object that will proxy all props to Channel or User
-            ApplicationCommandOptionType::MENTIONABLE => throw new RuntimeException('Not implemented'),
+            ApplicationCommandOptionType::USER => $resolved?->users[$option->value] ?? (function () use ($option) {
+                $discord = get(Discord::class);
+                return await($discord->rest->user->get($option->value));
+            })(),
+            ApplicationCommandOptionType::CHANNEL => $resolved?->channels[$option->value] ?? (function () use ($option) {
+                $discord = get(Discord::class);
+                return await($discord->rest->channel->get($option->value));
+            })(),
+            ApplicationCommandOptionType::ROLE => $resolved?->roles[$option->value] ?? (function () use ($option, $interaction) {
+                $discord = get(Discord::class);
+                return await($discord->rest->guild->getRole($interaction->interaction->guild_id, $option->value));
+            })(),
             default => $option->value,
         };
     }

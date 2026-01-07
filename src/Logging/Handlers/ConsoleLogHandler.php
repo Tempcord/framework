@@ -30,7 +30,7 @@ final class ConsoleLogHandler extends AbstractProcessingHandler
             return;
         }
 
-        $message = $this->formatMessage($record);
+        $message = $this->formatRichMessage($record);
         $component = $this->getComponent($record->level);
 
         // Use the appropriate console method based on log level
@@ -48,29 +48,108 @@ final class ConsoleLogHandler extends AbstractProcessingHandler
         );
     }
 
-    private function formatMessage(LogRecord $record): string
+    private function formatRichMessage(LogRecord $record): string
     {
-        $message = ucfirst($record->message);
+        $parts = [];
 
+        // Timestamp with gray color
         if ($this->includeTimestamp) {
-            $timestamp = $record->datetime->format('Y-m-d H:i:s');
-            $message = "[{$timestamp}] {$message}";
+            $timestamp = $record->datetime->format('H:i:s');
+            $parts[] = "\033[90m[$timestamp]\033[0m"; // Gray
         }
 
-        return $message;
+        // Level badge with color and text
+        $badge = $this->getLevelBadge($record->level);
+        $parts[] = $badge;
+
+        // Main message
+        $parts[] = $record->message;
+
+        $firstLine = implode(' ', $parts);
+
+        // Format context if present
+        if (!empty($record->context)) {
+            $contextLines = $this->formatContext($record->context);
+            return $firstLine . "\n" . $contextLines;
+        }
+
+        return $firstLine;
     }
 
-    private function getLogLevel(Level $level): string
+    private function getLevelBadge(Level $level): string
     {
         return match ($level) {
-            Level::Alert => LogLevel::ALERT,
-            Level::Critical => LogLevel::CRITICAL,
-            Level::Debug => LogLevel::DEBUG,
-            Level::Emergency => LogLevel::EMERGENCY,
-            Level::Error => LogLevel::ERROR,
-            Level::Warning => LogLevel::WARNING,
-            default => LogLevel::INFO,
+            Level::Emergency => "\033[41;97m EMERGENCY \033[0m", // Red background, white text
+            Level::Alert => "\033[41;97m ALERT \033[0m",
+            Level::Critical => "\033[41;97m CRITICAL \033[0m",
+            Level::Error => "\033[41;97m ERROR \033[0m",
+            Level::Warning => "\033[43;30m WARNING \033[0m", // Yellow background, black text
+            Level::Notice => "\033[44;97m NOTICE \033[0m", // Blue background, white text
+            Level::Info => "\033[42;97m INFO \033[0m", // Green background, white text
+            Level::Debug => "\033[100;97m DEBUG \033[0m", // Gray background, white text
         };
+    }
+
+    private function formatContext(array $context, int $indent = 0): string
+    {
+        $lines = [];
+        $indentStr = str_repeat('  ', $indent);
+        $arrow = "\033[90m→\033[0m"; // Gray arrow
+
+        foreach ($context as $key => $value) {
+            $coloredKey = "\033[36m{$key}\033[0m"; // Cyan key
+
+            if (is_array($value)) {
+                // Nested array - compact format
+                $jsonValue = json_encode($value, JSON_UNESCAPED_SLASHES);
+                $lines[] = "{$indentStr}  {$arrow} {$coloredKey}: \033[90m{$jsonValue}\033[0m"; // Gray value
+            } elseif (is_bool($value)) {
+                $valueStr = $value ? "\033[32mtrue\033[0m" : "\033[31mfalse\033[0m"; // Green/Red
+                $lines[] = "{$indentStr}  {$arrow} {$coloredKey}: {$valueStr}";
+            } elseif (is_null($value)) {
+                $lines[] = "{$indentStr}  {$arrow} {$coloredKey}: \033[90mnull\033[0m"; // Gray
+            } elseif (is_numeric($value)) {
+                $lines[] = "{$indentStr}  {$arrow} {$coloredKey}: \033[33m{$value}\033[0m"; // Yellow
+            } elseif (is_string($value)) {
+                $truncated = $this->truncateString($value, 150);
+                // Check for special patterns
+                if ($this->looksLikeId($value)) {
+                    $lines[] = "{$indentStr}  {$arrow} {$coloredKey}: \033[35m{$truncated}\033[0m"; // Magenta for IDs
+                } elseif ($this->looksLikeFilePath($value)) {
+                    $lines[] = "{$indentStr}  {$arrow} {$coloredKey}: \033[36m{$truncated}\033[0m"; // Cyan for paths
+                } else {
+                    $lines[] = "{$indentStr}  {$arrow} {$coloredKey}: {$truncated}";
+                }
+            } elseif (is_object($value)) {
+                $className = get_class($value);
+                $lines[] = "{$indentStr}  {$arrow} {$coloredKey}: \033[35m{$className}\033[0m"; // Magenta
+            } else {
+                $lines[] = "{$indentStr}  {$arrow} {$coloredKey}: {$value}";
+            }
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function looksLikeId(string $value): bool
+    {
+        // Discord snowflake IDs are 17-19 digits
+        return preg_match('/^\d{17,19}$/', $value) === 1;
+    }
+
+    private function looksLikeFilePath(string $value): bool
+    {
+        return preg_match('/^[\/\\\\].*\.(php|js|ts|json|yaml|yml)$/i', $value) === 1
+            || preg_match('/.*:\d+$/', $value) === 1; // file:line format
+    }
+
+    private function truncateString(string $value, int $maxLength): string
+    {
+        if (strlen($value) <= $maxLength) {
+            return $value;
+        }
+
+        return substr($value, 0, $maxLength - 3) . '...';
     }
 
     private function getComponent(Level $level): string
@@ -78,7 +157,7 @@ final class ConsoleLogHandler extends AbstractProcessingHandler
         return match ($level) {
             Level::Alert, Level::Critical, Level::Error, Level::Emergency => 'error',
             Level::Warning => 'warning',
-            default => 'info',
+            default => 'writeln',
         };
     }
 }

@@ -10,9 +10,12 @@ use Ragnarok\Fenrir\Rest\Helpers\Command\CommandOptionBuilder;
 use Tempcord\Attributes\HasSubcommands;
 use Tempcord\Contract\Buildable;
 use Tempcord\Contract\CanBeHandled;
+use Tempcord\Middleware\CommandMiddleware;
 use Tempcord\Support\Commands\CommandHandler;
 use Tempcord\Support\Traits\HasAttributes;
+use Tempcord\TempcordConfig;
 use Tempest\Reflection\ClassReflector;
+use function Tempest\get;
 use function Tempest\Support\arr;
 use function Tempest\Support\str;
 
@@ -59,7 +62,7 @@ final class Command implements Buildable, CanBeHandled
                 $method = $this->reflector->getMethod('__invoke');
             }
 
-            return new CommandHandler($this, $method);
+            return new CommandHandler($this, $method, get(TempcordConfig::class));
         }
     }
 
@@ -116,6 +119,16 @@ final class Command implements Buildable, CanBeHandled
         }
     }
 
+    /**
+     * @param string|BackedEnum|null $name
+     * @param string|null $description
+     * @param int|null $guildId
+     * @param bool $isNsfw
+     * @param array $permissions
+     * @param bool $directMessage
+     * @param ApplicationCommandTypes $type
+     * @param array<class-string<CommandMiddleware>> $middleware
+     */
     public function __construct(
         string|BackedEnum|null         $name = null,
         public ?string                 $description = null,
@@ -124,6 +137,7 @@ final class Command implements Buildable, CanBeHandled
         public array                   $permissions = [],
         public bool                    $directMessage = true,
         public ApplicationCommandTypes $type = ApplicationCommandTypes::CHAT_INPUT,
+        public array                   $middleware = [],
     )
     {
         $this->setAttribute('name', $name);

@@ -8,23 +8,18 @@ use Ragnarok\Fenrir\Enums\InteractionType;
 use Ragnarok\Fenrir\Extension\Extension;
 use Ragnarok\Fenrir\FilteredEventEmitter;
 use Ragnarok\Fenrir\Gateway\Events\InteractionCreate;
-use Ragnarok\Fenrir\Parts\ApplicationCommand;
-use Ragnarok\Fenrir\Rest\Helpers\Command\CommandBuilder;
-use Tempcord\Attributes\Commands\Command;
 use Tempcord\Support\Commands\CommandsBucket;
+use Tempcord\TempcordConfig;
 use Tempest\Container\Singleton;
-use Tempest\Reflection\MethodReflector;
-use function React\Async\await;
 
 #[Singleton]
 class CommandsRegistry implements Extension
 {
-    /** @var array<string, MethodReflector> */
-    private array $handlersCommand = [];
     private Discord $discord;
 
     public function __construct(
-        protected(set) CommandsBucket $bucket
+        protected(set) CommandsBucket $bucket,
+        private readonly TempcordConfig $config
     )
     {
     }
@@ -53,46 +48,22 @@ class CommandsRegistry implements Extension
             $this->discord->gateway->events->once(
                 Events::READY,
                 function ($ready) use ($command) {
-                    $this->discord->rest->guildCommand->createApplicationCommand(
-                        $ready->user->id,
-                        '932734827545903104',
-                        $command->builder
-                    );
+                    $guildId = $command->guildId ?? $this->config->guildId;
+
+                    if ($guildId !== null) {
+                        $this->discord->rest->guildCommand->createApplicationCommand(
+                            $ready->user->id,
+                            $guildId,
+                            $command->builder
+                        );
+                    } else {
+                        $this->discord->rest->globalCommand->createApplicationCommand(
+                            $ready->user->id,
+                            $command->builder
+                        );
+                    }
                 }
             );
         }
     }
-
-
-//    public function registerGuildCommand(Command $command, string $guildId): void
-//    {
-//        $this->events->once(
-//            Events::READY,
-//            function ($ready) use ($guildId, $command) {
-//                $this->registrar->registerGuild(
-//                    $ready->user->id,
-//                    $guildId,
-//                    $command->builder
-//                )->then(function (ApplicationCommand $applicationCommand) use ($command) {
-//                    $this->router->register($applicationCommand, $command);
-//                });
-//            }
-//        );
-//    }
-//
-//
-//    public function registerGlobalCommand(Command $command): void
-//    {
-//        $this->events->once(
-//            Events::READY,
-//            function (Ready $ready) use ($command) {
-//                $this->registrar->registerGlobal(
-//                    $ready->user->id,
-//                    $command->builder
-//                )->then(function (ApplicationCommand $applicationCommand) use ($command) {
-//                    $this->router->register($applicationCommand, $command);
-//                });
-//            }
-//        );
-//    }
 }

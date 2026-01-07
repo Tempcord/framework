@@ -8,6 +8,7 @@ use Tempest\Discovery\Discovery;
 use Tempest\Discovery\DiscoveryLocation;
 use Tempest\Discovery\IsDiscovery;
 use Tempest\Reflection\ClassReflector;
+use function Tempest\get;
 
 final class CommandsDiscovery implements Discovery
 {
@@ -17,7 +18,6 @@ final class CommandsDiscovery implements Discovery
         private readonly CommandsRegistry $registry,
     )
     {
-
     }
 
     public function discover(DiscoveryLocation $location, ClassReflector $class): void

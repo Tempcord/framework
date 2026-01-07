@@ -6,10 +6,16 @@ use Tempcord\CommandInteraction;
 use Tempcord\Support\Responses\InteractionResponse;
 use Tempcord\Support\Responses\ResponseDecorator;
 
-class SuccessEmbed implements ResponseDecorator
+readonly class Title implements ResponseDecorator
 {
+    public function __construct(
+        private string $title
+    )
+    {
+    }
+
     public function decorate(InteractionResponse $response, CommandInteraction $interaction): void
     {
-        $response->success();
+        $response->title($this->title);
     }
 }

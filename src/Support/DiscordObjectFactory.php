@@ -18,19 +18,15 @@ class DiscordObjectFactory
 
     public function toMention(): string
     {
-        $this->isMentionable($this->from);
+        $mentionable = $this->getMentionable($this->from);
 
-        return "<@{$this->from->id}>";
+        return "<@{$mentionable->id}>";
     }
 
-    private function isMentionable(mixed $from): void
+    private function getMentionable(GuildMember|User $from): User
     {
-        if (
-            !$from instanceof User &&
-            !$from instanceof GuildMember
-        ) {
-            throw new \InvalidArgumentException('Can not mention this object. [' . $from::class . ']');
-        }
+        return $from instanceof GuildMember ? $from->user : $from;
+
     }
 
 }

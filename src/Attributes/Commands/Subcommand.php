@@ -62,6 +62,7 @@ final class Subcommand
     public function __construct(
         public string          $description,
         string|BackedEnum|null $name = null,
+        public array           $middleware = [],
     )
     {
         $this->setAttribute('name', $name);

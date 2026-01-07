@@ -2,33 +2,22 @@
 
 namespace Tempcord\Support\Responses\Decorators;
 
-use Ragnarok\Fenrir\Interaction\Helpers\InteractionCallbackBuilder;
-use Ragnarok\Fenrir\Rest\Helpers\Channel\EmbedBuilder;
 use Tempcord\CommandInteraction;
-use Tempcord\Support\Responses\Factory;
+use Tempcord\Support\Responses\InteractionResponse;
 use Tempcord\Support\Responses\ResponseDecorator;
 
 class WarningEmbed implements ResponseDecorator
 {
-    public function decorate(CommandInteraction $interaction, InteractionCallbackBuilder $builder): Factory
+    public function decorate(InteractionResponse $response, CommandInteraction $interaction): void
     {
-        if ($builder->hasEmbeds()) {
-            foreach ($builder->getEmbeds() as $embed) {
-                $embed->color = 0xFFA500; // Orange color for warning
-                $embed->setTitle("Warning");
-                $embed->description = $embed->getDescription() ?? $builder->getContent() ?? 'Warning';
-            }
-        } else {
-            $builder->addEmbed(
-                embed: new EmbedBuilder()
-                    ->setColor(0xFFA500)
-                    ->setTitle("Warning")
-                    ->setDescription($builder->getContent() ?? 'Warning')
-            );
+        $response->warning();
+
+        // If content was set as plain text, move it to embed
+        $builder = $response->getBuilder();
+        $content = $builder->getContent();
+        if ($content !== null && $content !== '') {
+            $response->content($content);
+            $builder->setContent(null);
         }
-
-        $builder->setContent('');
-
-        return $interaction->respondWith($builder);
     }
 }

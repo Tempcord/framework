@@ -2,11 +2,16 @@
 
 namespace Tempcord\Support\Responses;
 
-use Ragnarok\Fenrir\Interaction\Helpers\InteractionCallbackBuilder;
 use Tempcord\CommandInteraction;
 
 interface ResponseDecorator
 {
-    public function decorate(CommandInteraction $interaction, InteractionCallbackBuilder $builder): Factory;
-
+    /**
+     * Decorate the response in-place
+     *
+     * @param InteractionResponse $response The response to decorate
+     * @param CommandInteraction $interaction The interaction (for context)
+     * @return void
+     */
+    public function decorate(InteractionResponse $response, CommandInteraction $interaction): void;
 }

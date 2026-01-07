@@ -6,10 +6,17 @@ use Tempcord\CommandInteraction;
 use Tempcord\Support\Responses\InteractionResponse;
 use Tempcord\Support\Responses\ResponseDecorator;
 
-class SuccessEmbed implements ResponseDecorator
+readonly class Footer implements ResponseDecorator
 {
+    public function __construct(
+        private string $text,
+        private ?string $iconUrl = null
+    )
+    {
+    }
+
     public function decorate(InteractionResponse $response, CommandInteraction $interaction): void
     {
-        $response->success();
+        $response->footer($this->text, $this->iconUrl);
     }
 }

@@ -5,6 +5,7 @@ namespace Tempcord\Logging;
 use Monolog\Level;
 use Tempcord\Logging\Handlers\ConsoleLogHandler;
 use Tempest\Console\Console;
+use Tempest\Core\Environment;
 use Tempest\Log\LogChannel;
 use function Tempest\get;
 
@@ -14,30 +15,49 @@ final class ConsoleLogChannel implements LogChannel
         private array $except = [],
     ) {
         $this->except = array_merge($this->except, [
-//            'Fenrir initialized.',
-//            'sending heartbeat',
-//            'received heartbeat',
-//            'http not checking',
-//            'resetting payload count',
-//            'Client: Connection established',
-//            'Client: Attempting connection',
-//            'Server: New message',
-//            'Client: New message',
-//            'Client: Queued message',
-//            'Started heartbeat timer'
+            'sending heartbeat',
+            'received heartbeat',
+            'http not checking',
+            'resetting payload count',
+            'Client: Attempting connection',
+            'Client: New message',
+            'Client: Queued message',
+            'Started heartbeat timer',
+            'REQ POST',
+            'REQ GET',
+            'waiting:',
+            'empty:',
         ]);
     }
 
     public function getHandlers(Level $level): array
     {
+        // Adjust log level based on environment
+        $effectiveLevel = $this->getEffectiveLevel();
+        
         return [
             new ConsoleLogHandler(
                 console: get(Console::class),
                 except: $this->except,
                 includeTimestamp: true,
-                level: $level
+                level: $effectiveLevel
             ),
         ];
+    }
+    
+    private function getEffectiveLevel(): Level
+    {
+        // Check if we're in production environment
+        $isProduction = Environment::fromEnv()->isProduction();
+
+        if ($isProduction) {
+            // In production: use Info level (excludes Debug)
+            // This includes: Info, Notice, Warning, Error, Critical, Alert, Emergency
+            return Level::Info;
+        }
+        
+        // In non-production: use Debug level (includes all levels)
+        return Level::Debug;
     }
 
     public function getProcessors(): array
