@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Tempcord\ConsoleCommands;
 
-use Tempcord\Registries\TasksRegistry;
+use Tempcord\Tasks\Registry;
 use Tempest\Console\Console;
 use Tempest\Console\ConsoleCommand;
 
 final readonly class TasksListCommand
 {
     public function __construct(
-        private TasksRegistry $tasksRegistry,
-        private Console $console
+        private Registry $tasksRegistry,
+        private Console  $console
     ) {}
 
     #[ConsoleCommand(name: 'tasks:list', description: 'List all registered scheduled tasks')]
     public function __invoke(): void
     {
-        $tasks = $this->tasksRegistry->getTasks();
+        $tasks = $this->tasksRegistry;
 
         if (empty($tasks)) {
             $this->console->writeln('<comment>No tasks registered</comment>');

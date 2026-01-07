@@ -107,12 +107,36 @@ final class Option
     }
 
     public function __construct(
-        public string   $description,
-        ?string         $name = null,
-        public ?Closure $autocomplete = null,
+        public string $description,
+        ?string       $name = null,
+        public mixed  $autocomplete = null,
     )
     {
         $this->setAttribute('name', $name);
+        $this->validateAutocomplete($autocomplete);
+    }
+
+    /**
+     * Validate that autocomplete is one of the supported types.
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function validateAutocomplete(mixed $autocomplete): void
+    {
+        if ($autocomplete === null) {
+            return;
+        }
+
+        $valid = $autocomplete instanceof Closure
+            || is_string($autocomplete) // Class reference
+            || (is_array($autocomplete) && count($autocomplete) === 2) // [Class, 'method']
+            || is_object($autocomplete); // Instantiated object
+
+        if (!$valid) {
+            throw new \InvalidArgumentException(
+                'Autocomplete must be a Closure, class-string, [class-string, method], or object instance'
+            );
+        }
     }
 
     public function withReflector(ParameterReflector $reflector): Option

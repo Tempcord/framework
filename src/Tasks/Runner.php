@@ -2,21 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Tempcord\Support\Tasks;
+namespace Tempcord\Tasks;
 
 use DateTimeImmutable;
 use React\EventLoop\LoopInterface;
 use Tempcord\Attributes\Task;
+use Tempcord\Support\Tasks\CronExpression;
+use Tempcord\Support\Tasks\TaskStats;
 use Tempest\Log\Logger;
 use Throwable;
-
 use function Tempest\get;
 use function Tempest\invoke;
 
 /**
  * Manages the execution of scheduled tasks
  */
-final class TaskRunner
+final class Runner
 {
     /** @var array<string, mixed> Timer references for cleanup */
     private array $timers = [];
@@ -168,15 +169,6 @@ final class TaskRunner
         foreach (array_keys($this->timers) as $taskName) {
             $this->cancel($taskName);
         }
-    }
-
-    /**
-     * Get statistics for all tasks
-     * @return array<string, TaskStats>
-     */
-    public function getStats(): array
-    {
-        return $this->stats;
     }
 
     /**

@@ -127,9 +127,9 @@ namespace Tempcord {
     /**
      * Get the tasks registry for managing scheduled tasks
      */
-    function tasks(): \Tempcord\Registries\TasksRegistry
+    function tasks(): Tasks\Registry
     {
-        return get(\Tempcord\Registries\TasksRegistry::class);
+        return get(Tasks\Registry::class);
     }
 
     /**

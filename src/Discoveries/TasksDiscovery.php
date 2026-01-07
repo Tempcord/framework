@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tempcord\Discoveries;
 
 use Tempcord\Attributes\Task;
-use Tempcord\Registries\TasksRegistry;
+use Tempcord\Tasks\Registry;
 use Tempest\Container\Container;
 use Tempest\Discovery\Discovery;
 use Tempest\Discovery\DiscoveryLocation;
@@ -17,7 +17,7 @@ final class TasksDiscovery implements Discovery
     use IsDiscovery;
 
     public function __construct(
-        private readonly TasksRegistry $registry
+        private readonly Registry $registry
     ) {}
 
     public function discover(DiscoveryLocation $location, ClassReflector $class): void
@@ -36,7 +36,7 @@ final class TasksDiscovery implements Discovery
 
     public function createCachePayload(): string
     {
-        return serialize($this->registry->getTasks());
+        return serialize($this->registry);
     }
 
     public function restoreCachePayload(Container $container, string $payload): void

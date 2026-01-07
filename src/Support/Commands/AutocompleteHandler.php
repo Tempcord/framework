@@ -6,11 +6,15 @@ namespace Tempcord\Support\Commands;
 
 use Closure;
 use Ragnarok\Fenrir\Discord;
+use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
+use Ragnarok\Fenrir\Enums\InteractionCallbackType;
 use Ragnarok\Fenrir\Gateway\Events\InteractionCreate;
-use Ragnarok\Fenrir\Interaction\Helpers\InteractionCallbackBuilder;
 use Ragnarok\Fenrir\Parts\ApplicationCommandInteractionDataOptionStructure;
+use Ragnarok\Fenrir\Parts\ApplicationCommandOptionChoice;
 use Tempcord\Attributes\Commands\Command;
 use Tempcord\Attributes\Commands\Option;
+use Tempcord\Registries\AutocompleteRegistry;
+use Tempcord\Support\InteractionCallbackBuilder;
 use Tempest\Log\Logger;
 use function Tempest\get;
 
@@ -19,13 +23,16 @@ use function Tempest\get;
  *
  * Finds the focused option, calls its autocomplete handler, and returns choices.
  */
-class AutocompleteHandler
+readonly class AutocompleteHandler
 {
     public function __construct(
-        private readonly Command $command,
-        private readonly Discord $discord,
-        private readonly Logger $logger,
-    ) {}
+        private Command $command,
+        private Discord $discord,
+        private Logger  $logger,
+        private AutocompleteRegistry $autocompleteRegistry,
+    )
+    {
+    }
 
     /**
      * Handle an autocomplete interaction.
@@ -54,7 +61,7 @@ class AutocompleteHandler
             // Call the autocomplete handler
             $results = $this->callHandler($handler, $currentValue, $interaction);
 
-            // Build and send response
+            // Build and send a response
             $choices = $this->buildChoices($results);
             $this->sendResponse($interaction, $choices);
 
@@ -126,13 +133,12 @@ class AutocompleteHandler
     private function getSubcommandPath(array $options): ?string
     {
         foreach ($options as $option) {
-            // Type 1 = SUB_COMMAND, Type 2 = SUB_COMMAND_GROUP
-            if (($option->type ?? 0) === 1) {
+            if ($option->type === ApplicationCommandOptionType::SUB_COMMAND) {
                 return $option->name;
             }
-            if (($option->type ?? 0) === 2 && !empty($option->options)) {
+            if ($option->type === ApplicationCommandOptionType::SUB_COMMAND_GROUP && !empty($option->options)) {
                 foreach ($option->options as $subOption) {
-                    if (($subOption->type ?? 0) === 1) {
+                    if ($subOption->type === ApplicationCommandOptionType::SUB_COMMAND) {
                         return "{$option->name}:{$subOption->name}";
                     }
                 }
@@ -143,19 +149,79 @@ class AutocompleteHandler
     }
 
     /**
-     * Call the autocomplete handler.
+     * Resolve and call the autocomplete handler.
+     *
+     * Supports:
+     * - Closure: fn($value, $interaction) => [...]
+     * - Class reference: DatabaseAutocomplete::class
+     * - Array callable: [DatabaseAutocomplete::class, 'search']
+     * - Instantiated object: new DatabaseAutocomplete()
      */
-    private function callHandler(Closure $handler, string $value, InteractionCreate $interaction): mixed
+    private function callHandler(mixed $handler, string $value, InteractionCreate $interaction): mixed
     {
-        // Get handler parameter count to determine how to call it
-        $reflection = new \ReflectionFunction($handler);
-        $paramCount = $reflection->getNumberOfParameters();
+        // Case 1: Closure (existing behavior)
+        if ($handler instanceof Closure) {
+            $reflection = new \ReflectionFunction($handler);
+            $paramCount = $reflection->getNumberOfParameters();
 
-        return match ($paramCount) {
-            0 => $handler(),
-            1 => $handler($value),
-            default => $handler($value, $interaction),
-        };
+            return match ($paramCount) {
+                0 => $handler(),
+                1 => $handler($value),
+                default => $handler($value, $interaction),
+            };
+        }
+
+        // Case 2: Class reference (string)
+        if (is_string($handler)) {
+            $autocomplete = $this->autocompleteRegistry->getByClass($handler);
+
+            if ($autocomplete === null) {
+                throw new \RuntimeException(
+                    "Autocomplete class '{$handler}' not found. Did you add #[Autocomplete] attribute?"
+                );
+            }
+
+            $instance = get($handler); // Resolve from container as singleton
+            return $instance($value, $interaction);
+        }
+
+        // Case 3: Array callable [Class::class, 'method']
+        if (is_array($handler) && count($handler) === 2) {
+            [$className, $method] = $handler;
+
+            $autocomplete = $this->autocompleteRegistry->getByClass($className);
+
+            if ($autocomplete === null) {
+                throw new \RuntimeException(
+                    "Autocomplete class '{$className}' not found. Did you add #[Autocomplete] attribute?"
+                );
+            }
+
+            $instance = get($className);
+
+            if (!method_exists($instance, $method)) {
+                throw new \RuntimeException(
+                    "Method '{$method}' does not exist on autocomplete class '{$className}'"
+                );
+            }
+
+            return $instance->$method($value, $interaction);
+        }
+
+        // Case 4: Instantiated object
+        if (is_object($handler)) {
+            if (!method_exists($handler, '__invoke')) {
+                throw new \RuntimeException(
+                    'Autocomplete object must implement __invoke() method'
+                );
+            }
+
+            return $handler($value, $interaction);
+        }
+
+        throw new \RuntimeException(
+            'Invalid autocomplete handler type: ' . gettype($handler)
+        );
     }
 
     /**
@@ -178,7 +244,7 @@ class AutocompleteHandler
             // Already formatted as choice
             if (is_array($value) && isset($value['name'], $value['value'])) {
                 $choices[] = [
-                    'name' => (string) $value['name'],
+                    'name' => (string)$value['name'],
                     'value' => $value['value'],
                 ];
                 continue;
@@ -195,10 +261,19 @@ class AutocompleteHandler
 
             // Simple value: use as both name and value
             $choices[] = [
-                'name' => (string) $value,
+                'name' => (string)$value,
                 'value' => $value,
             ];
         }
+
+        //TODO: Add name localization support
+
+        $choices = array_map(static function(array $choice){
+            $c = new ApplicationCommandOptionChoice();
+            $c->name = $choice['name'];
+            $c->value = $choice['value'];
+            return $c;
+        }, $choices);
 
         // Discord limits to 25 choices
         return array_slice($choices, 0, 25);
@@ -210,8 +285,8 @@ class AutocompleteHandler
     private function sendResponse(InteractionCreate $interaction, array $choices): void
     {
         $callback = InteractionCallbackBuilder::new()
-            ->setType(8) // APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
-            ->setChoices($choices);
+            ->setChoices($choices)
+            ->setType(InteractionCallbackType::APPLICATION_COMMAND_AUTOCOMPLETE_RESULT);
 
         $this->discord->rest->webhook->createInteractionResponse(
             $interaction->id,
@@ -221,7 +296,7 @@ class AutocompleteHandler
     }
 
     /**
-     * Send empty autocomplete response.
+     * Send an empty autocomplete response.
      */
     private function sendEmptyResponse(InteractionCreate $interaction): void
     {

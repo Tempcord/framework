@@ -2,10 +2,10 @@
 
 namespace Tempcord;
 
-use Tempcord\Plugins\Registry;
+use Tempcord\Plugins\Registry as PluginsRegistry;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\ComponentsRegistry;
-use Tempcord\Registries\TasksRegistry;
+use Tempcord\Tasks\Registry as TasksRegistry;
 use Tempest\Container\Container;
 use Tempest\Container\Initializer;
 use Tempest\Container\Singleton;
@@ -19,7 +19,7 @@ final readonly class TempcordInitializer implements Initializer
             commandsRegistry: $container->get(CommandsRegistry::class),
             componentsRegistry: $container->get(ComponentsRegistry::class),
             tasksRegistry: $container->get(TasksRegistry::class),
-            pluginRegistry: $container->get(Registry::class),
+            pluginRegistry: $container->get(PluginsRegistry::class),
             container: $container,
         );
     }

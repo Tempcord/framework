@@ -22,7 +22,8 @@ class CommandsRegistry implements Extension
 
     public function __construct(
         protected(set) CommandsBucket $bucket,
-        private readonly TempcordConfig $config
+        private readonly TempcordConfig $config,
+        private readonly AutocompleteRegistry $autocompleteRegistry,
     )
     {
     }
@@ -75,6 +76,7 @@ class CommandsRegistry implements Extension
             command: $command,
             discord: $this->discord,
             logger: get(Logger::class),
+            autocompleteRegistry: $this->autocompleteRegistry,
         );
 
         $handler->handle($interaction);

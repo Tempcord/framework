@@ -3,10 +3,10 @@
 namespace Tempcord;
 
 use Ragnarok\Fenrir\Discord;
-use Tempcord\Plugins\Registry;
+use Tempcord\Plugins\Registry as PluginRegistry;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\ComponentsRegistry;
-use Tempcord\Registries\TasksRegistry;
+use Tempcord\Tasks\Registry as TasksRegistry;
 use Tempest\Container\Container;
 use Tempest\Log\Logger;
 
@@ -16,7 +16,7 @@ final readonly class Tempcord
         private(set) CommandsRegistry   $commandsRegistry,
         private(set) ComponentsRegistry $componentsRegistry,
         private(set) TasksRegistry      $tasksRegistry,
-        private(set) Registry           $pluginRegistry,
+        private(set) PluginRegistry     $pluginRegistry,
         private(set) Container          $container
     )
     {

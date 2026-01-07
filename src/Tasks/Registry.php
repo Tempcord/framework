@@ -2,26 +2,24 @@
 
 declare(strict_types=1);
 
-namespace Tempcord\Registries;
+namespace Tempcord\Tasks;
 
 use Ragnarok\Fenrir\Discord;
 use Ragnarok\Fenrir\Extension\Extension;
 use React\EventLoop\Loop;
 use Tempcord\Attributes\Task;
-use Tempcord\Support\Tasks\TaskRunner;
 use Tempcord\Support\Tasks\TaskStats;
 use Tempest\Container\Singleton;
 use Tempest\Log\Logger;
-
 use function Tempest\get;
 
 #[Singleton]
-class TasksRegistry implements Extension
+class Registry implements Extension
 {
     /** @var array<Task> */
     private array $tasks = [];
 
-    private ?TaskRunner $runner = null;
+    private ?Runner $runner = null;
 
     public function __construct() {}
 
@@ -31,15 +29,6 @@ class TasksRegistry implements Extension
     public function register(Task $task): void
     {
         $this->tasks[] = $task;
-    }
-
-    /**
-     * Get all registered tasks
-     * @return array<Task>
-     */
-    public function getTasks(): array
-    {
-        return $this->tasks;
     }
 
     /**
@@ -54,7 +43,7 @@ class TasksRegistry implements Extension
         $logger = get(Logger::class);
         $loop = Loop::get();
 
-        $this->runner = new TaskRunner($loop, $logger);
+        $this->runner = new Runner($loop, $logger);
 
         // Schedule all tasks
         foreach ($this->tasks as $task) {
@@ -64,14 +53,6 @@ class TasksRegistry implements Extension
         $logger->info("📋 Task scheduler initialized", [
             'tasks' => count($this->tasks),
         ]);
-    }
-
-    /**
-     * Get the task runner (null if not initialized)
-     */
-    public function getRunner(): ?TaskRunner
-    {
-        return $this->runner;
     }
 
     /**
@@ -96,7 +77,7 @@ class TasksRegistry implements Extension
      */
     public function getStats(): array
     {
-        return $this->runner?->getStats() ?? [];
+        return $this->runner ?? [];
     }
 
     /**
