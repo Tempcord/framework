@@ -6,8 +6,6 @@ namespace Tempcord\Common;
 
 use Ragnarok\Fenrir\Discord;
 use Tempcord\Attributes\TempcordPlugin;
-use Tempcord\Common\Middleware\CooldownMiddleware;
-use Tempcord\Common\Middleware\GuildOnlyMiddleware;
 use Tempcord\Common\Middleware\MaintenanceModeMiddleware;
 use Tempcord\Plugins\AbstractPlugin;
 use Tempest\Container\Container;
@@ -15,25 +13,12 @@ use Tempest\Container\Container;
 /**
  * Common plugin providing essential middleware, tasks, and utilities
  * that every Discord bot developer typically needs.
+ *
+ * Name, version, and description are read from composer.json.
  */
 #[TempcordPlugin(priority: 50)]
 class CommonPlugin extends AbstractPlugin
 {
-    public function name(): string
-    {
-        return 'tempcord/common';
-    }
-
-    public function version(): string
-    {
-        return '0.1.0';
-    }
-
-    public function description(): string
-    {
-        return 'Common middleware, tasks and utilities for Discord bots';
-    }
-
     public function register(Container $container): void
     {
         // Register plugin configuration if needed
