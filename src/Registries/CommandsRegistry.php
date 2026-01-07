@@ -8,9 +8,12 @@ use Ragnarok\Fenrir\Enums\InteractionType;
 use Ragnarok\Fenrir\Extension\Extension;
 use Ragnarok\Fenrir\FilteredEventEmitter;
 use Ragnarok\Fenrir\Gateway\Events\InteractionCreate;
+use Tempcord\Support\Commands\AutocompleteHandler;
 use Tempcord\Support\Commands\CommandsBucket;
 use Tempcord\TempcordConfig;
 use Tempest\Container\Singleton;
+use Tempest\Log\Logger;
+use function Tempest\get;
 
 #[Singleton]
 class CommandsRegistry implements Extension
@@ -29,6 +32,7 @@ class CommandsRegistry implements Extension
         $this->discord = $discord;
         $this->registerCommands();
 
+        // Handle slash command interactions
         $commandListener = new FilteredEventEmitter(
             $discord->gateway->events,
             Events::INTERACTION_CREATE,
@@ -40,6 +44,40 @@ class CommandsRegistry implements Extension
         );
 
         $commandListener->start();
+
+        // Handle autocomplete interactions
+        $autocompleteListener = new FilteredEventEmitter(
+            $discord->gateway->events,
+            Events::INTERACTION_CREATE,
+            fn(InteractionCreate $interactionCreate) => $interactionCreate?->type === InteractionType::APPLICATION_COMMAND_AUTOCOMPLETE
+        );
+
+        $autocompleteListener->on(Events::INTERACTION_CREATE,
+            fn(InteractionCreate $interactionCreate) => $this->handleAutocomplete($interactionCreate)
+        );
+
+        $autocompleteListener->start();
+    }
+
+    /**
+     * Handle autocomplete interaction.
+     */
+    private function handleAutocomplete(InteractionCreate $interaction): void
+    {
+        $commandName = $interaction->data->name;
+        $command = $this->bucket->items->get($commandName);
+
+        if ($command === null) {
+            return;
+        }
+
+        $handler = new AutocompleteHandler(
+            command: $command,
+            discord: $this->discord,
+            logger: get(Logger::class),
+        );
+
+        $handler->handle($interaction);
     }
 
     private function registerCommands(): void
