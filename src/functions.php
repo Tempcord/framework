@@ -121,4 +121,31 @@ namespace Tempcord {
     {
         return ActionRowBuilder::create();
     }
+
+    // ============ Task Helper Functions ============
+
+    /**
+     * Get the tasks registry for managing scheduled tasks
+     */
+    function tasks(): \Tempcord\Registries\TasksRegistry
+    {
+        return get(\Tempcord\Registries\TasksRegistry::class);
+    }
+
+    /**
+     * Cancel a scheduled task by name
+     */
+    function cancelTask(string $taskName): bool
+    {
+        return tasks()->cancelTask($taskName);
+    }
+
+    /**
+     * Get task statistics
+     * @return array<string, \Tempcord\Support\Tasks\TaskStats>
+     */
+    function taskStats(): array
+    {
+        return tasks()->getStats();
+    }
 }
