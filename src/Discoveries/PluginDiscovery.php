@@ -39,19 +39,7 @@ final class PluginDiscovery implements Discovery
 
     public function apply(): void
     {
-        // Collect all plugins with their priorities
-        $plugins = [];
-
         foreach ($this->discoveryItems as $pluginAttribute) {
-            /** @var TempcordPlugin $pluginAttribute */
-            $plugins[] = $pluginAttribute;
-        }
-
-        // Sort by priority (lower = earlier)
-        usort($plugins, fn(TempcordPlugin $a, TempcordPlugin $b) => $a->priority <=> $b->priority);
-
-        // Register plugins in priority order
-        foreach ($plugins as $pluginAttribute) {
             $this->registry->register($pluginAttribute);
         }
     }

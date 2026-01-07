@@ -18,7 +18,7 @@ use Tempest\Reflection\ClassReflector;
  * #[TempcordPlugin]
  * class CommonPlugin extends AbstractPlugin
  * {
- *     public function name(): string { return 'tempcord/common'; }
+ *     // name, version, description read from composer.json
  * }
  * ```
  */
@@ -28,11 +28,9 @@ final class TempcordPlugin
     public ClassReflector $reflector;
 
     /**
-     * @param int $priority Plugin boot priority (lower = earlier). Default: 100
      * @param bool $enabled Whether this plugin is enabled. Default: true
      */
     public function __construct(
-        public int $priority = 100,
         public bool $enabled = true,
     ) {}
 

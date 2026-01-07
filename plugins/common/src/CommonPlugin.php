@@ -16,7 +16,7 @@ use Tempest\Container\Container;
  *
  * Name, version, and description are read from composer.json.
  */
-#[TempcordPlugin(priority: 50)]
+#[TempcordPlugin]
 class CommonPlugin extends AbstractPlugin
 {
     public function register(Container $container): void
