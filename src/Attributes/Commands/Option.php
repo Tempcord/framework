@@ -32,12 +32,6 @@ final class Option
 
     public ParameterReflector $reflector;
 
-    /** @var string|null Command translation key for localization context */
-    private ?string $commandTranslationKey = null;
-
-    /** @var bool Whether localization is enabled */
-    private bool $localizationEnabled = false;
-
     public string $name {
         get {
             if ($this->hasAttribute('name')) {
@@ -78,16 +72,24 @@ final class Option
 
     public CommandOptionBuilder $builder {
         get {
+            $translator = $this->getTranslator();
+
+            // Resolve description (auto-detect translation key)
+            $resolvedDescription = $translator?->resolve($this->description) ?? $this->description;
+
             $builder = CommandOptionBuilder::new()
                 ->setName($this->name)
-                ->setDescription($this->description)
+                ->setDescription($resolvedDescription)
                 ->setRequired($this->isRequired)
                 ->setType($this->type)
                 ->setAutoComplete($this->autocomplete !== null);
 
-            // Apply localizations if enabled
-            if ($this->localizationEnabled && $this->commandTranslationKey !== null) {
-                $this->applyLocalizations($builder);
+            // Auto-add localizations if description is a translation key
+            if ($translator?->isTranslationKey($this->description)) {
+                $descLocalizations = $translator->getLocalizations($this->description);
+                if (!empty($descLocalizations)) {
+                    $builder->setDescriptionLocalizations($descLocalizations);
+                }
             }
 
             return $builder;
@@ -95,48 +97,15 @@ final class Option
     }
 
     /**
-     * Apply localizations to the option builder
+     * Get translator instance (null if not available)
      */
-    private function applyLocalizations(CommandOptionBuilder $builder): void
+    private function getTranslator(): ?CommandTranslator
     {
         try {
-            $translator = get(CommandTranslator::class);
-            $localizations = $translator->getOptionLocalizations(
-                $this->commandTranslationKey,
-                $this->name
-            );
-
-            $nameLocalizations = [];
-            $descriptionLocalizations = [];
-
-            foreach ($localizations as $locale => $translation) {
-                if (isset($translation['name'])) {
-                    $nameLocalizations[$locale] = $translation['name'];
-                }
-                if (isset($translation['description'])) {
-                    $descriptionLocalizations[$locale] = $translation['description'];
-                }
-            }
-
-            if (!empty($nameLocalizations)) {
-                $builder->setNameLocalizations($nameLocalizations);
-            }
-
-            if (!empty($descriptionLocalizations)) {
-                $builder->setDescriptionLocalizations($descriptionLocalizations);
-            }
+            return get(CommandTranslator::class);
         } catch (\Throwable) {
-            // Silently ignore if translator is not available
+            return null;
         }
-    }
-
-    /**
-     * Set localization context from parent command
-     */
-    public function setLocalizationContext(string $commandKey, bool $enabled): void
-    {
-        $this->commandTranslationKey = $commandKey;
-        $this->localizationEnabled = $enabled;
     }
 
     public function __construct(

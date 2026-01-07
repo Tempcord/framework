@@ -149,48 +149,4 @@ namespace Tempcord {
         return tasks()->getStats();
     }
 
-    // ============ Localization Helper Functions ============
-
-    /**
-     * Get the command translator instance
-     */
-    function translator(): \Tempcord\Support\Localization\CommandTranslator
-    {
-        return get(\Tempcord\Support\Localization\CommandTranslator::class);
-    }
-
-    /**
-     * Translate a key for a specific locale
-     *
-     * @param string $key Translation key (e.g., 'commands.ping.description')
-     * @param string|null $locale Target locale (defaults to en-US)
-     * @param array $replace Placeholder replacements
-     */
-    function trans(string $key, ?string $locale = null, array $replace = []): ?string
-    {
-        return translator()->translate($key, $locale, $replace);
-    }
-
-    /**
-     * Get command localizations for Discord
-     *
-     * @param string $commandKey Command translation key
-     * @return array<string, array{name?: string, description?: string}>
-     */
-    function commandLocalizations(string $commandKey): array
-    {
-        return translator()->getCommandLocalizations($commandKey);
-    }
-
-    /**
-     * Get option localizations for Discord
-     *
-     * @param string $commandKey Command translation key
-     * @param string $optionName Option name
-     * @return array<string, array{name?: string, description?: string}>
-     */
-    function optionLocalizations(string $commandKey, string $optionName): array
-    {
-        return translator()->getOptionLocalizations($commandKey, $optionName);
-    }
 }

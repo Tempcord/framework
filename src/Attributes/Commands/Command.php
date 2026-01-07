@@ -98,38 +98,33 @@ final class Command implements Buildable, CanBeHandled
     }
 
     /**
-     * Get the translation key for this command
-     */
-    public string $translationKey {
-        get {
-            return $this->rememberAttribute('translationKey', fn() => $this->name);
-        }
-    }
-
-    /**
      * The CommandBuilder
      *
      * This CommandBuilder allows us to build the command and send it to discord
      */
     public CommandBuilder $builder {
         get {
+            $translator = $this->getTranslator();
+
+            // Resolve description (auto-detect translation key)
+            $resolvedDescription = $translator?->resolve($this->description) ?? $this->description;
+
             $builder = CommandBuilder::new()
                 ->setName($this->name)
                 ->setNsfw($this->isNsfw)
                 ->setDmPermission($this->directMessage)
                 ->setType($this->type)
-                ->setDescription($this->description);
+                ->setDescription($resolvedDescription);
 
-            // Add localizations if enabled
-            if ($this->localized) {
-                $this->applyLocalizations($builder);
+            // Auto-add localizations if description is a translation key
+            if ($translator?->isTranslationKey($this->description)) {
+                $descLocalizations = $translator->getLocalizations($this->description);
+                if (!empty($descLocalizations)) {
+                    $builder->setDescriptionLocalizations($descLocalizations);
+                }
             }
 
             foreach ($this->options as $option) {
-                // Pass localization context to options
-                if ($this->localized && $option instanceof Option) {
-                    $option->setLocalizationContext($this->translationKey, $this->localized);
-                }
                 $builder->addOption($option->builder);
             }
 
@@ -138,49 +133,26 @@ final class Command implements Buildable, CanBeHandled
     }
 
     /**
-     * Apply localizations to the command builder
+     * Get translator instance (null if not available)
      */
-    private function applyLocalizations(CommandBuilder $builder): void
+    private function getTranslator(): ?CommandTranslator
     {
         try {
-            $translator = get(CommandTranslator::class);
-            $localizations = $translator->getCommandLocalizations($this->translationKey);
-
-            $nameLocalizations = [];
-            $descriptionLocalizations = [];
-
-            foreach ($localizations as $locale => $translation) {
-                if (isset($translation['name'])) {
-                    $nameLocalizations[$locale] = $translation['name'];
-                }
-                if (isset($translation['description'])) {
-                    $descriptionLocalizations[$locale] = $translation['description'];
-                }
-            }
-
-            if (!empty($nameLocalizations)) {
-                $builder->setNameLocalizations($nameLocalizations);
-            }
-
-            if (!empty($descriptionLocalizations)) {
-                $builder->setDescriptionLocalizations($descriptionLocalizations);
-            }
+            return get(CommandTranslator::class);
         } catch (\Throwable) {
-            // Silently ignore if translator is not available
+            return null;
         }
     }
 
     /**
      * @param string|BackedEnum|null $name Command name
-     * @param string|null $description Command description
+     * @param string|null $description Command description or translation key (e.g., 'commands.ping')
      * @param int|null $guildId Guild ID for guild-specific commands
      * @param bool $isNsfw Whether the command is NSFW
      * @param array $permissions Required permissions
      * @param bool $directMessage Whether command works in DMs
      * @param ApplicationCommandTypes $type Command type
      * @param array<class-string<CommandMiddleware>> $middleware Middleware classes
-     * @param bool $localized Enable localization support
-     * @param string|null $translationKey Custom translation key (defaults to command name)
      */
     public function __construct(
         string|BackedEnum|null         $name = null,
@@ -191,12 +163,9 @@ final class Command implements Buildable, CanBeHandled
         public bool                    $directMessage = true,
         public ApplicationCommandTypes $type = ApplicationCommandTypes::CHAT_INPUT,
         public array                   $middleware = [],
-        public bool                    $localized = false,
-        ?string                        $translationKey = null,
     )
     {
         $this->setAttribute('name', $name);
-        $this->setAttribute('translationKey', $translationKey);
 
         if (($this->type === ApplicationCommandTypes::CHAT_INPUT) && $this->description === null) {
             throw new \InvalidArgumentException("Description for command is required when type=CHAT_INPUT");
