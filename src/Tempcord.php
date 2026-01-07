@@ -3,6 +3,7 @@
 namespace Tempcord;
 
 use Ragnarok\Fenrir\Discord;
+use Tempcord\Plugins\PluginRegistry;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\ComponentsRegistry;
 use Tempcord\Registries\TasksRegistry;
@@ -15,6 +16,7 @@ final readonly class Tempcord
         private(set) CommandsRegistry $commandsRegistry,
         private(set) ComponentsRegistry $componentsRegistry,
         private(set) TasksRegistry $tasksRegistry,
+        private(set) PluginRegistry $pluginRegistry,
         private(set) Container $container
     )
     {
@@ -31,6 +33,9 @@ final readonly class Tempcord
 
         $this->container->singleton(Discord::class, $discord);
 
+        // Register plugins first (they may add middleware or services)
+        $discord->registerExtension($this->pluginRegistry);
+
         // Register command handlers
         $discord->registerExtension($this->commandsRegistry);
 
@@ -41,5 +46,13 @@ final readonly class Tempcord
         $discord->registerExtension($this->tasksRegistry);
 
         $discord->gateway->open();
+    }
+
+    /**
+     * Get the plugin registry.
+     */
+    public function plugins(): PluginRegistry
+    {
+        return $this->pluginRegistry;
     }
 }
