@@ -14,8 +14,6 @@ use Ragnarok\Fenrir\Parts\GuildMember;
 use Ragnarok\Fenrir\Parts\Role;
 use Ragnarok\Fenrir\Parts\User;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandOptionBuilder;
-use RuntimeException;
-use Tempcord\Interfaces\Autocomplete;
 use Tempcord\Support\Localization\CommandTranslator;
 use Tempcord\Support\Traits\HasAttributes;
 use Tempcord\Tempcord;
