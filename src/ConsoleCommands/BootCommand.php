@@ -5,7 +5,6 @@ namespace Tempcord\ConsoleCommands;
 use Tempcord\Tempcord;
 use Tempcord\TempcordConfig;
 use Tempest\Console\Console;
-use Tempest\Console\ConsoleArgument;
 use Tempest\Console\ConsoleCommand;
 use Tempest\Log\Logger;
 
@@ -16,16 +15,15 @@ final readonly class BootCommand
         private Console        $console,
         private Logger         $logger,
         private TempcordConfig $config
-
     )
     {
     }
 
-    #[ConsoleCommand(name: 'boot', description: 'Boots the bot')]
-    public function __invoke(
-        #[ConsoleArgument(description: 'Whether to register commands', aliases: ['r'])]
-        bool $registerCommands = false
-    ): void
+    #[ConsoleCommand(
+        name: 'boot',
+        description: 'Boots the Discord bot (blocking)'
+    )]
+    public function __invoke(): void
     {
         $this->console->header('Booting up...');
         $this->tempcord->boot($this->logger, $this->config);

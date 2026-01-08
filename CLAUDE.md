@@ -55,9 +55,23 @@ Commands use PHP attributes for definition and are auto-discovered by Tempest's 
 - **InteractionResponse** (`src/Support/Responses/InteractionResponse.php`) - Fluent response builder with decorators (success, warning, error, content)
 - **ResponseDecorator** pattern in `src/Support/Responses/Decorators/` for composable response styling
 
+### Prompts System
+
+Interactive terminal prompts for runtime bot management and control:
+
+1. **Prompt Attribute** (`src/Attributes/Prompts/Prompt.php`) - Class-level attribute for defining interactive prompts
+2. **PromptOption Attribute** (`src/Attributes/Prompts/PromptOption.php`) - Parameter-level attribute for prompt options with autocomplete support
+3. **PromptsDiscovery** (`src/Discoveries/PromptsDiscovery.php`) - Discovers all `#[Prompt]` attributed classes
+4. **PromptsRegistry** (`src/Registries/PromptsRegistry.php`) - Registers discovered prompts into the bucket
+5. **PromptsBucket** (`src/Support/Prompts/PromptsBucket.php`) - Routes prompt commands to handlers with error handling
+6. **InteractiveSession** (`src/Support/Prompts/InteractiveSession.php`) - Terminal management for interactive mode using ReactPHP
+7. **AutocompleteService** (`src/Support/Prompts/AutocompleteService.php`) - Context-aware autocomplete for commands, options, and values
+
 ### Console Commands
 
-- `boot` - Starts the Discord bot (`php tempcord boot`)
-- `boot --register` / `boot -r` - Boot with command registration
+- `boot` - Starts the Discord bot in blocking mode (`php tempcord boot`)
+- `interactive` / `i` - Starts the bot in interactive mode with live command prompt (`php tempcord interactive`)
+  - Features tab-based autocomplete, arrow key navigation, and fuzzy command matching
+  - Controls: Tab (autocomplete), ↑↓ (navigate), Enter (confirm), Esc×2 or Ctrl+C (exit)
 - `register` - Register commands without starting bot
 - `commands:list` - List discovered commands

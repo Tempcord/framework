@@ -4,6 +4,7 @@ namespace Tempcord\Logging;
 
 use Monolog\Level;
 use Tempcord\Logging\Handlers\ConsoleLogHandler;
+use Tempcord\Support\InteractiveModeService;
 use Tempest\Console\Console;
 use Tempest\Core\Environment;
 use Tempest\Log\LogChannel;
@@ -32,9 +33,19 @@ final class ConsoleLogChannel implements LogChannel
 
     public function getHandlers(Level $level): array
     {
+        // Disable console logging when in interactive mode
+        try {
+            $interactiveMode = get(InteractiveModeService::class);
+            if ($interactiveMode->isEnabled()) {
+                return []; // No console logging in interactive mode
+            }
+        } catch (\Throwable) {
+            // Service not available, continue with normal logging
+        }
+
         // Adjust log level based on environment
         $effectiveLevel = $this->getEffectiveLevel();
-        
+
         return [
             new ConsoleLogHandler(
                 console: get(Console::class),
