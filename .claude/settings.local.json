@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(php:*)",
-      "Bash(composer show:*)"
+      "Bash(composer show:*)",
+      "Bash(tree:*)"
     ]
   }
 }

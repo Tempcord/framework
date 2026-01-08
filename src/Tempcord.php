@@ -7,7 +7,6 @@ use React\EventLoop\Loop;
 use Tempcord\Plugins\Registry as PluginRegistry;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\ComponentsRegistry;
-use Tempcord\Tasks\Registry as TasksRegistry;
 use Tempest\Container\Container;
 use Tempest\Log\Logger;
 
@@ -16,7 +15,6 @@ final readonly class Tempcord
     public function __construct(
         private(set) CommandsRegistry   $commandsRegistry,
         private(set) ComponentsRegistry $componentsRegistry,
-        private(set) TasksRegistry      $tasksRegistry,
         private(set) PluginRegistry     $pluginRegistry,
         private(set) Container          $container
     )
@@ -42,9 +40,6 @@ final readonly class Tempcord
 
         // Register component handlers (buttons, select menus, modals)
         $discord->registerExtension($this->componentsRegistry);
-
-        // Register scheduled tasks
-        $discord->registerExtension($this->tasksRegistry);
 
         $discord->gateway->open();
     }
@@ -79,9 +74,6 @@ final readonly class Tempcord
 
         // Register component handlers (buttons, select menus, modals)
         $discord->registerExtension($this->componentsRegistry);
-
-        // Register scheduled tasks
-        $discord->registerExtension($this->tasksRegistry);
 
         return $discord;
     }

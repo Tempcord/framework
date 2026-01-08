@@ -33,8 +33,17 @@ final class StatusPrompt
             // Collect status data
             $commandCount = count($this->tempcord->commandsRegistry->bucket->items);
             $componentCount = count($this->tempcord->componentsRegistry->bucket->items);
-            $taskCount = count($this->tempcord->tasksRegistry->bucket->items);
-            $pluginCount = count($this->tempcord->pluginRegistry->getPlugins());
+
+            // Tasks are optional (plugin-based)
+            $taskCount = 0;
+            try {
+                $tasksRegistry = get(\Tempcord\Plugins\Tasks\Registry::class);
+                $taskCount = $tasksRegistry->count();
+            } catch (\Throwable) {
+                // Tasks plugin not installed
+            }
+
+            $pluginCount = count($this->tempcord->pluginRegistry->all());
 
             $data = [
                 'gateway' => 'Connected',
