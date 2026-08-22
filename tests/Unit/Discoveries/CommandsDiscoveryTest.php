@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Log\NullLogger;
 use Ragnarok\Fenrir\Bitwise\Bitwise;
 use ReflectionProperty;
+use Tempcord\Compiler\CommandCompiler;
 use Tempcord\Definitions\CommandDefinition;
 use Tempcord\Discord\AllCommandExtension;
 use Tempcord\Discord\CommandBuilderFactory;
@@ -64,7 +65,7 @@ final class CommandsDiscoveryTest extends TestCase
 
     private function discovery(CommandsRegistry $registry): CommandsDiscovery
     {
-        $discovery = new CommandsDiscovery($registry);
+        $discovery = new CommandsDiscovery($registry, new CommandCompiler());
         $discovery->setItems(new DiscoveryItems());
 
         return $discovery;

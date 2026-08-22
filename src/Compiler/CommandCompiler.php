@@ -19,6 +19,8 @@ use Tempcord\Definitions\HandlerDefinition;
 use Tempcord\Definitions\OptionDefinition;
 use Tempcord\Definitions\SubcommandDefinition;
 use Tempcord\Definitions\SubcommandGroupDefinition;
+use Tempcord\Localization\LocalizationProvider;
+use Tempcord\Localization\NullLocalizations;
 use Tempest\Reflection\ClassReflector;
 use Tempest\Reflection\MethodReflector;
 use Tempest\Reflection\ParameterReflector;
@@ -32,6 +34,10 @@ use function Tempest\Support\str;
  */
 final readonly class CommandCompiler
 {
+    public function __construct(
+        private LocalizationProvider $localizations = new NullLocalizations(),
+    ) {}
+
     /**
      * PHP parameter types the framework knows how to ask Discord for.
      */
@@ -51,8 +57,9 @@ final readonly class CommandCompiler
         $options = [];
         $handlers = [];
 
-        $group = $this->groupOf($class);
-        $subcommands = $this->subcommandsOf($class);
+        $key = $command->translationKey;
+        $group = $this->groupOf($class, $key);
+        $subcommands = $this->subcommandsOf($class, $key);
 
         if ($group !== null) {
             $options[$group->name] = $group;
@@ -85,7 +92,7 @@ final readonly class CommandCompiler
              * parameters are the command's options.
              */
             $invoke = $this->invokerOf($class);
-            $options = $this->optionsOf($invoke);
+            $options = $this->optionsOf($invoke, $key);
 
             $handlers[$name] = new HandlerDefinition(
                 path: $name,
@@ -108,6 +115,8 @@ final readonly class CommandCompiler
             permissions: $command->permissions,
             options: $options,
             handlers: $handlers,
+            nameLocalizations: $this->translate($key, 'name'),
+            descriptionLocalizations: $this->translate($key, 'description'),
         );
     }
 
@@ -131,7 +140,7 @@ final readonly class CommandCompiler
             ->toString();
     }
 
-    private function groupOf(ClassReflector $class): ?SubcommandGroupDefinition
+    private function groupOf(ClassReflector $class, ?string $key): ?SubcommandGroupDefinition
     {
         if (!$class->hasAttribute(SubcommandGroup::class)) {
             return null;
@@ -139,18 +148,22 @@ final readonly class CommandCompiler
 
         /** @var SubcommandGroup $group */
         $group = $class->getAttribute(SubcommandGroup::class);
+        $name = $this->valueOf($group->name);
+        $groupKey = $this->nest($key, $name);
 
         return new SubcommandGroupDefinition(
-            name: $this->valueOf($group->name),
+            name: $name,
             description: $group->description,
-            subcommands: $this->subcommandsOf($class),
+            subcommands: $this->subcommandsOf($class, $groupKey),
+            nameLocalizations: $this->translate($groupKey, 'name'),
+            descriptionLocalizations: $this->translate($groupKey, 'description'),
         );
     }
 
     /**
      * @return array<string, SubcommandDefinition>
      */
-    private function subcommandsOf(ClassReflector $class): array
+    private function subcommandsOf(ClassReflector $class, ?string $key): array
     {
         $subcommands = [];
 
@@ -163,11 +176,15 @@ final readonly class CommandCompiler
             $subcommand = $method->getAttribute(Subcommand::class);
             $name = $this->valueOf($subcommand->name);
 
+            $subcommandKey = $this->nest($key, $name);
+
             $subcommands[$name] = new SubcommandDefinition(
                 name: $name,
                 description: $subcommand->description,
-                options: $this->optionsOf($method),
+                options: $this->optionsOf($method, $subcommandKey),
                 method: $method,
+                nameLocalizations: $this->translate($subcommandKey, 'name'),
+                descriptionLocalizations: $this->translate($subcommandKey, 'description'),
             );
         }
 
@@ -188,7 +205,7 @@ final readonly class CommandCompiler
     /**
      * @return array<string, OptionDefinition>
      */
-    private function optionsOf(MethodReflector $method): array
+    private function optionsOf(MethodReflector $method, ?string $key): array
     {
         $options = [];
 
@@ -200,6 +217,8 @@ final readonly class CommandCompiler
             /** @var Option $option */
             $option = $parameter->getAttribute(Option::class);
             $name = $option->name ?? $parameter->getName();
+
+            $optionKey = $this->nest($key, $name);
 
             $options[$name] = new OptionDefinition(
                 name: $name,
@@ -214,6 +233,8 @@ final readonly class CommandCompiler
                 minLength: $option->minLength,
                 maxLength: $option->maxLength,
                 channelTypes: $option->channelTypes,
+                nameLocalizations: $this->translate($optionKey, 'name'),
+                descriptionLocalizations: $this->translate($optionKey, 'description'),
             );
         }
 
@@ -253,6 +274,23 @@ final readonly class CommandCompiler
 
         return self::OPTION_TYPES[$parameter->getType()->getName()]
             ?? throw new LogicException('Command option type not supported');
+    }
+
+    /**
+     * Extends a translation key one step down the command tree. Null stays
+     * null, so a command that declares no key localizes nothing.
+     */
+    private function nest(?string $key, string $segment): ?string
+    {
+        return $key === null ? null : $key . '.' . $segment;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function translate(?string $key, string $field): array
+    {
+        return $key === null ? [] : $this->localizations->forKey($key . '.' . $field);
     }
 
     private function valueOf(string|BackedEnum $name): string

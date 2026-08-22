@@ -49,5 +49,8 @@
         "psr-4": {
             "Tempcord\\Tests\\": "tests/"
         }
+    },
+    "suggest": {
+        "tempest/intl": "Enables name and description translations for commands via #[Command(translationKey: ...)]. Requires ext-intl."
     }
 }

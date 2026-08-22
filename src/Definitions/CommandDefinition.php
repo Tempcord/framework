@@ -17,6 +17,8 @@ final readonly class CommandDefinition
      *        the command's direct children, in the shape Discord expects
      * @param array<string, HandlerDefinition> $handlers keyed by dotted interaction path
      * @param list<Permission> $permissions
+     * @param array<string, string> $nameLocalizations keyed by Discord locale
+     * @param array<string, string> $descriptionLocalizations keyed by Discord locale
      */
     public function __construct(
         public string $name,
@@ -28,6 +30,8 @@ final readonly class CommandDefinition
         public array $permissions,
         public array $options,
         public array $handlers,
+        public array $nameLocalizations = [],
+        public array $descriptionLocalizations = [],
     ) {}
 
     public function isGlobal(): bool
@@ -67,6 +71,8 @@ final readonly class CommandDefinition
             permissions: $this->permissions,
             options: [...$this->options, ...$other->options],
             handlers: [...$this->handlers, ...$other->handlers],
+            nameLocalizations: $this->nameLocalizations,
+            descriptionLocalizations: $this->descriptionLocalizations,
         );
     }
 }

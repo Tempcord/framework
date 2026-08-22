@@ -14,9 +14,14 @@ final class CommandsDiscovery implements Discovery
 {
     use IsDiscovery;
 
+    /**
+     * The compiler is injected rather than defaulted so it arrives carrying the
+     * container's localization provider; a default would silently compile every
+     * command without translations.
+     */
     public function __construct(
         private readonly CommandsRegistry $commandRegistry,
-        private readonly CommandCompiler $compiler = new CommandCompiler(),
+        private readonly CommandCompiler $compiler,
     ) {}
 
     public function discover(DiscoveryLocation $location, ClassReflector $class): void

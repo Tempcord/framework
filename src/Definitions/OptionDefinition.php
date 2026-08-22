@@ -16,6 +16,8 @@ final readonly class OptionDefinition
     /**
      * @param array<string, string|int|float> $choices keyed by the label users see
      * @param list<ChannelType> $channelTypes
+     * @param array<string, string> $nameLocalizations keyed by Discord locale
+     * @param array<string, string> $descriptionLocalizations keyed by Discord locale
      */
     public function __construct(
         public string $name,
@@ -30,6 +32,8 @@ final readonly class OptionDefinition
         public ?int $minLength = null,
         public ?int $maxLength = null,
         public array $channelTypes = [],
+        public array $nameLocalizations = [],
+        public array $descriptionLocalizations = [],
     ) {}
 
     public function hasAutocomplete(): bool

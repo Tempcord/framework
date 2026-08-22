@@ -54,6 +54,14 @@ final readonly class CommandBuilderFactory
         if ($command->type === ApplicationCommandTypes::CHAT_INPUT) {
             // The compiler guarantees a description for chat input commands.
             $builder->setDescription((string) $command->description);
+
+            if ($command->descriptionLocalizations !== []) {
+                $builder->setDescriptionLocalizations($command->descriptionLocalizations);
+            }
+        }
+
+        if ($command->nameLocalizations !== []) {
+            $builder->setNameLocalizations($command->nameLocalizations);
         }
 
         foreach ($command->options as $option) {
@@ -75,10 +83,14 @@ final readonly class CommandBuilderFactory
 
     private function forGroup(SubcommandGroupDefinition $group): CommandOptionBuilder
     {
-        $builder = CommandOptionBuilder::new()
-            ->setName($group->name)
-            ->setDescription($group->description)
-            ->setType(ApplicationCommandOptionType::SUB_COMMAND_GROUP);
+        $builder = $this->localize(
+            CommandOptionBuilder::new()
+                ->setName($group->name)
+                ->setDescription($group->description)
+                ->setType(ApplicationCommandOptionType::SUB_COMMAND_GROUP),
+            $group->nameLocalizations,
+            $group->descriptionLocalizations,
+        );
 
         foreach ($group->subcommands as $subcommand) {
             $builder->addOption($this->forSubcommand($subcommand));
@@ -89,10 +101,14 @@ final readonly class CommandBuilderFactory
 
     private function forSubcommand(SubcommandDefinition $subcommand): CommandOptionBuilder
     {
-        $builder = CommandOptionBuilder::new()
-            ->setName($subcommand->name)
-            ->setDescription($subcommand->description)
-            ->setType(ApplicationCommandOptionType::SUB_COMMAND);
+        $builder = $this->localize(
+            CommandOptionBuilder::new()
+                ->setName($subcommand->name)
+                ->setDescription($subcommand->description)
+                ->setType(ApplicationCommandOptionType::SUB_COMMAND),
+            $subcommand->nameLocalizations,
+            $subcommand->descriptionLocalizations,
+        );
 
         foreach ($subcommand->options as $option) {
             $builder->addOption($this->forParameter($option));
@@ -101,14 +117,41 @@ final readonly class CommandBuilderFactory
         return $builder;
     }
 
+    /**
+     * Localizations are left off entirely when there are none, rather than sent
+     * as empty maps.
+     *
+     * @param array<string, string> $nameLocalizations
+     * @param array<string, string> $descriptionLocalizations
+     */
+    private function localize(
+        CommandOptionBuilder $builder,
+        array $nameLocalizations,
+        array $descriptionLocalizations,
+    ): CommandOptionBuilder {
+        if ($nameLocalizations !== []) {
+            $builder->setNameLocalizations($nameLocalizations);
+        }
+
+        if ($descriptionLocalizations !== []) {
+            $builder->setDescriptionLocalizations($descriptionLocalizations);
+        }
+
+        return $builder;
+    }
+
     private function forParameter(OptionDefinition $option): CommandOptionBuilder
     {
-        $builder = CommandOptionBuilder::new()
-            ->setName($option->name)
-            ->setDescription($option->description)
-            ->setRequired($option->isRequired)
-            ->setType($option->type)
-            ->setAutoComplete($option->hasAutocomplete());
+        $builder = $this->localize(
+            CommandOptionBuilder::new()
+                ->setName($option->name)
+                ->setDescription($option->description)
+                ->setRequired($option->isRequired)
+                ->setType($option->type)
+                ->setAutoComplete($option->hasAutocomplete()),
+            $option->nameLocalizations,
+            $option->descriptionLocalizations,
+        );
 
         foreach ($option->choices as $label => $value) {
             $builder->addChoice($label, $value);
