@@ -5,9 +5,11 @@
     "type": "library",
     "require": {
         "php": "^8.5",
-        "tempest/console": "^3.18",
         "ragnarok/fenrir": "^1.0",
-        "tempest/core": "^3.18"
+        "tempest/console": "^3.18",
+        "tempest/core": "^3.18",
+        "tempest/event-bus": "^3.18",
+        "tempest/log": "^3.18"
     },
     "license": "MIT",
     "authors": [
