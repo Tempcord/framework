@@ -22,6 +22,11 @@ use function React\Async\await;
 #[Singleton]
 final class CommandsRegistry
 {
+    /**
+     * Discord rejects an autocomplete response carrying more choices than this.
+     */
+    private const int MAX_CHOICES = 25;
+
     /** @var array<Command> */
     private array $commands = [];
 
@@ -117,43 +122,31 @@ final class CommandsRegistry
                         }
                     },
                     autocomplete: function (CommandInteraction $interaction) use ($command) {
-                        [$option, $interactionOption] = $this->resolveFocusedAndParam($interaction->interaction->data->options, $command);
+                        $resolved = $this->resolveFocusedAndParam(
+                            $interaction->interaction->data->options ?? [],
+                            $command,
+                        );
+
+                        // Nothing focused, or focused on an option this command does not declare.
+                        if ($resolved === null) {
+                            return null;
+                        }
+
+                        [$option, $interactionOption] = $resolved;
 
                         if (!$option->autocomplete instanceof Autocomplete) {
                             return null;
                         }
 
-                        $value = $option->autocomplete->handle($interaction, $interactionOption->value);
-
-                        $choices = is_array($value) ? $value : [$value];
-
-                        $choices = array_slice($choices, 0, 25);
-
-                        $choices = array_map(function ($choice, $key) use ($choices) {
-                            if ($choice instanceof ApplicationCommandOptionChoice) {
-                                return $choice;
-                            }
-
-                            if (array_is_list($choices)) {
-                                $key = $choice;
-                            }
-
-                            if (is_int($key)) {
-                                $key = (string)$key;
-                            }
-
-                            $applicationCommandOptionChoice = new ApplicationCommandOptionChoice();
-                            $applicationCommandOptionChoice->name = $key;
-                            $applicationCommandOptionChoice->value = $choice;
-
-                            return $applicationCommandOptionChoice;
-                        }, $value, array_keys($value));
-
                         $interaction->createInteractionResponse(
                             InteractionCallbackBuilder::new()
-                                ->setChoices($choices)
+                                ->setChoices($this->toChoices(
+                                    $option->autocomplete->handle($interaction, $interactionOption->value),
+                                ))
                                 ->setType(InteractionCallbackType::APPLICATION_COMMAND_AUTOCOMPLETE_RESULT)
                         );
+
+                        return null;
                     }
                 );
 
@@ -166,6 +159,40 @@ final class CommandsRegistry
         if ($count <= 0) {
             $console->warning('Listened ' . $count . ' commands. Maybe this behavior is not expected, or you just did not created any command yet.');
         }
+    }
+
+    /**
+     * Normalises whatever an Autocomplete returned into the choice list Discord
+     * accepts.
+     *
+     * A bare scalar stands for a single suggestion. A list uses each entry as
+     * its own label; a map uses its keys as labels. Choices built by hand are
+     * passed through untouched.
+     *
+     * @return list<ApplicationCommandOptionChoice>
+     */
+    private function toChoices(mixed $value): array
+    {
+        $choices = is_array($value) ? $value : [$value];
+        $choices = array_slice($choices, 0, self::MAX_CHOICES, preserve_keys: true);
+
+        $isList = array_is_list($choices);
+
+        return array_map(
+            static function (mixed $choice, int|string $label) use ($isList): ApplicationCommandOptionChoice {
+                if ($choice instanceof ApplicationCommandOptionChoice) {
+                    return $choice;
+                }
+
+                $applicationCommandOptionChoice = new ApplicationCommandOptionChoice();
+                $applicationCommandOptionChoice->name = (string) ($isList ? $choice : $label);
+                $applicationCommandOptionChoice->value = $choice;
+
+                return $applicationCommandOptionChoice;
+            },
+            $choices,
+            array_keys($choices),
+        );
     }
 
     /**
