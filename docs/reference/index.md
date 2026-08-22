@@ -23,3 +23,7 @@
 
 - [DiscordLocale](enums/discord-locale.md) — The locales Discord accepts for name and description localizations.
 
+## Plugins
+
+- [Plugin](plugins/plugin.md) — A package that extends a bot with its own behaviour.
+

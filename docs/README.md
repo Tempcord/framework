@@ -11,6 +11,7 @@ Build Discord bots with PHP, on top of [Tempest](https://tempestphp.com).
 - [Autocomplete](guides/03-autocomplete.md)
 - [Events](guides/04-events.md)
 - [Translations](guides/05-translations.md)
+- [Plugins](guides/06-plugins.md)
 
 ## Reference
 
@@ -23,4 +24,6 @@ Generated from the source, so it describes what the framework actually does.
 **Configuration** — [TempcordConfig](reference/configuration/tempcord-config.md)
 
 **Enums** — [DiscordLocale](reference/enums/discord-locale.md)
+
+**Plugins** — [Plugin](reference/plugins/plugin.md)
 

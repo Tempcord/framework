@@ -41,6 +41,9 @@ final readonly class ApiReflector
         'enums' => [
             \Tempcord\Enums\DiscordLocale::class,
         ],
+        'plugins' => [
+            \Tempcord\Plugins\Plugin::class,
+        ],
     ];
 
     /**

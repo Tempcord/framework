@@ -11,6 +11,7 @@ use Tempcord\Discord\AllCommandExtension;
 use Tempcord\Discord\CommandBuilderFactory;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\EventsRegistry;
+use Tempcord\Registries\PluginsRegistry;
 use Tempcord\Runtime\ArgumentResolver;
 use Tempcord\Runtime\AutocompleteResponder;
 use Tempcord\Runtime\ChoiceFactory;
@@ -32,6 +33,7 @@ final class TempcordTest extends TestCase
     private FakeDiscord $discord;
     private CommandsRegistry $commands;
     private EventsRegistry $events;
+    private PluginsRegistry $plugins;
 
     protected function setUp(): void
     {
@@ -54,11 +56,12 @@ final class TempcordTest extends TestCase
             autocomplete: new AutocompleteResponder(new ChoiceFactory()),
         );
         $this->events = new EventsRegistry(new GenericContainer());
+        $this->plugins = new PluginsRegistry(new NullLogger());
     }
 
     private function tempcord(): Tempcord
     {
-        return new Tempcord($this->discord, $this->commands, $this->events);
+        return new Tempcord($this->discord, $this->commands, $this->events, $this->plugins);
     }
 
     public function test_it_registers_the_command_extension_once_the_gateway_is_ready(): void

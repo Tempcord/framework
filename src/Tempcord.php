@@ -7,6 +7,7 @@ use Ragnarok\Fenrir\Discord;
 use Ragnarok\Fenrir\Gateway\Events\Ready;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\EventsRegistry;
+use Tempcord\Registries\PluginsRegistry;
 use Tempcord\Runtime\Outcome;
 
 /**
@@ -20,6 +21,7 @@ final class Tempcord
         public readonly Discord $discord,
         private readonly CommandsRegistry $commandsRegistry,
         private readonly EventsRegistry $eventsRegistry,
+        private readonly PluginsRegistry $pluginsRegistry,
     ) {
         $this->discord->gateway->events->on(Events::READY, function (Ready $ready): void {
             $this->discord->registerExtension($this->commandsRegistry->extension);
@@ -36,7 +38,10 @@ final class Tempcord
     }
 
     /**
-     * Binds everything that has been discovered, then opens the gateway.
+     * Binds everything that has been discovered.
+     *
+     * Plugins boot last, so whatever they do runs against a bot whose commands
+     * and events are already bound, and still before the gateway opens.
      *
      * @return list<Outcome>
      */
@@ -45,6 +50,7 @@ final class Tempcord
         return [
             ...$this->commandsRegistry->listen(),
             ...$this->eventsRegistry->listen($this->discord),
+            ...$this->pluginsRegistry->boot($this),
         ];
     }
 

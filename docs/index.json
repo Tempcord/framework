@@ -19,6 +19,10 @@
         {
             "title": "Translations",
             "slug": "guides/05-translations"
+        },
+        {
+            "title": "Plugins",
+            "slug": "guides/06-plugins"
         }
     ],
     "reference": {
@@ -495,6 +499,24 @@
                     {
                         "signature": "tempestLocale(): string",
                         "summary": "The Tempest locale this maps to."
+                    }
+                ]
+            }
+        ],
+        "plugins": [
+            {
+                "name": "Plugin",
+                "fqcn": "Tempcord\\Plugins\\Plugin",
+                "kind": "interface",
+                "target": null,
+                "summary": "A package that extends a bot with its own behaviour.",
+                "slug": "reference/plugins/plugin",
+                "parameters": [],
+                "cases": [],
+                "methods": [
+                    {
+                        "signature": "boot(Tempcord $tempcord): void",
+                        "summary": "Called once, after commands and events are bound and before the gateway opens."
                     }
                 ]
             }
