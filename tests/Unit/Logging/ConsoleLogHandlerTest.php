@@ -96,4 +96,33 @@ final class ConsoleLogHandlerTest extends BaseTestCase
         $handler->handle($this->record('boom', level: Level::Error));
         $handler->handle($this->record('careful', level: Level::Warning));
     }
+
+    /**
+     * A long message carrying the literal "<style=" used to exhaust the regex
+     * engine inside Tempest's console parser, which then handed null to
+     * preg_match and killed the process. Log messages carry response bodies, so
+     * this is reachable from anything Discord returns.
+     */
+    public function test_a_message_that_looks_like_console_markup_is_neutralised(): void
+    {
+        $console = $this->createMock(Console::class);
+        $console->expects($this->once())
+            ->method('warning')
+            ->with($this->callback(static fn(string $written) => !str_contains($written, '<style')));
+
+        new ConsoleLogHandler($console, includeContext: false)
+            ->handle($this->record('<style="fg-red">' . str_repeat('a', 100), level: Level::Warning));
+    }
+
+    public function test_a_very_long_message_is_truncated(): void
+    {
+        $console = $this->createMock(Console::class);
+        $console->expects($this->once())
+            ->method('info')
+            ->with($this->callback(static fn(string $written) => mb_strlen($written) < 2200
+                && str_contains($written, 'characters)')));
+
+        new ConsoleLogHandler($console, includeContext: false)
+            ->handle($this->record(str_repeat('a', 5000)));
+    }
 }

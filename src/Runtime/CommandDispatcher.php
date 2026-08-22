@@ -2,7 +2,7 @@
 
 namespace Tempcord\Runtime;
 
-use Psr\Log\LoggerInterface;
+use Tempest\Log\Logger;
 use Ragnarok\Fenrir\Interaction\CommandInteraction;
 use Tempcord\Definitions\HandlerDefinition;
 use Tempest\Container\Container;
@@ -18,7 +18,7 @@ final readonly class CommandDispatcher
     public function __construct(
         private ArgumentResolver $arguments,
         private Container $container,
-        private LoggerInterface $logger,
+        private Logger $logger,
     ) {}
 
     public function dispatch(HandlerDefinition $handler, CommandInteraction $interaction): void

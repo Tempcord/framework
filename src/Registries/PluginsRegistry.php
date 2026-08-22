@@ -2,25 +2,21 @@
 
 namespace Tempcord\Registries;
 
-use Psr\Log\LoggerInterface;
 use Tempcord\Plugins\Plugin;
-use Tempcord\Runtime\Outcome;
-use Tempcord\Tempcord;
 use Tempest\Container\Singleton;
-use Throwable;
 
 /**
- * Holds every discovered plugin and boots them before the gateway opens.
+ * Holds every discovered plugin.
+ *
+ * Storage only, for the same reason CommandsRegistry is: discovery builds this
+ * while the container is still being assembled, so it must not depend on
+ * anything an initializer provides. Booting lives in PluginBooter.
  */
 #[Singleton]
 final class PluginsRegistry
 {
     /** @var array<class-string<Plugin>, Plugin> */
     private array $plugins = [];
-
-    public function __construct(
-        private readonly LoggerInterface $logger,
-    ) {}
 
     public function add(Plugin $plugin): void
     {
@@ -36,41 +32,8 @@ final class PluginsRegistry
         return array_values($this->plugins);
     }
 
-    /**
-     * @return list<Outcome>
-     */
-    public function boot(Tempcord $tempcord): array
+    public function count(): int
     {
-        $outcomes = [];
-
-        foreach ($this->plugins as $plugin) {
-            $name = $this->nameOf($plugin);
-
-            try {
-                $plugin->boot($tempcord);
-
-                $outcomes[] = Outcome::success('Plugin "' . $name . '" booted.');
-            } catch (Throwable $throwable) {
-                /*
-                 * A plugin that cannot start is worth reporting loudly, but not
-                 * worth taking the bot down for.
-                 */
-                $this->logger->error(
-                    'Plugin "' . $name . '" failed to boot: ' . $throwable->getMessage(),
-                    ['exception' => $throwable],
-                );
-
-                $outcomes[] = Outcome::error('Plugin "' . $name . '": ' . $throwable->getMessage());
-            }
-        }
-
-        return $outcomes;
-    }
-
-    private function nameOf(Plugin $plugin): string
-    {
-        $class = $plugin::class;
-
-        return substr($class, strrpos($class, '\\') + 1);
+        return count($this->plugins);
     }
 }

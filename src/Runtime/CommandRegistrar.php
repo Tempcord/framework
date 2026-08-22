@@ -5,7 +5,7 @@ namespace Tempcord\Runtime;
 use Discord\Http\Drivers\React;
 use Discord\Http\Endpoint;
 use Discord\Http\Http;
-use Psr\Log\LoggerInterface;
+use Tempest\Log\Logger;
 use Ragnarok\Fenrir\Discord;
 use Ragnarok\Fenrir\Enums\TokenType;
 use React\EventLoop\Loop;
@@ -31,7 +31,7 @@ final readonly class CommandRegistrar
     public function __construct(
         private CommandBuilderFactory $builders,
         private TempcordConfig $config,
-        private LoggerInterface $logger,
+        private Logger $logger,
         private ?Http $http = null,
     ) {}
 

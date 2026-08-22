@@ -3,7 +3,6 @@
 namespace Tempcord\Tests\Unit\Registries;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use Psr\Log\NullLogger;
 use Ragnarok\Fenrir\Bitwise\Bitwise;
 use Ragnarok\Fenrir\Enums\Permission;
 use Tempcord\Discord\CommandBuilderFactory;
@@ -13,6 +12,7 @@ use Tempcord\Runtime\OutcomeLevel;
 use Tempcord\TempcordConfig;
 use Tempcord\Tests\Doubles\FakeDiscord;
 use Tempcord\Tests\Doubles\RecordingHttp;
+use Tempcord\Tests\Doubles\RecordingLogger;
 use Tempcord\Tests\Fixtures\GlobalAlphaCommand;
 use Tempcord\Tests\Fixtures\GuildAlphaCommand;
 use Tempcord\Tests\Fixtures\GuildBetaCommand;
@@ -53,7 +53,7 @@ final class CommandRegistrationTest extends TestCase
         return new CommandRegistrar(
             new CommandBuilderFactory(),
             new TempcordConfig('::token::', new Bitwise()),
-            new NullLogger(),
+            new RecordingLogger(),
             $this->http,
         )->register(new FakeDiscord($this->http), $commands);
     }

@@ -3,12 +3,12 @@
 namespace Tempcord\Tests\Unit\Discoveries;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use Psr\Log\NullLogger;
 use Tempcord\Discoveries\PluginsDiscovery;
 use Tempcord\Plugins\Plugin;
 use Tempcord\Registries\PluginsRegistry;
 use Tempcord\Tests\Fixtures\PingCommand;
 use Tempcord\Tests\Fixtures\RecordingPlugin;
+use Tempcord\Tests\Doubles\RecordingLogger;
 use Tempcord\Tests\Unit\TestCase;
 use Tempest\Container\GenericContainer;
 use Tempest\Discovery\DiscoveryItems;
@@ -38,7 +38,7 @@ final class PluginsDiscoveryTest extends TestCase
 
     public function test_it_discovers_plugins(): void
     {
-        $plugins = new PluginsRegistry(new NullLogger());
+        $plugins = new PluginsRegistry();
         $discovery = $this->discovery($plugins);
 
         $discovery->discover($this->location, new ClassReflector(RecordingPlugin::class));
@@ -50,7 +50,7 @@ final class PluginsDiscoveryTest extends TestCase
 
     public function test_it_ignores_classes_that_are_not_plugins(): void
     {
-        $discovery = $this->discovery(new PluginsRegistry(new NullLogger()));
+        $discovery = $this->discovery(new PluginsRegistry());
 
         $discovery->discover($this->location, new ClassReflector(PingCommand::class));
 
@@ -63,7 +63,7 @@ final class PluginsDiscoveryTest extends TestCase
      */
     public function test_it_ignores_the_interface_itself(): void
     {
-        $discovery = $this->discovery(new PluginsRegistry(new NullLogger()));
+        $discovery = $this->discovery(new PluginsRegistry());
 
         $discovery->discover($this->location, new ClassReflector(Plugin::class));
 
