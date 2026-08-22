@@ -7,7 +7,7 @@ use Monolog\Level;
 use Monolog\LogRecord;
 use Psr\Log\LogLevel;
 use Tempest\Console\Console;
-use function Tempest\Support\Arr\map_iterable;
+use function Tempest\Support\Arr\map;
 use function Tempest\Support\str;
 
 final class ConsoleLogHandler extends AbstractProcessingHandler
@@ -47,7 +47,7 @@ final class ConsoleLogHandler extends AbstractProcessingHandler
         
         $messageLower = str($message)->lower();
         return $messageLower->contains(
-            map_iterable($this->except, fn(string $pattern) => str($pattern)->lower())
+            map($this->except, fn(string $pattern) => str($pattern)->lower())
         );
     }
     
@@ -59,7 +59,12 @@ final class ConsoleLogHandler extends AbstractProcessingHandler
             $timestamp = $record->datetime->format('Y-m-d H:i:s');
             $message = "[{$timestamp}] {$message}";
         }
-        
+
+        if ($this->includeContext && $record->context !== []) {
+            $context = json_encode($record->context, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+            $message = "{$message} {$context}";
+        }
+
         return $message;
     }
     

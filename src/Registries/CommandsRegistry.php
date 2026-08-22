@@ -18,7 +18,6 @@ use Tempest\Console\Console;
 use Tempest\Container\Singleton;
 use Throwable;
 use function React\Async\await;
-use function Tempest\Support\Arr\map_iterable;
 
 #[Singleton]
 final class CommandsRegistry
@@ -32,16 +31,28 @@ final class CommandsRegistry
 
     public function add(Command $command): void
     {
-        if ($command->guildId) {
-            $this->commands[$command->guildId] = $command;
-            return;
+        $key = self::key($command);
+
+        if (array_key_exists($key, $this->commands)) {
+            $command->mergeOptions($this->commands[$key]);
         }
 
-        if (array_key_exists($command->name, $this->commands)) {
-            $command->mergeOptions($this->commands[$command->name]);
-        }
+        $this->commands[$key] = $command;
+    }
 
-        $this->commands[$command->name] = $command;
+    /**
+     * Commands are keyed by name, scoped by guild so that a guild command
+     * neither collides with another command in the same guild nor with the
+     * global command of the same name.
+     *
+     * Discord command names cannot contain ":", so the two key shapes
+     * can never overlap.
+     */
+    private static function key(Command $command): string
+    {
+        return $command->guildId === null
+            ? $command->name
+            : $command->guildId . ':' . $command->name;
     }
 
     /**
@@ -54,23 +65,36 @@ final class CommandsRegistry
             return;
         }
 
-        $register = static fn(string $through, int $applicationId) => static function (Command $command) use ($console, $discord, $applicationId, $through) {
-            try {
-                $command = await($discord->rest->{$through}->createApplicationCommand(
-                    $applicationId,
-                    $command->build
-                ));
-                $console->success('Command "' . $command->name . '" registered.');
-            } catch (Throwable $throwable) {
-                $console->error($throwable->getMessage());
-            }
-        };
-
         try {
             $application = await($discord->rest->application->getCurrent());
-            map_iterable($this->commands, $register('globalCommand', $application->id));
         } catch (Throwable $throwable) {
             $console->error($throwable->getMessage());
+            return;
+        }
+
+        foreach ($this->commands as $command) {
+            try {
+                /*
+                 * Guild commands go to a different endpoint that additionally
+                 * takes the guild id, so the two cannot share a call.
+                 */
+                await($command->guildId === null
+                    ? $discord->rest->globalCommand->createApplicationCommand(
+                        $application->id,
+                        $command->build,
+                    )
+                    : $discord->rest->guildCommand->createApplicationCommand(
+                        $application->id,
+                        $command->guildId,
+                        $command->build,
+                    ));
+
+                $console->success($command->guildId === null
+                    ? 'Command "' . $command->name . '" registered globally.'
+                    : 'Command "' . $command->name . '" registered in guild ' . $command->guildId . '.');
+            } catch (Throwable $throwable) {
+                $console->error('Command "' . $command->name . '": ' . $throwable->getMessage());
+            }
         }
     }
 
@@ -167,7 +191,7 @@ final class CommandsRegistry
                         return $result;
                     }
                 }
-            } else if ((isset($option->focused) && $option->focused === true) && $definition->options[$name]) {
+            } else if ((isset($option->focused) && $option->focused === true) && isset($definition->options[$name])) {
                 return [
                     $definition->options[$name],
                     $option

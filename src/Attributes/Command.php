@@ -89,7 +89,8 @@ final class Command
     /** @var array<SubcommandGroup|Subcommand|Option> */
     public array $options {
         get {
-            $options = $this->getAttribute('options');
+            // A command may legitimately declare no options at all, so start from a list.
+            $options = $this->getAttribute('options') ?? [];
 
             if ($this->reflector->hasAttribute(SubcommandGroup::class)) {
                 /** @var SubcommandGroup $subcommandGroup */
@@ -132,16 +133,23 @@ final class Command
 
     public ClassReflector $reflector;
 
+    /**
+     * The guild this command is scoped to, or null when it is registered globally.
+     */
+    public ?string $guildId;
+
     public function __construct(
         string|BackedEnum|null         $name = null,
         public ?string                 $description = null,
-        public ?int                    $guildId = null,
+        int|string|null                $guildId = null,
         public bool                    $isNsfw = false,
         public array                   $permissions = [],
         public bool                    $directMessage = true,
         public ApplicationCommandTypes $type = ApplicationCommandTypes::CHAT_INPUT
     )
     {
+        $this->guildId = $guildId === null ? null : (string) $guildId;
+
         $this->setAttribute('name', $name);
     }
 

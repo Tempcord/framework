@@ -10,7 +10,6 @@ use Ragnarok\Fenrir\FilteredEventEmitter;
 use Ragnarok\Fenrir\Gateway\Events\InteractionCreate;
 use Ragnarok\Fenrir\Interaction\CommandInteraction;
 use Ragnarok\Fenrir\Parts\ApplicationCommandInteractionDataOptionStructure;
-use function Freezemage\ArrayUtils\find;
 
 final class AllCommandExtension extends \Ragnarok\Fenrir\Command\AllCommandExtension
 {
@@ -78,7 +77,7 @@ final class AllCommandExtension extends \Ragnarok\Fenrir\Command\AllCommandExten
     private function drillName(array $options, array &$names): void
     {
         /** @var ?ApplicationCommandInteractionDataOptionStructure $subCommand */
-        $subCommand = find($options ?? [], function (ApplicationCommandInteractionDataOptionStructure $option) {
+        $subCommand = array_find($options, function (ApplicationCommandInteractionDataOptionStructure $option) {
             return in_array($option->type, [
                 ApplicationCommandOptionType::SUB_COMMAND,
                 ApplicationCommandOptionType::SUB_COMMAND_GROUP,

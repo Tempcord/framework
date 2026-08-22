@@ -18,7 +18,7 @@ use Tempcord\Traits\HasAttributes;
 use Tempest\Reflection\ParameterReflector;
 use Throwable;
 use function React\Async\await;
-use function Tempest\get;
+use function Tempest\Container\get;
 use function Tempest\Support\str;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
