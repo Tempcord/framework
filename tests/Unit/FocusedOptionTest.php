@@ -9,6 +9,7 @@ use ReflectionMethod;
 use Tempcord\AllCommandExtension;
 use Tempcord\Attributes\Command;
 use Tempcord\Registries\CommandsRegistry;
+use Tempcord\Tests\Fixtures\MusicCommand;
 use Tempcord\Tests\Fixtures\PingCommand;
 
 #[CoversClass(CommandsRegistry::class)]
@@ -65,5 +66,38 @@ final class FocusedOptionTest extends TestCase
     public function test_it_returns_null_for_no_options_at_all(): void
     {
         $this->assertNull($this->resolve([], $this->command(PingCommand::class)));
+    }
+
+    /**
+     * Discord nests the focused option inside the subcommand group and then
+     * the subcommand, so resolution has to drill through both.
+     */
+    public function test_it_drills_through_a_group_and_a_subcommand(): void
+    {
+        $command = $this->command(MusicCommand::class);
+
+        $focused = $this->option('title', focused: true);
+        $play = $this->option('play');
+        $play->type = ApplicationCommandOptionType::SUB_COMMAND;
+        $play->options = [$focused];
+        $playlist = $this->option('playlist');
+        $playlist->type = ApplicationCommandOptionType::SUB_COMMAND_GROUP;
+        $playlist->options = [$play];
+
+        $resolved = $this->resolve([$playlist], $command);
+
+        $this->assertNotNull($resolved);
+        $this->assertSame('title', $resolved[0]->name);
+        $this->assertSame('Track title', $resolved[0]->description);
+        $this->assertSame($focused, $resolved[1]);
+    }
+
+    public function test_a_subcommand_the_definition_does_not_know_resolves_to_null(): void
+    {
+        $unknown = $this->option('not_a_group');
+        $unknown->type = ApplicationCommandOptionType::SUB_COMMAND_GROUP;
+        $unknown->options = [$this->option('title', focused: true)];
+
+        $this->assertNull($this->resolve([$unknown], $this->command(MusicCommand::class)));
     }
 }

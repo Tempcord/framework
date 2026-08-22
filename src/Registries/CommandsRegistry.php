@@ -3,6 +3,7 @@
 namespace Tempcord\Registries;
 
 use Ragnarok\Fenrir\Discord;
+use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
 use Ragnarok\Fenrir\Enums\InteractionCallbackType;
 use Ragnarok\Fenrir\Interaction\CommandInteraction;
 use Ragnarok\Fenrir\Parts\ApplicationCommandInteractionDataOptionStructure;
@@ -204,11 +205,13 @@ final class CommandsRegistry
     {
         /** @var ApplicationCommandInteractionDataOptionStructure $option */
         foreach ($interactionOptions as $option) {
-            $type = $option->type->value;
             $name = $option->name;
 
             // If SUB_COMMAND_GROUP or SUB_COMMAND, go deeper
-            if (in_array($type, [1, 2], true)) {
+            if (in_array($option->type, [
+                ApplicationCommandOptionType::SUB_COMMAND,
+                ApplicationCommandOptionType::SUB_COMMAND_GROUP,
+            ], true)) {
                 // $definition->options[$name] should be the nested command/group
                 $nextDefinition = $definition->options[$name] ?? null;
 
