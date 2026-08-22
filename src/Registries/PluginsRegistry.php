@@ -2,7 +2,7 @@
 
 namespace Tempcord\Registries;
 
-use Psr\Log\LoggerInterface;
+use Tempest\Log\Logger;
 use Tempcord\Plugins\Plugin;
 use Tempcord\Runtime\Outcome;
 use Tempcord\Tempcord;
@@ -19,7 +19,7 @@ final class PluginsRegistry
     private array $plugins = [];
 
     public function __construct(
-        private readonly LoggerInterface $logger,
+        private readonly Logger $logger,
     ) {}
 
     public function add(Plugin $plugin): void

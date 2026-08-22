@@ -3,7 +3,6 @@
 namespace Tempcord\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use Psr\Log\NullLogger;
 use Ragnarok\Fenrir\Bitwise\Bitwise;
 use Ragnarok\Fenrir\Constants\Events;
 use Ragnarok\Fenrir\Gateway\Events\Ready;
@@ -23,6 +22,7 @@ use Tempcord\Tempcord;
 use Tempcord\TempcordConfig;
 use Tempcord\Tests\Doubles\FakeDiscord;
 use Tempcord\Tests\Doubles\RecordingHttp;
+use Tempcord\Tests\Doubles\RecordingLogger;
 use Tempcord\Tests\Fixtures\ModerationCommand;
 use Tempcord\Tests\Fixtures\ReadyListener;
 use Tempest\Container\GenericContainer;
@@ -45,18 +45,18 @@ final class TempcordTest extends TestCase
             registrar: new CommandRegistrar(
                 new CommandBuilderFactory(),
                 new TempcordConfig('::token::', new Bitwise()),
-                new NullLogger(),
+                new RecordingLogger(),
                 new RecordingHttp(),
             ),
             dispatcher: new CommandDispatcher(
                 new ArgumentResolver(new OptionValueResolver($this->discord)),
                 new GenericContainer(),
-                new NullLogger(),
+                new RecordingLogger(),
             ),
             autocomplete: new AutocompleteResponder(new ChoiceFactory()),
         );
         $this->events = new EventsRegistry(new GenericContainer());
-        $this->plugins = new PluginsRegistry(new NullLogger());
+        $this->plugins = new PluginsRegistry(new RecordingLogger());
     }
 
     private function tempcord(): Tempcord

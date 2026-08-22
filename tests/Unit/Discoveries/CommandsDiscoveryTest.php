@@ -3,7 +3,6 @@
 namespace Tempcord\Tests\Unit\Discoveries;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use Psr\Log\NullLogger;
 use Ragnarok\Fenrir\Bitwise\Bitwise;
 use ReflectionProperty;
 use Tempcord\Compiler\CommandCompiler;
@@ -21,6 +20,7 @@ use Tempcord\Runtime\OptionValueResolver;
 use Tempcord\TempcordConfig;
 use Tempcord\Tests\Doubles\FakeDiscord;
 use Tempcord\Tests\Doubles\RecordingHttp;
+use Tempcord\Tests\Doubles\RecordingLogger;
 use Tempcord\Tests\Fixtures\ModerationCommand;
 use Tempcord\Tests\Fixtures\PingCommand;
 use Tempcord\Tests\Unit\TestCase;
@@ -51,13 +51,13 @@ final class CommandsDiscoveryTest extends TestCase
             registrar: new CommandRegistrar(
                 new CommandBuilderFactory(),
                 new TempcordConfig('::token::', new Bitwise()),
-                new NullLogger(),
+                new RecordingLogger(),
                 new RecordingHttp(),
             ),
             dispatcher: new CommandDispatcher(
                 new ArgumentResolver(new OptionValueResolver($discord)),
                 new GenericContainer(),
-                new NullLogger(),
+                new RecordingLogger(),
             ),
             autocomplete: new AutocompleteResponder(new ChoiceFactory()),
         );

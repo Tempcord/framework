@@ -3,7 +3,6 @@
 namespace Tempcord\Tests\Unit\Plugins;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use Psr\Log\NullLogger;
 use Ragnarok\Fenrir\Bitwise\Bitwise;
 use Tempcord\Discord\AllCommandExtension;
 use Tempcord\Discord\CommandBuilderFactory;
@@ -47,13 +46,13 @@ final class PluginsRegistryTest extends TestCase
                 registrar: new CommandRegistrar(
                     new CommandBuilderFactory(),
                     new TempcordConfig('::token::', new Bitwise()),
-                    new NullLogger(),
+                    new RecordingLogger(),
                     new RecordingHttp(),
                 ),
                 dispatcher: new CommandDispatcher(
                     new ArgumentResolver(new OptionValueResolver($discord)),
                     new GenericContainer(),
-                    new NullLogger(),
+                    new RecordingLogger(),
                 ),
                 autocomplete: new AutocompleteResponder(new ChoiceFactory()),
             ),
@@ -70,7 +69,7 @@ final class PluginsRegistryTest extends TestCase
 
     public function test_a_plugin_is_booted_with_the_bot(): void
     {
-        $plugins = new PluginsRegistry(new NullLogger());
+        $plugins = new PluginsRegistry(new RecordingLogger());
         $plugins->add(new RecordingPlugin());
 
         $tempcord = $this->tempcord($plugins);
@@ -86,7 +85,7 @@ final class PluginsRegistryTest extends TestCase
      */
     public function test_the_same_plugin_added_twice_boots_once(): void
     {
-        $plugins = new PluginsRegistry(new NullLogger());
+        $plugins = new PluginsRegistry(new RecordingLogger());
         $plugins->add(new RecordingPlugin());
         $plugins->add(new RecordingPlugin());
 
@@ -118,7 +117,7 @@ final class PluginsRegistryTest extends TestCase
 
     public function test_no_plugins_reports_nothing(): void
     {
-        $plugins = new PluginsRegistry(new NullLogger());
+        $plugins = new PluginsRegistry(new RecordingLogger());
 
         $this->assertSame([], $plugins->boot($this->tempcord($plugins)));
     }
@@ -129,7 +128,7 @@ final class PluginsRegistryTest extends TestCase
      */
     public function test_plugins_boot_as_part_of_listening(): void
     {
-        $plugins = new PluginsRegistry(new NullLogger());
+        $plugins = new PluginsRegistry(new RecordingLogger());
         $plugins->add(new RecordingPlugin());
 
         $tempcord = $this->tempcord($plugins);
