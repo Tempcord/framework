@@ -28,7 +28,8 @@
     "scripts": {
         "test": "phpunit",
         "analyse": "phpstan analyse --memory-limit=1G",
-        "cs-fix": "php-cs-fixer fix"
+        "cs-fix": "php-cs-fixer fix",
+        "docs": "php tools/generate-docs.php"
     },
     "config": {
         "sort-packages": true,
@@ -47,7 +48,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tempcord\\Tests\\": "tests/"
+            "Tempcord\\Tests\\": "tests/",
+            "Tempcord\\Tools\\": "tools/src/"
         }
     },
     "suggest": {

@@ -153,13 +153,24 @@ class UserCommand
 {
     #[Subcommand(name: 'info', description: 'Get user information')]
     public function info(
-        #[Option(name: 'user', description: 'Target user', required: true)]
+        #[Option(description: 'Target user')]
         User $user
     ): void {
         // Handle user info command
     }
 }
 ```
+
+Whether an option is required comes from whether its parameter has a default, so `$user`
+above is required without saying so.
+
+## Documentation
+
+See [docs/](docs/README.md) — guides for getting started, commands, autocomplete, events and
+translations, plus a reference generated from the source.
+
+Run `composer docs` after changing the public API; the test suite fails if the committed
+documentation no longer matches the code.
 
 ## Contributing
 

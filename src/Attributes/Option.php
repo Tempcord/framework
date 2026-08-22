@@ -17,7 +17,10 @@ use Tempcord\Interfaces\Autocomplete;
 final readonly class Option
 {
     /**
+     * @param string $description shown beneath the option in Discord's picker
      * @param string|null $name defaults to the parameter's own name
+     * @param Autocomplete|null $autocomplete suggests values as the user types;
+     *        mutually exclusive with choices
      * @param array<string, string|int|float>|list<string|int|float> $choices
      *        the only values Discord will accept. A map uses its keys as the
      *        labels users see; a list shows each value as its own label.
