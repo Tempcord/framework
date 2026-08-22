@@ -103,11 +103,6 @@ final class Option
 
         $tempcord = get(Tempcord::class);
 
-
-        if ($option->type === ApplicationCommandOptionType::USER) {
-            await($tempcord->discord->rest->user->get($option->value));
-        }
-
         return match ($option->type) {
             ApplicationCommandOptionType::USER => await($tempcord->discord->rest->user->get($option->value)),
             ApplicationCommandOptionType::CHANNEL => await($tempcord->discord->rest->channel->get($option->value)),
