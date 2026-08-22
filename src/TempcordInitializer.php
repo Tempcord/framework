@@ -3,7 +3,8 @@
 namespace Tempcord;
 
 use Ragnarok\Fenrir\Discord;
-use Tempest\Console\Console;
+use Tempcord\Registries\CommandsRegistry;
+use Tempcord\Registries\EventsRegistry;
 use Tempest\Container\Container;
 use Tempest\Container\Initializer;
 use Tempest\Container\Singleton;
@@ -21,9 +22,10 @@ final readonly class TempcordInitializer implements Initializer
                 token: $config->token,
                 logger: $container->get(Logger::class),
             )->withGateway(
-                intents: $config->intents
+                intents: $config->intents,
             )->withRest(),
-            console: $container->get(Console::class)
+            commandsRegistry: $container->get(CommandsRegistry::class),
+            eventsRegistry: $container->get(EventsRegistry::class),
         );
     }
 }

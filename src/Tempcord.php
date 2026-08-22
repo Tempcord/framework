@@ -7,48 +7,49 @@ use Ragnarok\Fenrir\Discord;
 use Ragnarok\Fenrir\Gateway\Events\Ready;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\EventsRegistry;
-use Tempest\Console\Console;
-use function Tempest\Container\get;
+use Tempcord\Runtime\Outcome;
 
+/**
+ * The bot itself: the Discord connection plus the registries that fill it.
+ */
 final class Tempcord
 {
-    private CommandsRegistry $commandsRegistry;
-    private EventsRegistry $eventsRegistry;
-
     public bool $booted = false;
 
     public function __construct(
-        public readonly Discord  $discord,
-        private readonly Console $console,
+        public readonly Discord $discord,
+        private readonly CommandsRegistry $commandsRegistry,
+        private readonly EventsRegistry $eventsRegistry,
     ) {
-        //@todo: Maybe move to  Interface
-        $this->commandsRegistry = get(CommandsRegistry::class);
-        $this->eventsRegistry = get(EventsRegistry::class);
-
-        $this->discord->gateway->events->on(Events::READY, function (Ready $ready) {
+        $this->discord->gateway->events->on(Events::READY, function (Ready $ready): void {
             $this->discord->registerExtension($this->commandsRegistry->extension);
             $this->booted = true;
         });
     }
 
-    public function registerCommands(): void
+    /**
+     * @return list<Outcome>
+     */
+    public function registerCommands(): array
     {
-        $this->commandsRegistry->register(
-            console: $this->console,
-            discord: $this->discord,
-        );
+        return $this->commandsRegistry->register($this->discord);
+    }
+
+    /**
+     * Binds everything that has been discovered, then opens the gateway.
+     *
+     * @return list<Outcome>
+     */
+    public function listen(): array
+    {
+        return [
+            ...$this->commandsRegistry->listen(),
+            ...$this->eventsRegistry->listen($this->discord),
+        ];
     }
 
     public function boot(): void
     {
-        $this->commandsRegistry->listen(
-            console: $this->console
-        );
-
-        $this->eventsRegistry->listen(
-            console: $this->console
-        );
-
         $this->discord->gateway->open();
     }
 }

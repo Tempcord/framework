@@ -17,6 +17,9 @@ final class RecordingHttp extends Http
     /** @var list<array{url: string, content: mixed}> */
     public array $posts = [];
 
+    /** @var list<string> */
+    public array $gets = [];
+
     public function __construct(
         private readonly bool $failApplicationLookup = false,
         private readonly array $failPostsMatching = [],
@@ -24,6 +27,8 @@ final class RecordingHttp extends Http
 
     public function get($url, $content = null, array $headers = []): PromiseInterface
     {
+        $this->gets[] = (string) $url;
+
         if ($this->failApplicationLookup) {
             return reject(new RuntimeException('401: Unauthorized'));
         }

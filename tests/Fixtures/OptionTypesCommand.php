@@ -23,18 +23,10 @@ final class OptionTypesCommand
         #[Option(description: 'a role')] Role $role,
     ): void {}
 
-    #[Subcommand(name: 'unsupported', description: 'An unsupported type')]
-    public function unsupported(
-        #[Option(description: 'an array')] array $values,
-    ): void {}
-
-    #[Subcommand(name: 'untyped', description: 'An untyped parameter')]
-    public function untyped(
-        #[Option(description: 'no type')] $whatever,
-    ): void {}
-
     #[Subcommand(name: 'renamed', description: 'Option with an explicit name')]
     public function renamed(
         #[Option(description: 'renamed option', name: 'custom')] string $original,
-    ): void {}
+    ): string {
+        return 'renamed:' . $original;
+    }
 }

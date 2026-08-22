@@ -4,22 +4,22 @@ namespace Tempcord\Tests\Unit;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Tempcord\Attributes\Command;
+use Tempcord\Compiler\CommandCompiler;
+use Tempcord\Definitions\CommandDefinition;
 use Tempest\Reflection\ClassReflector;
 
 abstract class TestCase extends BaseTestCase
 {
     /**
-     * Resolves the #[Command] attribute off a fixture class the same way
-     * CommandsDiscovery does: read the attribute, then attach the reflector.
+     * Compiles a fixture the same way CommandsDiscovery does.
      */
-    protected function command(string $class): Command
+    protected function definition(string $class): CommandDefinition
     {
         $reflector = new ClassReflector($class);
 
-        /** @var Command $command */
-        $command = $reflector->getAttribute(Command::class);
-        $command->reflector = $reflector;
+        /** @var Command $attribute */
+        $attribute = $reflector->getAttribute(Command::class);
 
-        return $command;
+        return new CommandCompiler()->compile($reflector, $attribute);
     }
 }

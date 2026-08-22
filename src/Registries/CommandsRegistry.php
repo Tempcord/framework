@@ -3,80 +3,62 @@
 namespace Tempcord\Registries;
 
 use Ragnarok\Fenrir\Discord;
-use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
-use Ragnarok\Fenrir\Enums\InteractionCallbackType;
 use Ragnarok\Fenrir\Interaction\CommandInteraction;
-use Ragnarok\Fenrir\Parts\ApplicationCommandInteractionDataOptionStructure;
-use Ragnarok\Fenrir\Parts\ApplicationCommandOptionChoice;
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
-use Tempcord\Attributes\Subcommand;
-use Tempcord\Attributes\SubcommandGroup;
-use Tempcord\Interfaces\Autocomplete;
-use Tempcord\AllCommandExtension;
-use Tempcord\InteractionCallbackBuilder;
-use Tempest\Console\Console;
+use Tempcord\Definitions\CommandDefinition;
+use Tempcord\Definitions\HandlerDefinition;
+use Tempcord\Discord\AllCommandExtension;
+use Tempcord\Discord\CommandBuilderFactory;
+use Tempcord\Runtime\AutocompleteResponder;
+use Tempcord\Runtime\CommandDispatcher;
+use Tempcord\Runtime\Outcome;
 use Tempest\Container\Singleton;
 use Throwable;
 use function React\Async\await;
 
+/**
+ * Holds every compiled command and wires it up: registering it with Discord and
+ * binding its handlers to the interactions that come back.
+ */
 #[Singleton]
 final class CommandsRegistry
 {
-    /**
-     * Discord rejects an autocomplete response carrying more choices than this.
-     */
-    private const int MAX_CHOICES = 25;
-
-    /** @var array<Command> */
+    /** @var array<string, CommandDefinition> */
     private array $commands = [];
 
     public function __construct(
-        public readonly AllCommandExtension $extension
+        public readonly AllCommandExtension $extension,
+        private readonly CommandBuilderFactory $builders,
+        private readonly CommandDispatcher $dispatcher,
+        private readonly AutocompleteResponder $autocomplete,
     ) {}
 
-    public function add(Command $command): void
+    public function add(CommandDefinition $command): void
     {
-        $key = self::key($command);
+        $key = $command->key();
 
-        if (array_key_exists($key, $this->commands)) {
-            $command->mergeOptions($this->commands[$key]);
-        }
-
-        $this->commands[$key] = $command;
+        $this->commands[$key] = isset($this->commands[$key])
+            ? $this->commands[$key]->mergedWith($command)
+            : $command;
     }
 
     /**
-     * Commands are keyed by name, scoped by guild so that a guild command
-     * neither collides with another command in the same guild nor with the
-     * global command of the same name.
+     * Pushes every command to Discord, reporting on each as it goes.
      *
-     * Discord command names cannot contain ":", so the two key shapes
-     * can never overlap.
+     * @return list<Outcome>
      */
-    private static function key(Command $command): string
+    public function register(Discord $discord): array
     {
-        return $command->guildId === null
-            ? $command->name
-            : $command->guildId . ':' . $command->name;
-    }
-
-    /**
-     * @throws Throwable
-     */
-    public function register(Console $console, Discord $discord): void
-    {
-        if (empty($this->commands)) {
-            $console->warning('No commands to register.');
-            return;
+        if ($this->commands === []) {
+            return [Outcome::warning('No commands to register.')];
         }
 
         try {
             $application = await($discord->rest->application->getCurrent());
         } catch (Throwable $throwable) {
-            $console->error($throwable->getMessage());
-            return;
+            return [Outcome::error($throwable->getMessage())];
         }
+
+        $outcomes = [];
 
         foreach ($this->commands as $command) {
             try {
@@ -84,151 +66,69 @@ final class CommandsRegistry
                  * Guild commands go to a different endpoint that additionally
                  * takes the guild id, so the two cannot share a call.
                  */
-                await($command->guildId === null
+                await($command->isGlobal()
                     ? $discord->rest->globalCommand->createApplicationCommand(
                         $application->id,
-                        $command->build,
+                        $this->builders->forCommand($command),
                     )
                     : $discord->rest->guildCommand->createApplicationCommand(
                         $application->id,
                         $command->guildId,
-                        $command->build,
+                        $this->builders->forCommand($command),
                     ));
 
-                $console->success($command->guildId === null
+                $outcomes[] = Outcome::success($command->isGlobal()
                     ? 'Command "' . $command->name . '" registered globally.'
                     : 'Command "' . $command->name . '" registered in guild ' . $command->guildId . '.');
             } catch (Throwable $throwable) {
-                $console->error('Command "' . $command->name . '": ' . $throwable->getMessage());
+                $outcomes[] = Outcome::error(
+                    'Command "' . $command->name . '": ' . $throwable->getMessage(),
+                );
             }
         }
+
+        return $outcomes;
     }
 
-    public function listen(Console $console): void
+    /**
+     * Binds every handler to the interaction path it answers.
+     *
+     * @return list<Outcome>
+     */
+    public function listen(): array
     {
-        $console->info('Starting Commands');
-
-        $count = 0;
+        $outcomes = [];
 
         foreach ($this->commands as $command) {
-            foreach ($command->handlers as $key => $handler) {
-
-                $this->extension->bind(
-                    command: $key,
-                    listener: function (CommandInteraction $interaction) use ($console, $handler) {
-                        try {
-                            $handler($interaction);
-                        } catch (\Throwable $e) {
-                            $console->error($e->getMessage());
-                        }
-                    },
-                    autocomplete: function (CommandInteraction $interaction) use ($command) {
-                        $resolved = $this->resolveFocusedAndParam(
-                            $interaction->interaction->data->options ?? [],
-                            $command,
-                        );
-
-                        // Nothing focused, or focused on an option this command does not declare.
-                        if ($resolved === null) {
-                            return null;
-                        }
-
-                        [$option, $interactionOption] = $resolved;
-
-                        if (!$option->autocomplete instanceof Autocomplete) {
-                            return null;
-                        }
-
-                        $interaction->createInteractionResponse(
-                            InteractionCallbackBuilder::new()
-                                ->setChoices($this->toChoices(
-                                    $option->autocomplete->handle($interaction, $interactionOption->value),
-                                ))
-                                ->setType(InteractionCallbackType::APPLICATION_COMMAND_AUTOCOMPLETE_RESULT)
-                        );
-
-                        return null;
-                    }
-                );
-
-                $count++;
-
-                $console->success('Command "' . $key . '" listened.');
+            foreach ($command->handlers as $handler) {
+                $this->bind($handler, $outcomes);
             }
         }
 
-        if ($count <= 0) {
-            $console->warning('Listened ' . $count . ' commands. Maybe this behavior is not expected, or you just did not created any command yet.');
+        if ($outcomes === []) {
+            return [Outcome::warning(
+                'Listened 0 commands. Maybe this behavior is not expected, or you just did not created any command yet.',
+            )];
         }
+
+        return $outcomes;
     }
 
     /**
-     * Normalises whatever an Autocomplete returned into the choice list Discord
-     * accepts.
-     *
-     * A bare scalar stands for a single suggestion. A list uses each entry as
-     * its own label; a map uses its keys as labels. Choices built by hand are
-     * passed through untouched.
-     *
-     * @return list<ApplicationCommandOptionChoice>
+     * @param list<Outcome> $outcomes
      */
-    private function toChoices(mixed $value): array
+    private function bind(HandlerDefinition $handler, array &$outcomes): void
     {
-        $choices = is_array($value) ? $value : [$value];
-        $choices = array_slice($choices, 0, self::MAX_CHOICES, preserve_keys: true);
-
-        $isList = array_is_list($choices);
-
-        return array_map(
-            static function (mixed $choice, int|string $label) use ($isList): ApplicationCommandOptionChoice {
-                if ($choice instanceof ApplicationCommandOptionChoice) {
-                    return $choice;
-                }
-
-                $applicationCommandOptionChoice = new ApplicationCommandOptionChoice();
-                $applicationCommandOptionChoice->name = (string) ($isList ? $choice : $label);
-                $applicationCommandOptionChoice->value = $choice;
-
-                return $applicationCommandOptionChoice;
+        $this->extension->bind(
+            command: $handler->path,
+            listener: function (CommandInteraction $interaction) use ($handler): void {
+                $this->dispatcher->dispatch($handler, $interaction);
             },
-            $choices,
-            array_keys($choices),
+            autocomplete: function (CommandInteraction $interaction) use ($handler): void {
+                $this->autocomplete->respond($handler, $interaction);
+            },
         );
-    }
 
-    /**
-     * @param array $interactionOptions — array of ApplicationCommandInteractionDataOptionStructure
-     * @param Command|SubcommandGroup|Subcommand $definition — Tempcord definition
-     * @return array{ Option, ApplicationCommandInteractionDataOptionStructure }|null
-     */
-    private function resolveFocusedAndParam(array $interactionOptions, Command|SubcommandGroup|Subcommand $definition): ?array
-    {
-        /** @var ApplicationCommandInteractionDataOptionStructure $option */
-        foreach ($interactionOptions as $option) {
-            $name = $option->name;
-
-            // If SUB_COMMAND_GROUP or SUB_COMMAND, go deeper
-            if (in_array($option->type, [
-                ApplicationCommandOptionType::SUB_COMMAND,
-                ApplicationCommandOptionType::SUB_COMMAND_GROUP,
-            ], true)) {
-                // $definition->options[$name] should be the nested command/group
-                $nextDefinition = $definition->options[$name] ?? null;
-
-                if ($nextDefinition && !empty($option->options)) {
-                    $result = $this->resolveFocusedAndParam($option->options, $nextDefinition);
-                    if ($result !== null) {
-                        return $result;
-                    }
-                }
-            } else if ((isset($option->focused) && $option->focused === true) && isset($definition->options[$name])) {
-                return [
-                    $definition->options[$name],
-                    $option
-                ];
-            }
-        }
-
-        return null;
+        $outcomes[] = Outcome::success('Command "' . $handler->path . '" listened.');
     }
 }
