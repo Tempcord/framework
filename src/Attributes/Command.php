@@ -41,19 +41,37 @@ final class Command
         }
     }
 
+    /**
+     * Every handler this command binds, keyed by the dotted interaction name
+     * Discord will send back ("moderation.kick", or just "ping").
+     *
+     * @var array<string, \Closure>
+     */
     public array $handlers {
         get {
-            $keys[$this->name] = [];
-            foreach ($this->options as $option) {
-                if (in_array(get_class($option), [SubcommandGroup::class, Subcommand::class])) {
-                    $keys[$this->name][$option->name] = $option->key;
-                } else {
-                    $fakeSubcommand = new Subcommand(name: $option->name, description: $option->description);
-                    $fakeSubcommand->reflector = $this->reflector->getMethod('__invoke');
-                    $keys[$this->name] = $fakeSubcommand->key;
+            $subcommands = array_filter(
+                $this->options,
+                static fn(object $option) => $option instanceof SubcommandGroup || $option instanceof Subcommand,
+            );
+
+            if ($subcommands !== []) {
+                $keys = [];
+
+                foreach ($subcommands as $subcommand) {
+                    $keys[$this->name][$subcommand->name] = $subcommand->key;
                 }
+
+                return dot($keys);
             }
-            return dot($keys);
+
+            /*
+             * No subcommands means __invoke is the handler, and it is bound
+             * under the bare command name whether or not it takes options.
+             */
+            $invokable = new Subcommand(name: $this->name, description: $this->description ?? $this->name);
+            $invokable->reflector = $this->reflector->getMethod('__invoke');
+
+            return [$this->name => $invokable->key];
         }
     }
 
