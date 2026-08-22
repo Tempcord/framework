@@ -6,7 +6,7 @@ use Tempcord\Attributes\Event;
 use Tempcord\Tempcord;
 use Tempest\Console\Console;
 use Tempest\Container\Singleton;
-use function Tempest\get;
+use function Tempest\Container\get;
 
 #[Singleton]
 final class EventsRegistry

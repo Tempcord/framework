@@ -8,7 +8,7 @@ use Ragnarok\Fenrir\Gateway\Events\Ready;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\EventsRegistry;
 use Tempest\Console\Console;
-use function Tempest\get;
+use function Tempest\Container\get;
 
 final class Tempcord
 {

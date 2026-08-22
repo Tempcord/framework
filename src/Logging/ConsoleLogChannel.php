@@ -6,7 +6,7 @@ use Monolog\Level;
 use Tempcord\Logging\Handlers\ConsoleLogHandler;
 use Tempest\Console\Console;
 use Tempest\Log\LogChannel;
-use function Tempest\get;
+use function Tempest\Container\get;
 
 final class ConsoleLogChannel implements LogChannel
 {

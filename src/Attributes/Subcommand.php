@@ -13,7 +13,7 @@ use Tempcord\Traits\HasAttributes;
 use Tempest\Reflection\MethodReflector;
 use function React\Async\async;
 use function React\Async\await;
-use function Tempest\get;
+use function Tempest\Container\get;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 final class Subcommand
