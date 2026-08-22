@@ -8,10 +8,14 @@ use Ragnarok\Fenrir\Gateway\Events\Ready;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\EventsRegistry;
 use Tempcord\Registries\PluginsRegistry;
+use Tempcord\Runtime\CommandBinder;
+use Tempcord\Runtime\CommandRegistrar;
 use Tempcord\Runtime\Outcome;
+use Tempcord\Runtime\PluginBooter;
 
 /**
- * The bot itself: the Discord connection plus the registries that fill it.
+ * The bot itself: the Discord connection, the registries that were filled
+ * during discovery, and the runtime that acts on them.
  */
 final class Tempcord
 {
@@ -22,9 +26,12 @@ final class Tempcord
         private readonly CommandsRegistry $commandsRegistry,
         private readonly EventsRegistry $eventsRegistry,
         private readonly PluginsRegistry $pluginsRegistry,
+        private readonly CommandRegistrar $registrar,
+        private readonly CommandBinder $binder,
+        private readonly PluginBooter $pluginBooter,
     ) {
         $this->discord->gateway->events->on(Events::READY, function (Ready $ready): void {
-            $this->discord->registerExtension($this->commandsRegistry->extension);
+            $this->discord->registerExtension($this->binder->extension);
             $this->booted = true;
         });
     }
@@ -34,7 +41,7 @@ final class Tempcord
      */
     public function registerCommands(): array
     {
-        return $this->commandsRegistry->register($this->discord);
+        return $this->registrar->register($this->discord, $this->commandsRegistry->all());
     }
 
     /**
@@ -48,9 +55,9 @@ final class Tempcord
     public function listen(): array
     {
         return [
-            ...$this->commandsRegistry->listen(),
+            ...$this->binder->bindAll($this->commandsRegistry->all()),
             ...$this->eventsRegistry->listen($this->discord),
-            ...$this->pluginsRegistry->boot($this),
+            ...$this->pluginBooter->bootAll($this->pluginsRegistry->all(), $this),
         ];
     }
 

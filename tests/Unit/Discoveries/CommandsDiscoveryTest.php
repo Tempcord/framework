@@ -46,21 +46,7 @@ final class CommandsDiscoveryTest extends TestCase
     {
         $discord = new FakeDiscord(new RecordingHttp());
 
-        return new CommandsRegistry(
-            extension: new AllCommandExtension(),
-            registrar: new CommandRegistrar(
-                new CommandBuilderFactory(),
-                new TempcordConfig('::token::', new Bitwise()),
-                new RecordingLogger(),
-                new RecordingHttp(),
-            ),
-            dispatcher: new CommandDispatcher(
-                new ArgumentResolver(new OptionValueResolver($discord)),
-                new GenericContainer(),
-                new RecordingLogger(),
-            ),
-            autocomplete: new AutocompleteResponder(new ChoiceFactory()),
-        );
+        return new CommandsRegistry();
     }
 
     private function discovery(CommandsRegistry $registry): CommandsDiscovery

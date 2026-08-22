@@ -38,7 +38,7 @@ final class PluginsDiscoveryTest extends TestCase
 
     public function test_it_discovers_plugins(): void
     {
-        $plugins = new PluginsRegistry(new RecordingLogger());
+        $plugins = new PluginsRegistry();
         $discovery = $this->discovery($plugins);
 
         $discovery->discover($this->location, new ClassReflector(RecordingPlugin::class));
@@ -50,7 +50,7 @@ final class PluginsDiscoveryTest extends TestCase
 
     public function test_it_ignores_classes_that_are_not_plugins(): void
     {
-        $discovery = $this->discovery(new PluginsRegistry(new RecordingLogger()));
+        $discovery = $this->discovery(new PluginsRegistry());
 
         $discovery->discover($this->location, new ClassReflector(PingCommand::class));
 
@@ -63,7 +63,7 @@ final class PluginsDiscoveryTest extends TestCase
      */
     public function test_it_ignores_the_interface_itself(): void
     {
-        $discovery = $this->discovery(new PluginsRegistry(new RecordingLogger()));
+        $discovery = $this->discovery(new PluginsRegistry());
 
         $discovery->discover($this->location, new ClassReflector(Plugin::class));
 

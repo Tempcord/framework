@@ -40,33 +40,15 @@ final class TempcordTest extends TestCase
         ReadyListener::$received = [];
 
         $this->discord = new FakeDiscord(new RecordingHttp());
-        $this->commands = new CommandsRegistry(
-            extension: new AllCommandExtension(),
-            registrar: new CommandRegistrar(
-                new CommandBuilderFactory(),
-                new TempcordConfig('::token::', new Bitwise()),
-                new RecordingLogger(),
-                new RecordingHttp(),
-            ),
-            dispatcher: new CommandDispatcher(
-                new ArgumentResolver(new OptionValueResolver($this->discord)),
-                new GenericContainer(),
-                new RecordingLogger(),
-            ),
-            autocomplete: new AutocompleteResponder(new ChoiceFactory()),
-        );
+        $this->commands = new CommandsRegistry();
         $this->events = new EventsRegistry(new GenericContainer());
-        $this->plugins = new PluginsRegistry(new RecordingLogger());
+        $this->plugins = new PluginsRegistry();
     }
 
-    private function tempcord(): Tempcord
-    {
-        return new Tempcord($this->discord, $this->commands, $this->events, $this->plugins);
-    }
 
     public function test_it_registers_the_command_extension_once_the_gateway_is_ready(): void
     {
-        $tempcord = $this->tempcord();
+        $tempcord = $this->tempcord(discord: $this->discord, commands: $this->commands, events: $this->events, plugins: $this->plugins);
 
         $this->assertFalse($tempcord->booted);
 
@@ -85,7 +67,7 @@ final class TempcordTest extends TestCase
 
         $messages = array_map(
             static fn(Outcome $outcome) => $outcome->message,
-            $this->tempcord()->listen(),
+            $this->tempcord(discord: $this->discord, commands: $this->commands, events: $this->events, plugins: $this->plugins)->listen(),
         );
 
         $this->assertSame(['Command "moderation.kick" listened.'], $messages);
