@@ -4,6 +4,7 @@ namespace Tempcord\Tests\Unit\Discoveries;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Log\NullLogger;
+use Ragnarok\Fenrir\Bitwise\Bitwise;
 use ReflectionProperty;
 use Tempcord\Definitions\CommandDefinition;
 use Tempcord\Discord\AllCommandExtension;
@@ -14,7 +15,9 @@ use Tempcord\Runtime\ArgumentResolver;
 use Tempcord\Runtime\AutocompleteResponder;
 use Tempcord\Runtime\ChoiceFactory;
 use Tempcord\Runtime\CommandDispatcher;
+use Tempcord\Runtime\CommandRegistrar;
 use Tempcord\Runtime\OptionValueResolver;
+use Tempcord\TempcordConfig;
 use Tempcord\Tests\Doubles\FakeDiscord;
 use Tempcord\Tests\Doubles\RecordingHttp;
 use Tempcord\Tests\Fixtures\ModerationCommand;
@@ -44,7 +47,12 @@ final class CommandsDiscoveryTest extends TestCase
 
         return new CommandsRegistry(
             extension: new AllCommandExtension(),
-            builders: new CommandBuilderFactory(),
+            registrar: new CommandRegistrar(
+                new CommandBuilderFactory(),
+                new TempcordConfig('::token::', new Bitwise()),
+                new NullLogger(),
+                new RecordingHttp(),
+            ),
             dispatcher: new CommandDispatcher(
                 new ArgumentResolver(new OptionValueResolver($discord)),
                 new GenericContainer(),

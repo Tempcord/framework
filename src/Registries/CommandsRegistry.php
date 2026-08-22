@@ -7,13 +7,11 @@ use Ragnarok\Fenrir\Interaction\CommandInteraction;
 use Tempcord\Definitions\CommandDefinition;
 use Tempcord\Definitions\HandlerDefinition;
 use Tempcord\Discord\AllCommandExtension;
-use Tempcord\Discord\CommandBuilderFactory;
 use Tempcord\Runtime\AutocompleteResponder;
 use Tempcord\Runtime\CommandDispatcher;
+use Tempcord\Runtime\CommandRegistrar;
 use Tempcord\Runtime\Outcome;
 use Tempest\Container\Singleton;
-use Throwable;
-use function React\Async\await;
 
 /**
  * Holds every compiled command and wires it up: registering it with Discord and
@@ -27,7 +25,7 @@ final class CommandsRegistry
 
     public function __construct(
         public readonly AllCommandExtension $extension,
-        private readonly CommandBuilderFactory $builders,
+        private readonly CommandRegistrar $registrar,
         private readonly CommandDispatcher $dispatcher,
         private readonly AutocompleteResponder $autocomplete,
     ) {}
@@ -42,52 +40,13 @@ final class CommandsRegistry
     }
 
     /**
-     * Pushes every command to Discord, reporting on each as it goes.
+     * Pushes every command to Discord, reporting on each scope as it goes.
      *
      * @return list<Outcome>
      */
     public function register(Discord $discord): array
     {
-        if ($this->commands === []) {
-            return [Outcome::warning('No commands to register.')];
-        }
-
-        try {
-            $application = await($discord->rest->application->getCurrent());
-        } catch (Throwable $throwable) {
-            return [Outcome::error($throwable->getMessage())];
-        }
-
-        $outcomes = [];
-
-        foreach ($this->commands as $command) {
-            try {
-                /*
-                 * Guild commands go to a different endpoint that additionally
-                 * takes the guild id, so the two cannot share a call.
-                 */
-                await($command->isGlobal()
-                    ? $discord->rest->globalCommand->createApplicationCommand(
-                        $application->id,
-                        $this->builders->forCommand($command),
-                    )
-                    : $discord->rest->guildCommand->createApplicationCommand(
-                        $application->id,
-                        $command->guildId,
-                        $this->builders->forCommand($command),
-                    ));
-
-                $outcomes[] = Outcome::success($command->isGlobal()
-                    ? 'Command "' . $command->name . '" registered globally.'
-                    : 'Command "' . $command->name . '" registered in guild ' . $command->guildId . '.');
-            } catch (Throwable $throwable) {
-                $outcomes[] = Outcome::error(
-                    'Command "' . $command->name . '": ' . $throwable->getMessage(),
-                );
-            }
-        }
-
-        return $outcomes;
+        return $this->registrar->register($discord, $this->commands);
     }
 
     /**

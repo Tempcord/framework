@@ -3,6 +3,7 @@
 namespace Tempcord\Definitions;
 
 use Ragnarok\Fenrir\Enums\ApplicationCommandTypes;
+use Ragnarok\Fenrir\Enums\Permission;
 
 /**
  * A fully resolved command: everything the framework needs to register it with
@@ -15,7 +16,7 @@ final readonly class CommandDefinition
      * @param array<string, SubcommandGroupDefinition|SubcommandDefinition|OptionDefinition> $options
      *        the command's direct children, in the shape Discord expects
      * @param array<string, HandlerDefinition> $handlers keyed by dotted interaction path
-     * @param list<string> $permissions
+     * @param list<Permission> $permissions
      */
     public function __construct(
         public string $name,

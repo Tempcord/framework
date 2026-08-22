@@ -4,16 +4,13 @@ namespace Tempcord\Tests\Unit\Registries;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Log\NullLogger;
-use Tempcord\Discord\AllCommandExtension;
+use Ragnarok\Fenrir\Bitwise\Bitwise;
+use Ragnarok\Fenrir\Enums\Permission;
 use Tempcord\Discord\CommandBuilderFactory;
-use Tempcord\Registries\CommandsRegistry;
-use Tempcord\Runtime\ArgumentResolver;
-use Tempcord\Runtime\AutocompleteResponder;
-use Tempcord\Runtime\ChoiceFactory;
-use Tempcord\Runtime\CommandDispatcher;
-use Tempcord\Runtime\OptionValueResolver;
+use Tempcord\Runtime\CommandRegistrar;
 use Tempcord\Runtime\Outcome;
 use Tempcord\Runtime\OutcomeLevel;
+use Tempcord\TempcordConfig;
 use Tempcord\Tests\Doubles\FakeDiscord;
 use Tempcord\Tests\Doubles\RecordingHttp;
 use Tempcord\Tests\Fixtures\GlobalAlphaCommand;
@@ -21,39 +18,44 @@ use Tempcord\Tests\Fixtures\GuildAlphaCommand;
 use Tempcord\Tests\Fixtures\GuildBetaCommand;
 use Tempcord\Tests\Fixtures\OtherGuildAlphaCommand;
 use Tempcord\Tests\Fixtures\PingCommand;
+use Tempcord\Tests\Fixtures\RestrictedCommand;
 use Tempcord\Tests\Unit\TestCase;
-use Tempest\Container\GenericContainer;
 
-#[CoversClass(CommandsRegistry::class)]
+#[CoversClass(CommandRegistrar::class)]
 final class CommandRegistrationTest extends TestCase
 {
     private const string GLOBAL_ENDPOINT = 'applications/424242/commands';
+
+    private RecordingHttp $http;
+
+    protected function setUp(): void
+    {
+        $this->http = new RecordingHttp();
+    }
 
     private function guildEndpoint(string $guildId): string
     {
         return 'applications/424242/guilds/' . $guildId . '/commands';
     }
 
-    private function registry(string ...$commandClasses): CommandsRegistry
+    /**
+     * @return list<Outcome>
+     */
+    private function register(string ...$commandClasses): array
     {
-        $discord = new FakeDiscord(new RecordingHttp());
-
-        $registry = new CommandsRegistry(
-            extension: new AllCommandExtension(),
-            builders: new CommandBuilderFactory(),
-            dispatcher: new CommandDispatcher(
-                new ArgumentResolver(new OptionValueResolver($discord)),
-                new GenericContainer(),
-                new NullLogger(),
-            ),
-            autocomplete: new AutocompleteResponder(new ChoiceFactory()),
-        );
+        $commands = [];
 
         foreach ($commandClasses as $class) {
-            $registry->add($this->definition($class));
+            $definition = $this->definition($class);
+            $commands[$definition->key()] = $definition;
         }
 
-        return $registry;
+        return new CommandRegistrar(
+            new CommandBuilderFactory(),
+            new TempcordConfig('::token::', new Bitwise()),
+            new NullLogger(),
+            $this->http,
+        )->register(new FakeDiscord($this->http), $commands);
     }
 
     /** @return list<OutcomeLevel> */
@@ -62,100 +64,116 @@ final class CommandRegistrationTest extends TestCase
         return array_map(static fn(Outcome $outcome) => $outcome->level, $outcomes);
     }
 
-    public function test_a_global_command_goes_to_the_global_endpoint(): void
+    public function test_global_commands_go_to_the_global_endpoint(): void
     {
-        $http = new RecordingHttp();
+        $this->register(PingCommand::class);
 
-        $this->registry(PingCommand::class)->register(new FakeDiscord($http));
-
-        $this->assertSame([self::GLOBAL_ENDPOINT], $http->postedUrls());
+        $this->assertSame([self::GLOBAL_ENDPOINT], $this->http->putUrls());
     }
 
     public function test_a_guild_command_goes_to_the_guild_endpoint(): void
     {
-        $http = new RecordingHttp();
+        $this->register(GuildAlphaCommand::class);
 
-        $this->registry(GuildAlphaCommand::class)->register(new FakeDiscord($http));
-
-        $this->assertSame([$this->guildEndpoint('111')], $http->postedUrls());
+        $this->assertSame([$this->guildEndpoint('111')], $this->http->putUrls());
     }
 
     /**
-     * The original defect: guild commands were keyed by guild id alone, so a
-     * second command in the same guild silently replaced the first.
+     * Discord replaces a whole scope at once, so every command in a guild
+     * belongs to the same request rather than one request each.
      */
-    public function test_two_commands_in_the_same_guild_are_both_registered(): void
+    public function test_commands_in_one_guild_are_sent_as_a_single_set(): void
     {
-        $http = new RecordingHttp();
+        $this->register(GuildAlphaCommand::class, GuildBetaCommand::class);
 
-        $this->registry(GuildAlphaCommand::class, GuildBetaCommand::class)
-            ->register(new FakeDiscord($http));
-
-        $this->assertSame(
-            [$this->guildEndpoint('111'), $this->guildEndpoint('111')],
-            $http->postedUrls(),
-        );
+        $this->assertSame([$this->guildEndpoint('111')], $this->http->putUrls());
+        $this->assertCount(2, $this->http->puts[0]['content']);
+        $this->assertSame(['alpha', 'beta'], array_column($this->http->puts[0]['content'], 'name'));
     }
 
-    public function test_the_same_command_name_in_two_guilds_is_registered_in_each(): void
+    public function test_each_guild_gets_its_own_request(): void
     {
-        $http = new RecordingHttp();
-
-        $this->registry(GuildAlphaCommand::class, OtherGuildAlphaCommand::class)
-            ->register(new FakeDiscord($http));
+        $this->register(GuildAlphaCommand::class, OtherGuildAlphaCommand::class);
 
         $this->assertSame(
             [$this->guildEndpoint('111'), $this->guildEndpoint('222')],
-            $http->postedUrls(),
+            $this->http->putUrls(),
         );
     }
 
     public function test_a_guild_command_does_not_collide_with_the_global_command_of_the_same_name(): void
     {
-        $http = new RecordingHttp();
-
-        $this->registry(GuildAlphaCommand::class, GlobalAlphaCommand::class)
-            ->register(new FakeDiscord($http));
+        $this->register(GuildAlphaCommand::class, GlobalAlphaCommand::class);
 
         $this->assertSame(
             [$this->guildEndpoint('111'), self::GLOBAL_ENDPOINT],
-            $http->postedUrls(),
+            $this->http->putUrls(),
         );
+    }
+
+    /**
+     * The payload is a bare list of command objects; keys would make Discord
+     * read it as an object rather than an array.
+     */
+    public function test_the_payload_is_a_list_of_command_objects(): void
+    {
+        $this->register(GuildAlphaCommand::class, GuildBetaCommand::class);
+
+        $sent = $this->http->puts[0]['content'];
+
+        $this->assertSame([0, 1], array_keys($sent));
+        $this->assertArrayHasKey('description', $sent[0]);
+    }
+
+    /**
+     * Discord reads default_member_permissions as a decimal bit field. Fenrir's
+     * setDefaultMemberPermissions sends the binary representation, so the
+     * payload is written directly instead.
+     */
+    public function test_permissions_are_sent_as_a_decimal_bit_field(): void
+    {
+        $this->register(RestrictedCommand::class);
+
+        $sent = $this->http->puts[0]['content'][0];
+
+        $this->assertSame(
+            (string) (Permission::KICK_MEMBERS->value | Permission::BAN_MEMBERS->value),
+            $sent['default_member_permissions'],
+        );
+    }
+
+    public function test_a_command_without_permissions_is_left_unrestricted(): void
+    {
+        $this->register(PingCommand::class);
+
+        $this->assertArrayNotHasKey('default_member_permissions', $this->http->puts[0]['content'][0]);
     }
 
     public function test_it_warns_instead_of_calling_discord_when_there_is_nothing_to_register(): void
     {
-        $http = new RecordingHttp();
-
-        $outcomes = $this->registry()->register(new FakeDiscord($http));
+        $outcomes = $this->register();
 
         $this->assertSame([OutcomeLevel::Warning], $this->levels($outcomes));
-        $this->assertSame('No commands to register.', $outcomes[0]->message);
-        $this->assertSame([], $http->postedUrls());
+        $this->assertSame([], $this->http->putUrls());
     }
 
     public function test_a_failed_application_lookup_stops_before_registering_anything(): void
     {
-        $http = new RecordingHttp(failApplicationLookup: true);
+        $this->http = new RecordingHttp(failApplicationLookup: true);
 
-        $outcomes = $this->registry(PingCommand::class)->register(new FakeDiscord($http));
-
-        $this->assertSame([OutcomeLevel::Error], $this->levels($outcomes));
-        $this->assertSame([], $http->postedUrls());
+        $this->assertSame([OutcomeLevel::Error], $this->levels($this->register(PingCommand::class)));
+        $this->assertSame([], $this->http->putUrls());
     }
 
     /**
-     * One command Discord rejects must not stop the rest from registering.
+     * One scope Discord rejects must not stop the others from registering.
      */
-    public function test_a_rejected_command_is_reported_and_the_others_continue(): void
+    public function test_a_rejected_scope_is_reported_and_the_others_continue(): void
     {
-        $http = new RecordingHttp(failPostsMatching: ['guilds/111']);
+        $this->http = new RecordingHttp(failPostsMatching: ['guilds/111']);
 
-        $outcomes = $this->registry(GuildAlphaCommand::class, GlobalAlphaCommand::class)
-            ->register(new FakeDiscord($http));
+        $outcomes = $this->register(GuildAlphaCommand::class, GlobalAlphaCommand::class);
 
         $this->assertSame([OutcomeLevel::Error, OutcomeLevel::Success], $this->levels($outcomes));
-        $this->assertStringContainsString('Command "alpha":', $outcomes[0]->message);
-        $this->assertSame('Command "alpha" registered globally.', $outcomes[1]->message);
     }
 }

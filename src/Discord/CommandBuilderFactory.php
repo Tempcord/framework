@@ -2,6 +2,7 @@
 
 namespace Tempcord\Discord;
 
+use Ragnarok\Fenrir\Bitwise\Bitwise;
 use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
 use Ragnarok\Fenrir\Enums\ApplicationCommandTypes;
 use Ragnarok\Fenrir\Rest\Helpers\Command\CommandBuilder;
@@ -19,6 +20,29 @@ use Tempcord\Definitions\SubcommandGroupDefinition;
  */
 final readonly class CommandBuilderFactory
 {
+    /**
+     * The payload for one command, ready to send.
+     *
+     * Default permissions are written here rather than through the builder's
+     * setDefaultMemberPermissions, which sends the binary representation of the
+     * bit field where Discord expects the decimal one. Asking for ADMINISTRATOR
+     * that way grants five permissions nobody asked for.
+     *
+     * @see https://github.com/dc-Ragnarok/Fenrir/pull/134
+     *
+     * @return array<string, mixed>
+     */
+    public function payloadFor(CommandDefinition $command): array
+    {
+        $payload = $this->forCommand($command)->get();
+
+        if ($command->permissions !== []) {
+            $payload['default_member_permissions'] = (string) Bitwise::from(...$command->permissions)->get();
+        }
+
+        return $payload;
+    }
+
     public function forCommand(CommandDefinition $command): CommandBuilder
     {
         $builder = CommandBuilder::new()

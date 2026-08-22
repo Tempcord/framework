@@ -5,6 +5,7 @@ namespace Tempcord\Attributes;
 use Attribute;
 use BackedEnum;
 use Ragnarok\Fenrir\Enums\ApplicationCommandTypes;
+use Ragnarok\Fenrir\Enums\Permission;
 
 /**
  * Declares a class as a Discord application command.
@@ -24,7 +25,8 @@ final readonly class Command
     /**
      * @param string|BackedEnum|null $name defaults to the class name, with a
      *        Command prefix or suffix stripped and the rest snake_cased
-     * @param list<string> $permissions
+     * @param list<Permission> $permissions the permissions a member needs by
+     *        default; an empty list leaves the command unrestricted
      */
     public function __construct(
         public string|BackedEnum|null $name = null,
