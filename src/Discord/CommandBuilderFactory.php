@@ -103,11 +103,37 @@ final readonly class CommandBuilderFactory
 
     private function forParameter(OptionDefinition $option): CommandOptionBuilder
     {
-        return CommandOptionBuilder::new()
+        $builder = CommandOptionBuilder::new()
             ->setName($option->name)
             ->setDescription($option->description)
             ->setRequired($option->isRequired)
             ->setType($option->type)
             ->setAutoComplete($option->hasAutocomplete());
+
+        foreach ($option->choices as $label => $value) {
+            $builder->addChoice($label, $value);
+        }
+
+        if (!is_null($option->minValue)) {
+            $builder->setMinValue($option->minValue);
+        }
+
+        if (!is_null($option->maxValue)) {
+            $builder->setMaxValue($option->maxValue);
+        }
+
+        if (!is_null($option->minLength)) {
+            $builder->setMinLength($option->minLength);
+        }
+
+        if (!is_null($option->maxLength)) {
+            $builder->setMaxLength($option->maxLength);
+        }
+
+        if ($option->channelTypes !== []) {
+            $builder->setChannelTypes(...$option->channelTypes);
+        }
+
+        return $builder;
     }
 }

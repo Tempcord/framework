@@ -208,10 +208,41 @@ final readonly class CommandCompiler
                 isRequired: !$parameter->isOptional(),
                 autocomplete: $option->autocomplete,
                 parameter: $parameter,
+                choices: $this->choicesOf($option),
+                minValue: $option->minValue,
+                maxValue: $option->maxValue,
+                minLength: $option->minLength,
+                maxLength: $option->maxLength,
+                channelTypes: $option->channelTypes,
             );
         }
 
         return $options;
+    }
+
+    /**
+     * A list of choices labels each entry with itself; a map uses its keys as
+     * the labels, matching how ArrayAutocomplete already reads its items.
+     *
+     * @return array<string, string|int|float>
+     */
+    private function choicesOf(Option $option): array
+    {
+        if ($option->choices === []) {
+            return [];
+        }
+
+        if (!array_is_list($option->choices)) {
+            return $option->choices;
+        }
+
+        $choices = [];
+
+        foreach ($option->choices as $choice) {
+            $choices[(string) $choice] = $choice;
+        }
+
+        return $choices;
     }
 
     private function typeOf(ParameterReflector $parameter): ApplicationCommandOptionType

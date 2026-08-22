@@ -3,6 +3,7 @@
 namespace Tempcord\Definitions;
 
 use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
+use Ragnarok\Fenrir\Enums\ChannelType;
 use Tempcord\Interfaces\Autocomplete;
 use Tempest\Reflection\ParameterReflector;
 
@@ -12,6 +13,10 @@ use Tempest\Reflection\ParameterReflector;
  */
 final readonly class OptionDefinition
 {
+    /**
+     * @param array<string, string|int|float> $choices keyed by the label users see
+     * @param list<ChannelType> $channelTypes
+     */
     public function __construct(
         public string $name,
         public string $description,
@@ -19,6 +24,12 @@ final readonly class OptionDefinition
         public bool $isRequired,
         public ?Autocomplete $autocomplete,
         public ParameterReflector $parameter,
+        public array $choices = [],
+        public int|float|null $minValue = null,
+        public int|float|null $maxValue = null,
+        public ?int $minLength = null,
+        public ?int $maxLength = null,
+        public array $channelTypes = [],
     ) {}
 
     public function hasAutocomplete(): bool

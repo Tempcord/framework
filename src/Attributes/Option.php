@@ -3,6 +3,7 @@
 namespace Tempcord\Attributes;
 
 use Attribute;
+use Ragnarok\Fenrir\Enums\ChannelType;
 use Tempcord\Interfaces\Autocomplete;
 
 /**
@@ -17,10 +18,26 @@ final readonly class Option
 {
     /**
      * @param string|null $name defaults to the parameter's own name
+     * @param array<string, string|int|float>|list<string|int|float> $choices
+     *        the only values Discord will accept. A map uses its keys as the
+     *        labels users see; a list shows each value as its own label.
+     *        Mutually exclusive with autocomplete.
+     * @param int|float|null $minValue smallest accepted number
+     * @param int|float|null $maxValue largest accepted number
+     * @param int|null $minLength shortest accepted string
+     * @param int|null $maxLength longest accepted string
+     * @param list<ChannelType> $channelTypes restricts which channels may be
+     *        picked, for a Channel option
      */
     public function __construct(
         public string $description,
         public ?string $name = null,
         public ?Autocomplete $autocomplete = null,
+        public array $choices = [],
+        public int|float|null $minValue = null,
+        public int|float|null $maxValue = null,
+        public ?int $minLength = null,
+        public ?int $maxLength = null,
+        public array $channelTypes = [],
     ) {}
 }
