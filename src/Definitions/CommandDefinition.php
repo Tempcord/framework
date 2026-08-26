@@ -2,8 +2,8 @@
 
 namespace Tempcord\Definitions;
 
-use Ragnarok\Fenrir\Enums\ApplicationCommandTypes;
-use Ragnarok\Fenrir\Enums\Permission;
+use CyberWolf\Discord\Enums\ApplicationCommandTypes;
+use CyberWolf\Discord\Enums\Permission;
 
 /**
  * A fully resolved command: everything the framework needs to register it with

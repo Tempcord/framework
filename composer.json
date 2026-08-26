@@ -1,17 +1,17 @@
 {
     "name": "tempcord/framework",
-    "version": "0.6.0",
     "description": "A modern, elegant PHP framework for building Discord bots with ease",
     "type": "library",
-    "require": {
-        "php": "^8.5",
-        "ragnarok/fenrir": "^1.0",
-        "tempest/console": "^3.18",
-        "tempest/core": "^3.18",
-        "tempest/event-bus": "^3.18",
-        "tempest/log": "^3.18"
-    },
     "license": "MIT",
+    "homepage": "https://tempcord.dev",
+    "keywords": [
+        "discord",
+        "discord-bot",
+        "bot",
+        "framework",
+        "tempest",
+        "php"
+    ],
     "authors": [
         {
             "name": "CyberWolf.Studio",
@@ -20,29 +20,28 @@
             "role": "Developer"
         }
     ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
+    "support": {
+        "issues": "https://github.com/Tempcord/framework/issues",
+        "source": "https://github.com/Tempcord/framework",
+        "docs": "https://tempcord.dev",
+        "chat": "https://discord.gg/tempcord"
+    },
+    "require": {
+        "php": "^8.5",
+        "cyberwolf-studio/discord-php": "^1.0",
+        "tempest/console": "^3.18",
+        "tempest/core": "^3.18",
+        "tempest/event-bus": "^3.18",
+        "tempest/log": "^3.18"
+    },
     "require-dev": {
         "phpunit/phpunit": "^13.0",
         "phpstan/phpstan": "^2.1",
         "friendsofphp/php-cs-fixer": "^3.0"
     },
-    "scripts": {
-        "test": "phpunit",
-        "analyse": "phpstan analyse --memory-limit=1G",
-        "cs-fix": "php-cs-fixer fix",
-        "docs": "php tools/generate-docs.php"
+    "suggest": {
+        "tempest/intl": "Enables name and description translations for commands via #[Command(translationKey: ...)]. Requires ext-intl."
     },
-    "config": {
-        "sort-packages": true,
-        "optimize-autoloader": true
-    },
-    "keywords": [
-        "discord",
-        "bot",
-        "framework",
-        "php"
-    ],
     "autoload": {
         "psr-4": {
             "Tempcord\\": "src/"
@@ -54,7 +53,15 @@
             "Tempcord\\Tools\\": "tools/src/"
         }
     },
-    "suggest": {
-        "tempest/intl": "Enables name and description translations for commands via #[Command(translationKey: ...)]. Requires ext-intl."
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=1G",
+        "cs-fix": "php-cs-fixer fix",
+        "docs": "php tools/generate-docs.php"
+    },
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
     }
 }

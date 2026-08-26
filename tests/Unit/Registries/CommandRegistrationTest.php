@@ -3,8 +3,8 @@
 namespace Tempcord\Tests\Unit\Registries;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use Ragnarok\Fenrir\Bitwise\Bitwise;
-use Ragnarok\Fenrir\Enums\Permission;
+use CyberWolf\Discord\Bitwise\Bitwise;
+use CyberWolf\Discord\Enums\Permission;
 use Tempcord\Discord\CommandBuilderFactory;
 use Tempcord\Runtime\CommandRegistrar;
 use Tempcord\Runtime\Outcome;

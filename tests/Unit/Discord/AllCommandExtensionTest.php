@@ -4,10 +4,10 @@ namespace Tempcord\Tests\Unit\Discord;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
-use Ragnarok\Fenrir\Gateway\Events\InteractionCreate;
-use Ragnarok\Fenrir\Parts\ApplicationCommandInteractionDataOptionStructure;
-use Ragnarok\Fenrir\Parts\InteractionData;
+use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
+use CyberWolf\Discord\Gateway\Events\InteractionCreate;
+use CyberWolf\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
+use CyberWolf\Discord\Parts\InteractionData;
 use Tempcord\Discord\AllCommandExtension;
 use ReflectionMethod;
 

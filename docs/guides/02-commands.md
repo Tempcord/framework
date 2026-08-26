@@ -73,9 +73,9 @@ The Discord option type is read from the parameter's PHP type:
 | `int` | INTEGER |
 | `float` | NUMBER |
 | `bool` | BOOLEAN |
-| `Ragnarok\Fenrir\Parts\User` | USER |
-| `Ragnarok\Fenrir\Parts\Channel` | CHANNEL |
-| `Ragnarok\Fenrir\Parts\Role` | ROLE |
+| `CyberWolf\Discord\Parts\User` | USER |
+| `CyberWolf\Discord\Parts\Channel` | CHANNEL |
+| `CyberWolf\Discord\Parts\Role` | ROLE |
 
 A parameter typed `User`, `Channel` or `Role` is fetched from Discord before your handler
 runs, so you receive the entity rather than an id.
@@ -93,8 +93,8 @@ Discord can enforce constraints before your handler is ever called, which is che
 gives the user immediate feedback.
 
 ```php
-use Ragnarok\Fenrir\Enums\ChannelType;
-use Ragnarok\Fenrir\Parts\Channel;
+use CyberWolf\Discord\Enums\ChannelType;
+use CyberWolf\Discord\Parts\Channel;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 
@@ -126,7 +126,7 @@ labels of its own, so each value stands in as its own.
 `permissions` sets the default a member needs. An empty list leaves the command unrestricted.
 
 ```php
-use Ragnarok\Fenrir\Enums\Permission;
+use CyberWolf\Discord\Enums\Permission;
 use Tempcord\Attributes\Command;
 
 #[Command(

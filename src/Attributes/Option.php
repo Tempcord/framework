@@ -3,7 +3,7 @@
 namespace Tempcord\Attributes;
 
 use Attribute;
-use Ragnarok\Fenrir\Enums\ChannelType;
+use CyberWolf\Discord\Enums\ChannelType;
 use Tempcord\Interfaces\Autocomplete;
 
 /**

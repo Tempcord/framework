@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Ragnarok\Fenrir\Enums\Permission;
+use CyberWolf\Discord\Enums\Permission;
 use Tempcord\Attributes\Command;
 
 #[Command(

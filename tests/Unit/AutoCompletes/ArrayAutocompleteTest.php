@@ -4,7 +4,7 @@ namespace Tempcord\Tests\Unit\AutoCompletes;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
+use CyberWolf\Discord\Interaction\CommandInteraction;
 use Tempcord\AutoCompletes\ArrayAutocomplete;
 
 #[CoversClass(ArrayAutocomplete::class)]

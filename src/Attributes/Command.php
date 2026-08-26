@@ -4,8 +4,8 @@ namespace Tempcord\Attributes;
 
 use Attribute;
 use BackedEnum;
-use Ragnarok\Fenrir\Enums\ApplicationCommandTypes;
-use Ragnarok\Fenrir\Enums\Permission;
+use CyberWolf\Discord\Enums\ApplicationCommandTypes;
+use CyberWolf\Discord\Enums\Permission;
 
 /**
  * Declares a class as a Discord application command.

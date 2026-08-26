@@ -2,7 +2,7 @@
 
 namespace Tempcord;
 
-use Ragnarok\Fenrir\Discord;
+use CyberWolf\Discord\Discord;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\EventsRegistry;
 use Tempcord\Registries\PluginsRegistry;

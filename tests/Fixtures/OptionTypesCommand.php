@@ -2,9 +2,9 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Ragnarok\Fenrir\Parts\Channel;
-use Ragnarok\Fenrir\Parts\Role;
-use Ragnarok\Fenrir\Parts\User;
+use CyberWolf\Discord\Parts\Channel;
+use CyberWolf\Discord\Parts\Role;
+use CyberWolf\Discord\Parts\User;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 use Tempcord\Attributes\Subcommand;

@@ -2,8 +2,8 @@
 
 namespace Tempcord\Definitions;
 
-use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
-use Ragnarok\Fenrir\Enums\ChannelType;
+use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
+use CyberWolf\Discord\Enums\ChannelType;
 use Tempcord\Interfaces\Autocomplete;
 use Tempest\Reflection\ParameterReflector;
 

@@ -3,9 +3,9 @@
 namespace Tempcord\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use Ragnarok\Fenrir\Bitwise\Bitwise;
-use Ragnarok\Fenrir\Constants\Events;
-use Ragnarok\Fenrir\Gateway\Events\Ready;
+use CyberWolf\Discord\Bitwise\Bitwise;
+use CyberWolf\Discord\Constants\Events;
+use CyberWolf\Discord\Gateway\Events\Ready;
 use Tempcord\Discord\AllCommandExtension;
 use Tempcord\Discord\CommandBuilderFactory;
 use Tempcord\Registries\CommandsRegistry;

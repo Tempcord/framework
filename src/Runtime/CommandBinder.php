@@ -2,7 +2,7 @@
 
 namespace Tempcord\Runtime;
 
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
+use CyberWolf\Discord\Interaction\CommandInteraction;
 use Tempcord\Definitions\CommandDefinition;
 use Tempcord\Definitions\HandlerDefinition;
 use Tempcord\Discord\AllCommandExtension;

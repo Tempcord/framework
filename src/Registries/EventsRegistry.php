@@ -2,7 +2,7 @@
 
 namespace Tempcord\Registries;
 
-use Ragnarok\Fenrir\Discord;
+use CyberWolf\Discord\Discord;
 use Tempcord\Definitions\EventDefinition;
 use Tempcord\Runtime\Outcome;
 use Tempest\Container\Container;

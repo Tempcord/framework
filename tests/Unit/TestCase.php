@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Unit;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Ragnarok\Fenrir\Bitwise\Bitwise;
+use CyberWolf\Discord\Bitwise\Bitwise;
 use Tempcord\Discord\AllCommandExtension;
 use Tempcord\Discord\CommandBuilderFactory;
 use Tempcord\Registries\CommandsRegistry;

@@ -2,8 +2,8 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Ragnarok\Fenrir\Enums\ChannelType;
-use Ragnarok\Fenrir\Parts\Channel;
+use CyberWolf\Discord\Enums\ChannelType;
+use CyberWolf\Discord\Parts\Channel;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 

@@ -2,10 +2,10 @@
 
 namespace Tempcord\Runtime;
 
-use Ragnarok\Fenrir\Discord;
-use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
-use Ragnarok\Fenrir\Parts\ApplicationCommandInteractionDataOptionStructure;
+use CyberWolf\Discord\Discord;
+use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
+use CyberWolf\Discord\Interaction\CommandInteraction;
+use CyberWolf\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
 use RuntimeException;
 use Throwable;
 use function React\Async\await;

@@ -2,9 +2,9 @@
 
 namespace Tempcord;
 
-use Ragnarok\Fenrir\Constants\Events;
-use Ragnarok\Fenrir\Discord;
-use Ragnarok\Fenrir\Gateway\Events\Ready;
+use CyberWolf\Discord\Constants\Events;
+use CyberWolf\Discord\Discord;
+use CyberWolf\Discord\Gateway\Events\Ready;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\EventsRegistry;
 use Tempcord\Registries\PluginsRegistry;

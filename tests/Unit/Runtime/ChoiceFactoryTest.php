@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Unit\Runtime;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use Ragnarok\Fenrir\Parts\ApplicationCommandOptionChoice;
+use CyberWolf\Discord\Parts\ApplicationCommandOptionChoice;
 use Tempcord\Runtime\ChoiceFactory;
 use Tempcord\Tests\Unit\TestCase;
 

@@ -2,7 +2,7 @@
 
 namespace Tempcord\Runtime;
 
-use Ragnarok\Fenrir\Parts\ApplicationCommandOptionChoice;
+use CyberWolf\Discord\Parts\ApplicationCommandOptionChoice;
 
 /**
  * Normalises whatever an Autocomplete returned into the choice list Discord

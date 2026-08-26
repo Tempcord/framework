@@ -14,7 +14,7 @@ Anything implementing `Autocomplete` can supply suggestions, which is what you w
 they come from a database or an API.
 
 ```php
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
+use CyberWolf\Discord\Interaction\CommandInteraction;
 use Tempcord\Interfaces\Autocomplete;
 
 final readonly class TrackAutocomplete implements Autocomplete

@@ -2,12 +2,12 @@
 
 namespace Tempcord\Discord;
 
-use Ragnarok\Fenrir\Constants\Events;
-use Ragnarok\Fenrir\Discord;
-use Ragnarok\Fenrir\Enums\InteractionType;
-use Ragnarok\Fenrir\FilteredEventEmitter;
-use Ragnarok\Fenrir\Gateway\Events\InteractionCreate;
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
+use CyberWolf\Discord\Constants\Events;
+use CyberWolf\Discord\Discord;
+use CyberWolf\Discord\Enums\InteractionType;
+use CyberWolf\Discord\FilteredEventEmitter;
+use CyberWolf\Discord\Gateway\Events\InteractionCreate;
+use CyberWolf\Discord\Interaction\CommandInteraction;
 
 /**
  * Fenrir's command extension, widened to also carry autocomplete interactions.
@@ -16,7 +16,7 @@ use Ragnarok\Fenrir\Interaction\CommandInteraction;
  * "music.playlist.play" — with autocomplete suffixed, which is exactly the
  * path a compiled HandlerDefinition is keyed by.
  */
-final class AllCommandExtension extends \Ragnarok\Fenrir\Command\AllCommandExtension
+final class AllCommandExtension extends \CyberWolf\Discord\Command\AllCommandExtension
 {
     public const string AUTOCOMPLETE_SUFFIX = '.autocomplete';
 

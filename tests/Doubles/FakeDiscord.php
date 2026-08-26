@@ -3,11 +3,11 @@
 namespace Tempcord\Tests\Doubles;
 
 use Psr\Log\NullLogger;
-use Ragnarok\Fenrir\DataMapper;
-use Ragnarok\Fenrir\Discord;
-use Ragnarok\Fenrir\EventHandler;
-use Ragnarok\Fenrir\Gateway\Connection;
-use Ragnarok\Fenrir\Rest\Rest;
+use CyberWolf\Discord\DataMapper;
+use CyberWolf\Discord\Discord;
+use CyberWolf\Discord\EventHandler;
+use CyberWolf\Discord\Gateway\Connection;
+use CyberWolf\Discord\Rest\Rest;
 use ReflectionClass;
 
 /**

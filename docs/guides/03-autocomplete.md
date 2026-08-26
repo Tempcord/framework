@@ -7,7 +7,7 @@ Autocomplete suggests values while the user is still typing, before they submit 
 `ArrayAutocomplete` filters a fixed list by what has been typed so far.
 
 ```php
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
+use CyberWolf\Discord\Interaction\CommandInteraction;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 use Tempcord\AutoCompletes\ArrayAutocomplete;
@@ -32,7 +32,7 @@ Anything implementing `Autocomplete` can supply suggestions, which is what you w
 they come from a database or an API.
 
 ```php
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
+use CyberWolf\Discord\Interaction\CommandInteraction;
 use Tempcord\Interfaces\Autocomplete;
 
 final readonly class TrackAutocomplete implements Autocomplete

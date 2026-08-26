@@ -2,7 +2,7 @@
 
 namespace Tempcord;
 
-use Ragnarok\Fenrir\Discord;
+use CyberWolf\Discord\Discord;
 use Tempest\Container\Container;
 use Tempest\Container\Initializer;
 use Tempest\Container\Singleton;
@@ -21,6 +21,13 @@ final readonly class DiscordInitializer implements Initializer
     public function initialize(Container $container): Discord
     {
         $config = $container->get(TempcordConfig::class);
+
+        if (trim($config->token) === '') {
+            throw new \RuntimeException(
+                'No Discord token configured. Run "php tempcord init" to set one up, '
+                . 'or add DISCORD_TOKEN to your .env file.',
+            );
+        }
 
         return new Discord(
             token: $config->token,

@@ -32,7 +32,7 @@ A command is a class carrying `#[Command]`. If it declares an `__invoke` method,
 handles it, and each parameter marked `#[Option]` becomes an option Discord shows the user.
 
 ```php
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
+use CyberWolf\Discord\Interaction\CommandInteraction;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 

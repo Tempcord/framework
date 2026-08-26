@@ -4,11 +4,11 @@ namespace Tempcord\Compiler;
 
 use BackedEnum;
 use LogicException;
-use Ragnarok\Fenrir\Enums\ApplicationCommandOptionType;
-use Ragnarok\Fenrir\Enums\ApplicationCommandTypes;
-use Ragnarok\Fenrir\Parts\Channel;
-use Ragnarok\Fenrir\Parts\Role;
-use Ragnarok\Fenrir\Parts\User;
+use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
+use CyberWolf\Discord\Enums\ApplicationCommandTypes;
+use CyberWolf\Discord\Parts\Channel;
+use CyberWolf\Discord\Parts\Role;
+use CyberWolf\Discord\Parts\User;
 use RuntimeException;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;

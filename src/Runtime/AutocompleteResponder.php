@@ -2,9 +2,9 @@
 
 namespace Tempcord\Runtime;
 
-use Ragnarok\Fenrir\Enums\InteractionCallbackType;
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
-use Ragnarok\Fenrir\Parts\ApplicationCommandInteractionDataOptionStructure;
+use CyberWolf\Discord\Enums\InteractionCallbackType;
+use CyberWolf\Discord\Interaction\CommandInteraction;
+use CyberWolf\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
 use Tempcord\Definitions\HandlerDefinition;
 use Tempcord\Definitions\OptionDefinition;
 use Tempcord\Discord\InteractionCallbackBuilder;
