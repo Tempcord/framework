@@ -17,6 +17,12 @@ final class RecordingHttp extends Http
     /** @var list<array{url: string, content: mixed}> */
     public array $posts = [];
 
+    /** @var list<string> */
+    public array $gets = [];
+
+    /** @var list<array{url: string, content: mixed}> */
+    public array $puts = [];
+
     public function __construct(
         private readonly bool $failApplicationLookup = false,
         private readonly array $failPostsMatching = [],
@@ -24,6 +30,8 @@ final class RecordingHttp extends Http
 
     public function get($url, $content = null, array $headers = []): PromiseInterface
     {
+        $this->gets[] = (string) $url;
+
         if ($this->failApplicationLookup) {
             return reject(new RuntimeException('401: Unauthorized'));
         }
@@ -51,9 +59,30 @@ final class RecordingHttp extends Http
         return resolve((object) ['id' => '1', 'name' => 'registered']);
     }
 
+    public function put($url, $content = null, array $headers = []): PromiseInterface
+    {
+        $url = (string) $url;
+
+        $this->puts[] = ['url' => $url, 'content' => $content];
+
+        foreach ($this->failPostsMatching as $needle) {
+            if (str_contains($url, $needle)) {
+                return reject(new RuntimeException('50035: Invalid Form Body'));
+            }
+        }
+
+        return resolve([]);
+    }
+
     /** @return list<string> */
     public function postedUrls(): array
     {
         return array_column($this->posts, 'url');
+    }
+
+    /** @return list<string> */
+    public function putUrls(): array
+    {
+        return array_column($this->puts, 'url');
     }
 }

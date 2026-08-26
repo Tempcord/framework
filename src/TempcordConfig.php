@@ -2,7 +2,7 @@
 
 namespace Tempcord;
 
-use Ragnarok\Fenrir\Bitwise\Bitwise;
+use CyberWolf\Discord\Bitwise\Bitwise;
 
 final readonly class TempcordConfig
 {

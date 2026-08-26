@@ -2,7 +2,7 @@
 
 namespace Tempcord\Interfaces;
 
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
+use CyberWolf\Discord\Interaction\CommandInteraction;
 
 interface Autocomplete
 {

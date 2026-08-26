@@ -73,7 +73,7 @@ The boilerplate includes example commands. Create a new command in any folder, f
 namespace App\Commands;
 
 use Tempcord\Attributes\Command;
-use Ragnarok\Fenrir\Gateway\Events\InteractionCreate;
+use CyberWolf\Discord\Gateway\Events\InteractionCreate;
 
 #[Command(name: 'hello', description: 'Say hello!')]
 class HelloCommand
@@ -130,7 +130,7 @@ Create event handlers using the `#[Event]` attribute:
 
 ```php
 use Tempcord\Attributes\Event;
-use Ragnarok\Fenrir\Gateway\Events\MessageCreate;
+use CyberWolf\Discord\Gateway\Events\MessageCreate;
 
 #[Event(name: 'message_create')]
 class MessageHandler
@@ -153,13 +153,24 @@ class UserCommand
 {
     #[Subcommand(name: 'info', description: 'Get user information')]
     public function info(
-        #[Option(name: 'user', description: 'Target user', required: true)]
+        #[Option(description: 'Target user')]
         User $user
     ): void {
         // Handle user info command
     }
 }
 ```
+
+Whether an option is required comes from whether its parameter has a default, so `$user`
+above is required without saying so.
+
+## Documentation
+
+See [docs/](docs/README.md) — guides for getting started, commands, autocomplete, events and
+translations, plus a reference generated from the source.
+
+Run `composer docs` after changing the public API; the test suite fails if the committed
+documentation no longer matches the code.
 
 ## Contributing
 
@@ -194,6 +205,20 @@ We're always looking for ways to improve Tempcord. Feel free to:
 - Open an issue with the `enhancement` label
 - Discuss your ideas in our community channels
 - Submit a pull request with your implementation
+
+## Credits & Acknowledgements
+
+Tempcord stands on the shoulders of excellent open-source projects. It does not
+bundle their source code — they are pulled in as Composer dependencies at install
+time, each under its own license — but the framework would not exist without them:
+
+- **[Discord PHP](https://github.com/CyberWolf-Studio/discord-php)** by CyberWolf.Studio —
+  the underlying Discord API/gateway library Tempcord builds upon; itself a maintained
+  fork of **[Fenrir](https://github.com/dc-Ragnarok/Fenrir)** by Ragnarök (MIT License).
+- **[Tempest](https://tempestphp.com)** — the console, core, event-bus and logging
+  foundation Tempcord integrates with (MIT License).
+- **[ReactPHP](https://reactphp.org)** — the async runtime powering the gateway
+  connection (MIT License).
 
 ## License
 

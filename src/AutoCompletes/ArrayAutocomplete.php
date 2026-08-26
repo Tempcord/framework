@@ -2,7 +2,7 @@
 
 namespace Tempcord\AutoCompletes;
 
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
+use CyberWolf\Discord\Interaction\CommandInteraction;
 use Tempcord\Interfaces\Autocomplete;
 use function Tempest\Support\str;
 

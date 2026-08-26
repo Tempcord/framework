@@ -2,37 +2,51 @@
 
 namespace Tempcord\Registries;
 
-use Tempcord\Attributes\Event;
-use Tempcord\Tempcord;
-use Tempest\Console\Console;
+use CyberWolf\Discord\Discord;
+use Tempcord\Definitions\EventDefinition;
+use Tempcord\Runtime\Outcome;
+use Tempest\Container\Container;
 use Tempest\Container\Singleton;
-use function Tempest\Container\get;
 
+/**
+ * Holds every compiled event listener and attaches it to the gateway.
+ */
 #[Singleton]
 final class EventsRegistry
 {
-    /** @var array<array<string, callable>> */
-    private array $eventListeners = [];
+    /** @var array<string, list<EventDefinition>> */
+    private array $events = [];
 
+    public function __construct(
+        private readonly Container $container,
+    ) {}
 
-    public function add(Event $event): void
+    public function add(EventDefinition $event): void
     {
-        $this->eventListeners[$event->name][] = static fn(object $eventObject) => $event->handler->invokeArgs(
-            object: get($event->reflector->getName()),
-            args: [$eventObject]
-        );
+        $this->events[$event->name][] = $event;
     }
 
-    public function listen(Console $console): void
+    /**
+     * @return list<Outcome>
+     */
+    public function listen(Discord $discord): array
     {
-        $console->header('Starting Events');
-        $tempcord = get(Tempcord::class);
+        $outcomes = [];
 
-        foreach ($this->eventListeners as $event => $eventListeners) {
-            foreach ($eventListeners as $eventListener) {
-                $tempcord->discord->gateway->events->on($event, $eventListener);
-                $console->success('Added listener for: ' . $event);
+        foreach ($this->events as $name => $events) {
+            foreach ($events as $event) {
+                $discord->gateway->events->on(
+                    $name,
+                    fn(object $payload) => $event->method->invokeArgs(
+                        $this->container->get($event->listener),
+                        [$payload],
+                    ),
+                );
+
+                $outcomes[] = Outcome::success('Added listener for: ' . $name);
             }
         }
+
+        return $outcomes;
     }
 }

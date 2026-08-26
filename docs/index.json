@@ -1,0 +1,525 @@
+{
+    "guides": [
+        {
+            "title": "Getting started",
+            "slug": "guides/01-getting-started"
+        },
+        {
+            "title": "Commands and options",
+            "slug": "guides/02-commands"
+        },
+        {
+            "title": "Autocomplete",
+            "slug": "guides/03-autocomplete"
+        },
+        {
+            "title": "Events",
+            "slug": "guides/04-events"
+        },
+        {
+            "title": "Translations",
+            "slug": "guides/05-translations"
+        },
+        {
+            "title": "Plugins",
+            "slug": "guides/06-plugins"
+        }
+    ],
+    "reference": {
+        "attributes": [
+            {
+                "name": "Command",
+                "fqcn": "Tempcord\\Attributes\\Command",
+                "kind": "attribute",
+                "target": "class, method",
+                "summary": "Declares a class as a Discord application command.",
+                "slug": "reference/attributes/command",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "type": "BackedEnum|string|null",
+                        "default": "null",
+                        "required": false,
+                        "summary": "defaults to the class name, with a Command prefix or suffix stripped and the rest snake_cased"
+                    },
+                    {
+                        "name": "description",
+                        "type": "?string",
+                        "default": "null",
+                        "required": false,
+                        "summary": ""
+                    },
+                    {
+                        "name": "guildId",
+                        "type": "string|int|null",
+                        "default": "null",
+                        "required": false,
+                        "summary": ""
+                    },
+                    {
+                        "name": "isNsfw",
+                        "type": "bool",
+                        "default": "false",
+                        "required": false,
+                        "summary": ""
+                    },
+                    {
+                        "name": "permissions",
+                        "type": "array",
+                        "default": "[]",
+                        "required": false,
+                        "summary": "the permissions a member needs by default; an empty list leaves the command unrestricted"
+                    },
+                    {
+                        "name": "directMessage",
+                        "type": "bool",
+                        "default": "true",
+                        "required": false,
+                        "summary": ""
+                    },
+                    {
+                        "name": "type",
+                        "type": "ApplicationCommandTypes",
+                        "default": "ApplicationCommandTypes::CHAT_INPUT",
+                        "required": false,
+                        "summary": ""
+                    },
+                    {
+                        "name": "translationKey",
+                        "type": "?string",
+                        "default": "null",
+                        "required": false,
+                        "summary": "the catalog key this command's translations live under. Keys for everything beneath it are derived from position, so \"commands.music\" gives commands.music.description for the command, commands.music.playlist.play.description for a subcommand, and commands.music.playlist.play.title.description for its option."
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            },
+            {
+                "name": "SubcommandGroup",
+                "fqcn": "Tempcord\\Attributes\\SubcommandGroup",
+                "kind": "attribute",
+                "target": "class",
+                "summary": "Groups every subcommand its class declares under one more level of nesting.",
+                "slug": "reference/attributes/subcommand-group",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "type": "BackedEnum|string",
+                        "default": null,
+                        "required": true,
+                        "summary": ""
+                    },
+                    {
+                        "name": "description",
+                        "type": "string",
+                        "default": null,
+                        "required": true,
+                        "summary": ""
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            },
+            {
+                "name": "Subcommand",
+                "fqcn": "Tempcord\\Attributes\\Subcommand",
+                "kind": "attribute",
+                "target": "method",
+                "summary": "Declares a public method as a subcommand of the command its class declares.",
+                "slug": "reference/attributes/subcommand",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "type": "BackedEnum|string",
+                        "default": null,
+                        "required": true,
+                        "summary": ""
+                    },
+                    {
+                        "name": "description",
+                        "type": "string",
+                        "default": null,
+                        "required": true,
+                        "summary": ""
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            },
+            {
+                "name": "Option",
+                "fqcn": "Tempcord\\Attributes\\Option",
+                "kind": "attribute",
+                "target": "parameter",
+                "summary": "Declares a method parameter as a user-supplied command option.",
+                "slug": "reference/attributes/option",
+                "parameters": [
+                    {
+                        "name": "description",
+                        "type": "string",
+                        "default": null,
+                        "required": true,
+                        "summary": "shown beneath the option in Discord's picker"
+                    },
+                    {
+                        "name": "name",
+                        "type": "?string",
+                        "default": "null",
+                        "required": false,
+                        "summary": "defaults to the parameter's own name"
+                    },
+                    {
+                        "name": "autocomplete",
+                        "type": "?Autocomplete",
+                        "default": "null",
+                        "required": false,
+                        "summary": "suggests values as the user types; mutually exclusive with choices"
+                    },
+                    {
+                        "name": "choices",
+                        "type": "array",
+                        "default": "[]",
+                        "required": false,
+                        "summary": "the only values Discord will accept. A map uses its keys as the labels users see; a list shows each value as its own label. Mutually exclusive with autocomplete."
+                    },
+                    {
+                        "name": "minValue",
+                        "type": "int|float|null",
+                        "default": "null",
+                        "required": false,
+                        "summary": "smallest accepted number"
+                    },
+                    {
+                        "name": "maxValue",
+                        "type": "int|float|null",
+                        "default": "null",
+                        "required": false,
+                        "summary": "largest accepted number"
+                    },
+                    {
+                        "name": "minLength",
+                        "type": "?int",
+                        "default": "null",
+                        "required": false,
+                        "summary": "shortest accepted string"
+                    },
+                    {
+                        "name": "maxLength",
+                        "type": "?int",
+                        "default": "null",
+                        "required": false,
+                        "summary": "longest accepted string"
+                    },
+                    {
+                        "name": "channelTypes",
+                        "type": "array",
+                        "default": "[]",
+                        "required": false,
+                        "summary": "restricts which channels may be picked, for a Channel option"
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            },
+            {
+                "name": "Event",
+                "fqcn": "Tempcord\\Attributes\\Event",
+                "kind": "attribute",
+                "target": "class",
+                "summary": "Declares an invokable class as a listener for a Discord gateway event.",
+                "slug": "reference/attributes/event",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "default": null,
+                        "required": true,
+                        "summary": ""
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            }
+        ],
+        "autocomplete": [
+            {
+                "name": "Autocomplete",
+                "fqcn": "Tempcord\\Interfaces\\Autocomplete",
+                "kind": "interface",
+                "target": null,
+                "summary": "",
+                "slug": "reference/autocomplete/autocomplete",
+                "parameters": [],
+                "cases": [],
+                "methods": [
+                    {
+                        "signature": "handle(CommandInteraction $interaction, mixed $value): mixed",
+                        "summary": ""
+                    }
+                ]
+            },
+            {
+                "name": "ArrayAutocomplete",
+                "fqcn": "Tempcord\\AutoCompletes\\ArrayAutocomplete",
+                "kind": "class",
+                "target": null,
+                "summary": "",
+                "slug": "reference/autocomplete/array-autocomplete",
+                "parameters": [
+                    {
+                        "name": "items",
+                        "type": "array",
+                        "default": null,
+                        "required": true,
+                        "summary": ""
+                    },
+                    {
+                        "name": "isList",
+                        "type": "bool",
+                        "default": "false",
+                        "required": false,
+                        "summary": ""
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            }
+        ],
+        "configuration": [
+            {
+                "name": "TempcordConfig",
+                "fqcn": "Tempcord\\TempcordConfig",
+                "kind": "class",
+                "target": null,
+                "summary": "",
+                "slug": "reference/configuration/tempcord-config",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "type": "string",
+                        "default": null,
+                        "required": true,
+                        "summary": ""
+                    },
+                    {
+                        "name": "intents",
+                        "type": "Bitwise",
+                        "default": null,
+                        "required": true,
+                        "summary": ""
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            }
+        ],
+        "enums": [
+            {
+                "name": "DiscordLocale",
+                "fqcn": "Tempcord\\Enums\\DiscordLocale",
+                "kind": "enum",
+                "target": null,
+                "summary": "The locales Discord accepts for name and description localizations.",
+                "slug": "reference/enums/discord-locale",
+                "parameters": [],
+                "cases": [
+                    {
+                        "name": "INDONESIAN",
+                        "value": "id",
+                        "note": ""
+                    },
+                    {
+                        "name": "DANISH",
+                        "value": "da",
+                        "note": ""
+                    },
+                    {
+                        "name": "GERMAN",
+                        "value": "de",
+                        "note": ""
+                    },
+                    {
+                        "name": "ENGLISH_UK",
+                        "value": "en-GB",
+                        "note": ""
+                    },
+                    {
+                        "name": "ENGLISH_US",
+                        "value": "en-US",
+                        "note": ""
+                    },
+                    {
+                        "name": "SPANISH",
+                        "value": "es-ES",
+                        "note": ""
+                    },
+                    {
+                        "name": "SPANISH_LATAM",
+                        "value": "es-419",
+                        "note": ""
+                    },
+                    {
+                        "name": "FRENCH",
+                        "value": "fr",
+                        "note": ""
+                    },
+                    {
+                        "name": "CROATIAN",
+                        "value": "hr",
+                        "note": ""
+                    },
+                    {
+                        "name": "ITALIAN",
+                        "value": "it",
+                        "note": ""
+                    },
+                    {
+                        "name": "LITHUANIAN",
+                        "value": "lt",
+                        "note": ""
+                    },
+                    {
+                        "name": "HUNGARIAN",
+                        "value": "hu",
+                        "note": ""
+                    },
+                    {
+                        "name": "DUTCH",
+                        "value": "nl",
+                        "note": ""
+                    },
+                    {
+                        "name": "NORWEGIAN",
+                        "value": "no",
+                        "note": ""
+                    },
+                    {
+                        "name": "POLISH",
+                        "value": "pl",
+                        "note": ""
+                    },
+                    {
+                        "name": "PORTUGUESE_BR",
+                        "value": "pt-BR",
+                        "note": ""
+                    },
+                    {
+                        "name": "ROMANIAN",
+                        "value": "ro",
+                        "note": ""
+                    },
+                    {
+                        "name": "FINNISH",
+                        "value": "fi",
+                        "note": ""
+                    },
+                    {
+                        "name": "SWEDISH",
+                        "value": "sv-SE",
+                        "note": ""
+                    },
+                    {
+                        "name": "VIETNAMESE",
+                        "value": "vi",
+                        "note": ""
+                    },
+                    {
+                        "name": "TURKISH",
+                        "value": "tr",
+                        "note": ""
+                    },
+                    {
+                        "name": "CZECH",
+                        "value": "cs",
+                        "note": ""
+                    },
+                    {
+                        "name": "GREEK",
+                        "value": "el",
+                        "note": ""
+                    },
+                    {
+                        "name": "BULGARIAN",
+                        "value": "bg",
+                        "note": ""
+                    },
+                    {
+                        "name": "RUSSIAN",
+                        "value": "ru",
+                        "note": ""
+                    },
+                    {
+                        "name": "UKRAINIAN",
+                        "value": "uk",
+                        "note": ""
+                    },
+                    {
+                        "name": "HINDI",
+                        "value": "hi",
+                        "note": ""
+                    },
+                    {
+                        "name": "THAI",
+                        "value": "th",
+                        "note": ""
+                    },
+                    {
+                        "name": "CHINESE_CHINA",
+                        "value": "zh-CN",
+                        "note": ""
+                    },
+                    {
+                        "name": "JAPANESE",
+                        "value": "ja",
+                        "note": ""
+                    },
+                    {
+                        "name": "CHINESE_TAIWAN",
+                        "value": "zh-TW",
+                        "note": ""
+                    },
+                    {
+                        "name": "KOREAN",
+                        "value": "ko",
+                        "note": ""
+                    },
+                    {
+                        "name": "ARABIC",
+                        "value": "ar",
+                        "note": ""
+                    },
+                    {
+                        "name": "HEBREW",
+                        "value": "he",
+                        "note": ""
+                    }
+                ],
+                "methods": [
+                    {
+                        "signature": "tempestLocale(): string",
+                        "summary": "The Tempest locale this maps to."
+                    }
+                ]
+            }
+        ],
+        "plugins": [
+            {
+                "name": "Plugin",
+                "fqcn": "Tempcord\\Plugins\\Plugin",
+                "kind": "interface",
+                "target": null,
+                "summary": "A package that extends a bot with its own behaviour.",
+                "slug": "reference/plugins/plugin",
+                "parameters": [],
+                "cases": [],
+                "methods": [
+                    {
+                        "signature": "boot(Tempcord $tempcord): void",
+                        "summary": "Called once, after commands and events are bound and before the gateway opens."
+                    }
+                ]
+            }
+        ]
+    }
+}

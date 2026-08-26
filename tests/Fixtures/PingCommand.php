@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Ragnarok\Fenrir\Interaction\CommandInteraction;
+use CyberWolf\Discord\Interaction\CommandInteraction;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 
