@@ -3,7 +3,7 @@
 namespace Tempcord\Runtime;
 
 use Tempest\Log\Logger;
-use CyberWolf\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Definitions\HandlerDefinition;
 use Tempest\Container\Container;
 use Throwable;

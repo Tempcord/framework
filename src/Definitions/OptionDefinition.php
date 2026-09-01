@@ -2,9 +2,8 @@
 
 namespace Tempcord\Definitions;
 
-use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
-use CyberWolf\Discord\Enums\ChannelType;
-use Tempcord\Interfaces\Autocomplete;
+use Tempcord\Discord\Enums\ApplicationCommandOptionType;
+use Tempcord\Discord\Enums\ChannelType;
 use Tempest\Reflection\ParameterReflector;
 
 /**
@@ -24,7 +23,7 @@ final readonly class OptionDefinition
         public string $description,
         public ApplicationCommandOptionType $type,
         public bool $isRequired,
-        public ?Autocomplete $autocomplete,
+        public ?AutocompleteDefinition $autocomplete,
         public ParameterReflector $parameter,
         public array $choices = [],
         public int|float|null $minValue = null,

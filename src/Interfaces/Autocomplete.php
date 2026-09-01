@@ -2,7 +2,7 @@
 
 namespace Tempcord\Interfaces;
 
-use CyberWolf\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\CommandInteraction;
 
 interface Autocomplete
 {

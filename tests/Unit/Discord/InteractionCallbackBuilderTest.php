@@ -4,8 +4,8 @@ namespace Tempcord\Tests\Unit\Discord;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use CyberWolf\Discord\Enums\InteractionCallbackType;
-use CyberWolf\Discord\Parts\ApplicationCommandOptionChoice;
+use Tempcord\Discord\Enums\InteractionCallbackType;
+use Tempcord\Discord\Parts\ApplicationCommandOptionChoice;
 use Tempcord\Discord\InteractionCallbackBuilder;
 
 #[CoversClass(InteractionCallbackBuilder::class)]

@@ -4,7 +4,6 @@ namespace Tempcord\Discoveries;
 
 use Tempcord\Plugins\Plugin;
 use Tempcord\Registries\PluginsRegistry;
-use Tempest\Container\Container;
 use Tempest\Discovery\Discovery;
 use Tempest\Discovery\DiscoveryLocation;
 use Tempest\Discovery\IsDiscovery;
@@ -15,7 +14,6 @@ final class PluginsDiscovery implements Discovery
     use IsDiscovery;
 
     public function __construct(
-        private readonly Container $container,
         private readonly PluginsRegistry $plugins,
     ) {}
 
@@ -33,10 +31,7 @@ final class PluginsDiscovery implements Discovery
     public function apply(): void
     {
         foreach ($this->discoveryItems as $className) {
-            /** @var Plugin $plugin */
-            $plugin = $this->container->get($className);
-
-            $this->plugins->add($plugin);
+            $this->plugins->add($className);
         }
     }
 }

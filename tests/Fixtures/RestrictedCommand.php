@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use CyberWolf\Discord\Enums\Permission;
+use Tempcord\Discord\Enums\Permission;
 use Tempcord\Attributes\Command;
 
 #[Command(

@@ -2,7 +2,7 @@
 
 namespace Tempcord\AutoCompletes;
 
-use CyberWolf\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Interfaces\Autocomplete;
 use function Tempest\Support\str;
 

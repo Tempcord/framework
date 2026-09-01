@@ -3,7 +3,7 @@
 namespace Tempcord\Attributes;
 
 use Attribute;
-use CyberWolf\Discord\Enums\ChannelType;
+use Tempcord\Discord\Enums\ChannelType;
 use Tempcord\Interfaces\Autocomplete;
 
 /**
@@ -19,8 +19,12 @@ final readonly class Option
     /**
      * @param string $description shown beneath the option in Discord's picker
      * @param string|null $name defaults to the parameter's own name
-     * @param Autocomplete|null $autocomplete suggests values as the user types;
-     *        mutually exclusive with choices
+     * @param Autocomplete|class-string<Autocomplete>|null $autocomplete suggests
+     *        values as the user types; mutually exclusive with choices. Given a
+     *        class name it is built by the container, so it may take
+     *        dependencies; given an object it is used as it stands. Suggestions
+     *        that belong to one command are usually better written as a method
+     *        carrying #[Autocomplete].
      * @param array<string, string|int|float>|list<string|int|float> $choices
      *        the only values Discord will accept. A map uses its keys as the
      *        labels users see; a list shows each value as its own label.
@@ -35,7 +39,7 @@ final readonly class Option
     public function __construct(
         public string $description,
         public ?string $name = null,
-        public ?Autocomplete $autocomplete = null,
+        public Autocomplete|string|null $autocomplete = null,
         public array $choices = [],
         public int|float|null $minValue = null,
         public int|float|null $maxValue = null,

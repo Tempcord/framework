@@ -16,8 +16,8 @@ The class is resolved from the container, so a listener may take constructor dep
 Discord only sends events your bot subscribed to. Intents are set in your configuration:
 
 ```php
-use CyberWolf\Discord\Bitwise\Bitwise;
-use CyberWolf\Discord\Enums\Intent;
+use Tempcord\Discord\Bitwise\Bitwise;
+use Tempcord\Discord\Enums\Intent;
 
 return new TempcordConfig(
     token: env('DISCORD_TOKEN'),

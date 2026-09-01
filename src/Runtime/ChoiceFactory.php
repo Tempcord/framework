@@ -2,7 +2,7 @@
 
 namespace Tempcord\Runtime;
 
-use CyberWolf\Discord\Parts\ApplicationCommandOptionChoice;
+use Tempcord\Discord\Parts\ApplicationCommandOptionChoice;
 
 /**
  * Normalises whatever an Autocomplete returned into the choice list Discord

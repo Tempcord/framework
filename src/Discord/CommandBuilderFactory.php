@@ -2,11 +2,11 @@
 
 namespace Tempcord\Discord;
 
-use CyberWolf\Discord\Bitwise\Bitwise;
-use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
-use CyberWolf\Discord\Enums\ApplicationCommandTypes;
-use CyberWolf\Discord\Rest\Helpers\Command\CommandBuilder;
-use CyberWolf\Discord\Rest\Helpers\Command\CommandOptionBuilder;
+use Tempcord\Discord\Bitwise\Bitwise;
+use Tempcord\Discord\Enums\ApplicationCommandOptionType;
+use Tempcord\Discord\Enums\ApplicationCommandTypes;
+use Tempcord\Discord\Rest\Helpers\Command\CommandBuilder;
+use Tempcord\Discord\Rest\Helpers\Command\CommandOptionBuilder;
 use Tempcord\Definitions\CommandDefinition;
 use Tempcord\Definitions\OptionDefinition;
 use Tempcord\Definitions\SubcommandDefinition;

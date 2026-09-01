@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Unit\Runtime;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use CyberWolf\Discord\Parts\ApplicationCommandOptionChoice;
+use Tempcord\Discord\Parts\ApplicationCommandOptionChoice;
 use Tempcord\Runtime\ChoiceFactory;
 use Tempcord\Tests\Unit\TestCase;
 

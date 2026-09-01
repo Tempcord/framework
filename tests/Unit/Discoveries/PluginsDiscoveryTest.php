@@ -30,7 +30,7 @@ final class PluginsDiscoveryTest extends TestCase
 
     private function discovery(PluginsRegistry $plugins): PluginsDiscovery
     {
-        $discovery = new PluginsDiscovery(new GenericContainer(), $plugins);
+        $discovery = new PluginsDiscovery($plugins);
         $discovery->setItems(new DiscoveryItems());
 
         return $discovery;

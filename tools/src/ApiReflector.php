@@ -30,10 +30,20 @@ final readonly class ApiReflector
             \Tempcord\Attributes\Subcommand::class,
             \Tempcord\Attributes\Option::class,
             \Tempcord\Attributes\Event::class,
+            \Tempcord\Attributes\Autocomplete::class,
+            \Tempcord\Attributes\Button::class,
+            \Tempcord\Attributes\SelectMenu::class,
+            \Tempcord\Attributes\ModalSubmit::class,
         ],
         'autocomplete' => [
             \Tempcord\Interfaces\Autocomplete::class,
             \Tempcord\AutoCompletes\ArrayAutocomplete::class,
+        ],
+        'cache' => [
+            \Tempcord\Cache\Cache::class,
+        ],
+        'components' => [
+            \Tempcord\Runtime\CustomId::class,
         ],
         'configuration' => [
             \Tempcord\TempcordConfig::class,

@@ -2,8 +2,9 @@
 
 namespace Tempcord\Registries;
 
-use CyberWolf\Discord\Discord;
+use Tempcord\Discord\Discord;
 use Tempcord\Definitions\EventDefinition;
+use Tempcord\Runtime\EventDispatcher;
 use Tempcord\Runtime\Outcome;
 use Tempest\Container\Container;
 use Tempest\Container\Singleton;
@@ -33,14 +34,18 @@ final class EventsRegistry
     {
         $outcomes = [];
 
+        /*
+         * Resolved here rather than in the constructor: discovery builds this
+         * registry while the container is still being assembled, before the
+         * initializers that provide the logger have themselves been found.
+         */
+        $dispatcher = $this->container->get(EventDispatcher::class);
+
         foreach ($this->events as $name => $events) {
             foreach ($events as $event) {
                 $discord->gateway->events->on(
                     $name,
-                    fn(object $payload) => $event->method->invokeArgs(
-                        $this->container->get($event->listener),
-                        [$payload],
-                    ),
+                    static fn(object $payload) => $dispatcher->dispatch($event, $payload),
                 );
 
                 $outcomes[] = Outcome::success('Added listener for: ' . $name);

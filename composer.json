@@ -28,7 +28,7 @@
     },
     "require": {
         "php": "^8.5",
-        "cyberwolf-studio/discord-php": "^1.0",
+        "tempcord/discord-php": "^1.1",
         "tempest/console": "^3.18",
         "tempest/core": "^3.18",
         "tempest/event-bus": "^3.18",
