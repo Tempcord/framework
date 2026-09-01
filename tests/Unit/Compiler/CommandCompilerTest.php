@@ -8,6 +8,8 @@ use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
 use RuntimeException;
 use Tempcord\Compiler\CommandCompiler;
 use Tempcord\Tests\Unit\TestCase;
+use Tempcord\AutoCompletes\ArrayAutocomplete;
+use Tempcord\Definitions\AutocompleteDefinition;
 use Tempcord\Definitions\CommandDefinition;
 use Tempcord\Definitions\OptionDefinition;
 use Tempcord\Definitions\SubcommandDefinition;
@@ -17,6 +19,11 @@ use Tempcord\Tests\Fixtures\CommandUserSettings;
 use Tempcord\Tests\Fixtures\DescriptionlessCommand;
 use Tempcord\Tests\Fixtures\EnumNamedCommand;
 use Tempcord\Tests\Fixtures\GuildAlphaCommand;
+use Tempcord\Tests\Fixtures\InjectedSearchCommand;
+use Tempcord\Tests\Fixtures\NotAnAutocompleteCommand;
+use Tempcord\Tests\Fixtures\SearchCommand;
+use Tempcord\Tests\Fixtures\SelfCompletingCommand;
+use Tempcord\Tests\Fixtures\TrackAutocomplete;
 use Tempcord\Tests\Fixtures\ModerationCommand;
 use Tempcord\Tests\Fixtures\MusicCommand;
 use Tempcord\Tests\Fixtures\NamedCommand;
@@ -200,5 +207,70 @@ final class CommandCompilerTest extends TestCase
             $definition->options['playlist']->subcommands['play']->options['title'],
             $definition->handlers['music.playlist.play']->options['title'],
         );
+    }
+
+    /**
+     * The three ways to supply suggestions are told apart at compile time, so
+     * the runtime only has to act on what it is given.
+     */
+    public function test_an_autocomplete_written_inline_is_kept_as_an_object(): void
+    {
+        $autocomplete = $this->definition(SearchCommand::class)
+            ->options['query']->autocomplete;
+
+        $this->assertInstanceOf(AutocompleteDefinition::class, $autocomplete);
+        $this->assertInstanceOf(ArrayAutocomplete::class, $autocomplete->instance);
+        $this->assertNull($autocomplete->className);
+        $this->assertNull($autocomplete->method);
+    }
+
+    public function test_an_autocomplete_named_by_class_is_left_for_the_container(): void
+    {
+        $autocomplete = $this->definition(InjectedSearchCommand::class)
+            ->options['track']->autocomplete;
+
+        $this->assertSame(TrackAutocomplete::class, $autocomplete->className);
+        $this->assertNull($autocomplete->instance);
+    }
+
+    public function test_a_completing_method_is_bound_to_the_option_it_names(): void
+    {
+        $options = $this->definition(SelfCompletingCommand::class)->options;
+
+        $this->assertSame('completeTrack', $options['track']->autocomplete->method->getName());
+        $this->assertSame('completeMood', $options['mood']->autocomplete->method->getName());
+    }
+
+    public function test_an_option_nobody_completes_has_no_autocomplete(): void
+    {
+        $this->assertNull(
+            $this->definition(SearchCommand::class)
+                ->options['note']->autocomplete
+        );
+    }
+
+    public function test_a_failing_autocomplete_source_is_named_for_the_log(): void
+    {
+        $this->assertSame(
+            TrackAutocomplete::class,
+            $this->definition(InjectedSearchCommand::class)->options['track']->autocomplete->label(),
+        );
+
+        $this->assertSame(
+            SelfCompletingCommand::class . '::completeTrack()',
+            $this->definition(SelfCompletingCommand::class)->options['track']->autocomplete->label(),
+        );
+    }
+
+    /**
+     * A class that is not an autocomplete at all is caught where it is written,
+     * rather than when someone first types into the option.
+     */
+    public function test_a_class_that_is_not_an_autocomplete_is_refused(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('does not implement');
+
+        $this->definition(NotAnAutocompleteCommand::class);
     }
 }

@@ -10,15 +10,18 @@ use CyberWolf\Discord\Parts\Channel;
 use CyberWolf\Discord\Parts\Role;
 use CyberWolf\Discord\Parts\User;
 use RuntimeException;
+use Tempcord\Attributes\Autocomplete as AutocompleteAttribute;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 use Tempcord\Attributes\Subcommand;
 use Tempcord\Attributes\SubcommandGroup;
+use Tempcord\Definitions\AutocompleteDefinition;
 use Tempcord\Definitions\CommandDefinition;
 use Tempcord\Definitions\HandlerDefinition;
 use Tempcord\Definitions\OptionDefinition;
 use Tempcord\Definitions\SubcommandDefinition;
 use Tempcord\Definitions\SubcommandGroupDefinition;
+use Tempcord\Interfaces\Autocomplete;
 use Tempcord\Localization\LocalizationProvider;
 use Tempcord\Localization\NullLocalizations;
 use Tempest\Reflection\ClassReflector;
@@ -92,7 +95,7 @@ final readonly class CommandCompiler
              * parameters are the command's options.
              */
             $invoke = $this->invokerOf($class);
-            $options = $this->optionsOf($invoke, $key);
+            $options = $this->optionsOf($class, $invoke, $key);
 
             $handlers[$name] = new HandlerDefinition(
                 path: $name,
@@ -181,7 +184,7 @@ final readonly class CommandCompiler
             $subcommands[$name] = new SubcommandDefinition(
                 name: $name,
                 description: $subcommand->description,
-                options: $this->optionsOf($method, $subcommandKey),
+                options: $this->optionsOf($class, $method, $subcommandKey),
                 method: $method,
                 nameLocalizations: $this->translate($subcommandKey, 'name'),
                 descriptionLocalizations: $this->translate($subcommandKey, 'description'),
@@ -205,9 +208,10 @@ final readonly class CommandCompiler
     /**
      * @return array<string, OptionDefinition>
      */
-    private function optionsOf(MethodReflector $method, ?string $key): array
+    private function optionsOf(ClassReflector $class, MethodReflector $method, ?string $key): array
     {
         $options = [];
+        $completers = $this->completersOf($class);
 
         foreach ($method->getParameters() as $parameter) {
             if (!$parameter->hasAttribute(Option::class)) {
@@ -225,7 +229,7 @@ final readonly class CommandCompiler
                 description: $option->description,
                 type: $this->typeOf($parameter),
                 isRequired: !$parameter->isOptional(),
-                autocomplete: $option->autocomplete,
+                autocomplete: $this->autocompleteFor($option, $completers[$name] ?? null),
                 parameter: $parameter,
                 choices: $this->choicesOf($option),
                 minValue: $option->minValue,
@@ -239,6 +243,56 @@ final readonly class CommandCompiler
         }
 
         return $options;
+    }
+
+    /**
+     * Where this option's suggestions come from.
+     *
+     * A method carrying #[Autocomplete] wins over the attribute's own argument:
+     * declaring both is a mistake, and the method is the more specific of the
+     * two, sitting on the command rather than beside the option.
+     */
+    private function autocompleteFor(Option $option, ?MethodReflector $completer): ?AutocompleteDefinition
+    {
+        if ($completer !== null) {
+            return AutocompleteDefinition::fromMethod($completer);
+        }
+
+        if ($option->autocomplete instanceof Autocomplete) {
+            return AutocompleteDefinition::fromInstance($option->autocomplete);
+        }
+
+        if (is_string($option->autocomplete)) {
+            if (!is_subclass_of($option->autocomplete, Autocomplete::class)) {
+                throw new LogicException(
+                    'Autocomplete [' . $option->autocomplete . '] does not implement '
+                    . Autocomplete::class,
+                );
+            }
+
+            return AutocompleteDefinition::fromClass($option->autocomplete);
+        }
+
+        return null;
+    }
+
+    /**
+     * The command's own methods that complete an option, keyed by the option
+     * each one answers for.
+     *
+     * @return array<string, MethodReflector>
+     */
+    private function completersOf(ClassReflector $class): array
+    {
+        $completers = [];
+
+        foreach ($class->getPublicMethods() as $method) {
+            foreach ($method->getAttributes(AutocompleteAttribute::class) as $attribute) {
+                $completers[$this->valueOf($attribute->option)] = $method;
+            }
+        }
+
+        return $completers;
     }
 
     /**

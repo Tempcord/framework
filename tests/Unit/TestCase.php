@@ -4,17 +4,25 @@ namespace Tempcord\Tests\Unit;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use CyberWolf\Discord\Bitwise\Bitwise;
+use Tempcord\Cache\Cache;
+use Tempcord\Cache\CacheSubscriber;
 use Tempcord\Discord\AllCommandExtension;
 use Tempcord\Discord\CommandBuilderFactory;
+use Tempcord\Discord\ComponentExtension;
 use Tempcord\Registries\CommandsRegistry;
+use Tempcord\Registries\ComponentsRegistry;
 use Tempcord\Registries\EventsRegistry;
 use Tempcord\Registries\PluginsRegistry;
 use Tempcord\Runtime\ArgumentResolver;
+use Tempcord\Runtime\AutocompleteResolver;
 use Tempcord\Runtime\AutocompleteResponder;
 use Tempcord\Runtime\ChoiceFactory;
 use Tempcord\Runtime\CommandBinder;
 use Tempcord\Runtime\CommandDispatcher;
 use Tempcord\Runtime\CommandRegistrar;
+use Tempcord\Runtime\ComponentArgumentResolver;
+use Tempcord\Runtime\ComponentBinder;
+use Tempcord\Runtime\ComponentDispatcher;
 use Tempcord\Runtime\OptionValueResolver;
 use Tempcord\Runtime\PluginBooter;
 use Tempcord\Tempcord;
@@ -23,6 +31,7 @@ use Tempcord\Tests\Doubles\FakeDiscord;
 use Tempcord\Tests\Doubles\RecordingHttp;
 use Tempcord\Tests\Doubles\RecordingLogger;
 use Tempest\Container\GenericContainer;
+use Tempest\Log\Logger;
 use Tempcord\Attributes\Command;
 use Tempcord\Compiler\CommandCompiler;
 use Tempcord\Definitions\CommandDefinition;
@@ -37,18 +46,26 @@ abstract class TestCase extends BaseTestCase
     protected function tempcord(
         ?FakeDiscord $discord = null,
         ?CommandsRegistry $commands = null,
+        ?ComponentsRegistry $components = null,
         ?EventsRegistry $events = null,
         ?PluginsRegistry $plugins = null,
         ?RecordingHttp $http = null,
         ?RecordingLogger $logger = null,
+        ?Cache $cache = null,
     ): Tempcord {
         $http ??= new RecordingHttp();
         $discord ??= new FakeDiscord($http);
+        $components ??= new ComponentsRegistry();
+        $logger ??= new RecordingLogger();
+
+        $container = new GenericContainer();
+        $container->singleton(Logger::class, $logger);
 
         return new Tempcord(
             discord: $discord,
             commandsRegistry: $commands ?? new CommandsRegistry(),
-            eventsRegistry: $events ?? new EventsRegistry(new GenericContainer()),
+            componentsRegistry: $components,
+            eventsRegistry: $events ?? new EventsRegistry($container),
             pluginsRegistry: $plugins ?? new PluginsRegistry(),
             registrar: new CommandRegistrar(
                 new CommandBuilderFactory(),
@@ -63,9 +80,24 @@ abstract class TestCase extends BaseTestCase
                     new GenericContainer(),
                     new RecordingLogger(),
                 ),
-                new AutocompleteResponder(new ChoiceFactory()),
+                new AutocompleteResponder(
+                    new ChoiceFactory(),
+                    new AutocompleteResolver($container),
+                    $logger,
+                ),
             ),
-            pluginBooter: new PluginBooter($logger ?? new RecordingLogger()),
+            componentBinder: new ComponentBinder(
+                new ComponentExtension($components),
+                new ComponentDispatcher(
+                    new ComponentArgumentResolver($discord),
+                    new GenericContainer(),
+                    new RecordingLogger(),
+                ),
+            ),
+            pluginBooter: new PluginBooter($logger),
+            cacheSubscriber: $cache === null
+                ? null
+                : new CacheSubscriber($cache, new TempcordConfig('::token::', new Bitwise())),
         );
     }
 

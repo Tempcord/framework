@@ -8,6 +8,7 @@ use Tempcord\Runtime\Outcome;
 use Tempcord\Runtime\OutcomeLevel;
 use Tempcord\Runtime\PluginBooter;
 use Tempcord\Tests\Doubles\RecordingLogger;
+use Tempcord\Tests\Fixtures\CountingPlugin;
 use Tempcord\Tests\Fixtures\RecordingPlugin;
 use Tempcord\Tests\Fixtures\ThrowingPlugin;
 use Tempcord\Tests\Unit\TestCase;
@@ -30,7 +31,7 @@ final class PluginsRegistryTest extends TestCase
     public function test_a_plugin_is_booted_with_the_bot(): void
     {
         $plugins = new PluginsRegistry();
-        $plugins->add(new RecordingPlugin());
+        $plugins->add(RecordingPlugin::class);
 
         $tempcord = $this->tempcord(plugins: $plugins);
         $outcomes = new PluginBooter(new RecordingLogger())->bootAll($plugins->all(), $tempcord);
@@ -46,8 +47,8 @@ final class PluginsRegistryTest extends TestCase
     public function test_the_same_plugin_added_twice_boots_once(): void
     {
         $plugins = new PluginsRegistry();
-        $plugins->add(new RecordingPlugin());
-        $plugins->add(new RecordingPlugin());
+        $plugins->add(RecordingPlugin::class);
+        $plugins->add(RecordingPlugin::class);
 
         new PluginBooter(new RecordingLogger())->bootAll($plugins->all(), $this->tempcord(plugins: $plugins));
 
@@ -62,8 +63,8 @@ final class PluginsRegistryTest extends TestCase
     {
         $logger = new RecordingLogger();
         $plugins = new PluginsRegistry();
-        $plugins->add(new ThrowingPlugin());
-        $plugins->add(new RecordingPlugin());
+        $plugins->add(ThrowingPlugin::class);
+        $plugins->add(RecordingPlugin::class);
 
         $outcomes = new PluginBooter($logger)->bootAll($plugins->all(), $this->tempcord(plugins: $plugins));
 
@@ -90,7 +91,7 @@ final class PluginsRegistryTest extends TestCase
     public function test_plugins_boot_as_part_of_listening(): void
     {
         $plugins = new PluginsRegistry();
-        $plugins->add(new RecordingPlugin());
+        $plugins->add(RecordingPlugin::class);
 
         $tempcord = $this->tempcord(plugins: $plugins);
         $messages = $this->messages($tempcord->listen());
@@ -106,5 +107,28 @@ final class PluginsRegistryTest extends TestCase
     public function test_it_needs_nothing_to_construct(): void
     {
         $this->assertSame(0, new PluginsRegistry()->count());
+    }
+
+    /**
+     * Plugins are resolved when the bot boots, not when they are discovered.
+     * Building one during discovery would drag its dependencies — the Discord
+     * connection above all — into existence before the application has been
+     * configured.
+     */
+    public function test_a_plugin_is_not_constructed_until_it_is_asked_for(): void
+    {
+        CountingPlugin::$constructed = 0;
+
+        $plugins = new PluginsRegistry();
+        $plugins->add(CountingPlugin::class);
+
+        $this->assertSame(0, CountingPlugin::$constructed);
+        $this->assertSame(1, $plugins->count());
+        $this->assertSame([CountingPlugin::class], $plugins->classes());
+        $this->assertSame(0, CountingPlugin::$constructed);
+
+        $plugins->all();
+
+        $this->assertSame(1, CountingPlugin::$constructed);
     }
 }

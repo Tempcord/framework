@@ -23,6 +23,14 @@
         {
             "title": "Plugins",
             "slug": "guides/06-plugins"
+        },
+        {
+            "title": "Components",
+            "slug": "guides/07-components"
+        },
+        {
+            "title": "Cache",
+            "slug": "guides/08-cache"
         }
     ],
     "reference": {
@@ -171,10 +179,10 @@
                     },
                     {
                         "name": "autocomplete",
-                        "type": "?Autocomplete",
+                        "type": "Autocomplete|string|null",
                         "default": "null",
                         "required": false,
-                        "summary": "suggests values as the user types; mutually exclusive with choices"
+                        "summary": "suggests values as the user types; mutually exclusive with choices. Given a class name it is built by the container, so it may take dependencies; given an object it is used as it stands. Suggestions that belong to one command are usually better written as a method carrying #[Autocomplete]."
                     },
                     {
                         "name": "choices",
@@ -240,6 +248,82 @@
                 ],
                 "cases": [],
                 "methods": []
+            },
+            {
+                "name": "Autocomplete",
+                "fqcn": "Tempcord\\Attributes\\Autocomplete",
+                "kind": "attribute",
+                "target": "method",
+                "summary": "Declares a method as the source of suggestions for one of the command's options.",
+                "slug": "reference/attributes/autocomplete",
+                "parameters": [
+                    {
+                        "name": "option",
+                        "type": "BackedEnum|string",
+                        "default": null,
+                        "required": true,
+                        "summary": "the name of the option this completes, as Discord knows it — the parameter's name, or whatever #[Option(name: ...)] renamed it to"
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            },
+            {
+                "name": "Button",
+                "fqcn": "Tempcord\\Attributes\\Button",
+                "kind": "attribute",
+                "target": "class, method",
+                "summary": "Declares a class or method as the handler for a button press.",
+                "slug": "reference/attributes/button",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "BackedEnum|string|null",
+                        "default": "null",
+                        "required": false,
+                        "summary": "the button's custom id. It may carry {placeholders}, as in \"tournament.accept.{team}\", which are matched out of the incoming id and passed to same-named parameters. Defaults to the class name with a Button prefix or suffix stripped and the rest snake_cased."
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            },
+            {
+                "name": "SelectMenu",
+                "fqcn": "Tempcord\\Attributes\\SelectMenu",
+                "kind": "attribute",
+                "target": "class, method",
+                "summary": "Declares a class or method as the handler for a select menu choice.",
+                "slug": "reference/attributes/select-menu",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "BackedEnum|string|null",
+                        "default": "null",
+                        "required": false,
+                        "summary": "the menu's custom id, which may carry {placeholders}. Defaults to the class name with a SelectMenu prefix or suffix stripped and the rest snake_cased."
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            },
+            {
+                "name": "ModalSubmit",
+                "fqcn": "Tempcord\\Attributes\\ModalSubmit",
+                "kind": "attribute",
+                "target": "class, method",
+                "summary": "Declares a class or method as the handler for a submitted modal.",
+                "slug": "reference/attributes/modal-submit",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "BackedEnum|string|null",
+                        "default": "null",
+                        "required": false,
+                        "summary": "the modal's custom id, which may carry {placeholders}. Defaults to the class name with a ModalSubmit or Modal prefix or suffix stripped and the rest snake_cased."
+                    }
+                ],
+                "cases": [],
+                "methods": []
             }
         ],
         "autocomplete": [
@@ -286,6 +370,54 @@
                 "methods": []
             }
         ],
+        "cache": [
+            {
+                "name": "Cache",
+                "fqcn": "Tempcord\\Cache\\Cache",
+                "kind": "class",
+                "target": null,
+                "summary": "What the gateway has told the bot about the guilds it is in.",
+                "slug": "reference/cache/cache",
+                "parameters": [],
+                "cases": [],
+                "methods": []
+            }
+        ],
+        "components": [
+            {
+                "name": "CustomId",
+                "fqcn": "Tempcord\\Runtime\\CustomId",
+                "kind": "class",
+                "target": null,
+                "summary": "A component's custom id, which may carry {placeholders}.",
+                "slug": "reference/components/custom-id",
+                "parameters": [
+                    {
+                        "name": "pattern",
+                        "type": "string",
+                        "default": null,
+                        "required": true,
+                        "summary": ""
+                    },
+                    {
+                        "name": "parameters",
+                        "type": "array",
+                        "default": null,
+                        "required": true,
+                        "summary": "the placeholder names, in the order they appear"
+                    },
+                    {
+                        "name": "regex",
+                        "type": "?string",
+                        "default": null,
+                        "required": true,
+                        "summary": "null when the pattern has no placeholders and a plain string comparison is enough"
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            }
+        ],
         "configuration": [
             {
                 "name": "TempcordConfig",
@@ -308,6 +440,20 @@
                         "default": null,
                         "required": true,
                         "summary": ""
+                    },
+                    {
+                        "name": "cache",
+                        "type": "bool",
+                        "default": "true",
+                        "required": false,
+                        "summary": "whether to keep the guilds, channels, roles, members and voice states the gateway reports, so a handler can read them without an HTTP round trip. Only ever holds what the configured intents already deliver."
+                    },
+                    {
+                        "name": "chunkMembers",
+                        "type": "bool",
+                        "default": "true",
+                        "required": false,
+                        "summary": "whether to ask the gateway for the members a large guild leaves out of GUILD_CREATE. Without it the member cache is only ever a slice of a busy server. Needs the GUILD_MEMBERS intent, and is ignored without it."
                     }
                 ],
                 "cases": [],

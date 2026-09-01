@@ -8,6 +8,10 @@ use CyberWolf\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
 use Tempcord\Definitions\HandlerDefinition;
 use Tempcord\Definitions\OptionDefinition;
 use Tempcord\Discord\InteractionCallbackBuilder;
+use Tempest\Log\Logger;
+use Throwable;
+
+use function React\Async\async;
 
 /**
  * Answers the autocomplete interactions Discord sends while a user is typing.
@@ -20,6 +24,8 @@ final readonly class AutocompleteResponder
 {
     public function __construct(
         private ChoiceFactory $choices,
+        private AutocompleteResolver $resolver,
+        private Logger $logger,
     ) {}
 
     public function respond(HandlerDefinition $handler, CommandInteraction $interaction): void
@@ -32,18 +38,33 @@ final readonly class AutocompleteResponder
         }
 
         [$option, $structure] = $focused;
+        $autocomplete = $option->autocomplete;
 
-        if ($option->autocomplete === null) {
+        if ($autocomplete === null) {
             return;
         }
 
-        $interaction->createInteractionResponse(
-            InteractionCallbackBuilder::new()
-                ->setChoices($this->choices->from(
-                    $option->autocomplete->handle($interaction, $structure->value),
-                ))
-                ->setType(InteractionCallbackType::APPLICATION_COMMAND_AUTOCOMPLETE_RESULT),
-        );
+        /*
+         * As with a command: suggestions may come from a database or an API and
+         * so may await, and one that throws must not travel up into the gateway
+         * and take the connection with it. Discord simply shows no suggestions.
+         */
+        async(function () use ($autocomplete, $interaction, $structure): void {
+            try {
+                $interaction->createInteractionResponse(
+                    InteractionCallbackBuilder::new()
+                        ->setChoices($this->choices->from(
+                            $this->resolver->suggest($autocomplete, $interaction, $structure->value),
+                        ))
+                        ->setType(InteractionCallbackType::APPLICATION_COMMAND_AUTOCOMPLETE_RESULT),
+                );
+            } catch (Throwable $throwable) {
+                $this->logger->error(
+                    'Autocomplete ' . $autocomplete->label() . ' failed: ' . $throwable->getMessage(),
+                    ['exception' => $throwable],
+                );
+            }
+        })();
     }
 
     /**

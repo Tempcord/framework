@@ -11,16 +11,22 @@ use Tempcord\Registries\EventsRegistry;
 use Tempcord\Runtime\Outcome;
 use Tempcord\Tests\Doubles\FakeDiscord;
 use Tempcord\Tests\Doubles\RecordingHttp;
+use Tempcord\Tests\Doubles\RecordingLogger;
 use Tempcord\Tests\Fixtures\ReadyListener;
+use Tempcord\Tests\Fixtures\ThrowingListener;
 use Tempest\Container\GenericContainer;
+use Tempest\Log\Logger;
 use Tempest\Reflection\ClassReflector;
 
 #[CoversClass(EventsRegistry::class)]
 final class EventsRegistryTest extends BaseTestCase
 {
+    private RecordingLogger $logger;
+
     protected function setUp(): void
     {
         ReadyListener::$received = [];
+        $this->logger = new RecordingLogger();
     }
 
     private function definition(string $class): EventDefinition
@@ -35,7 +41,10 @@ final class EventsRegistryTest extends BaseTestCase
 
     private function registry(): EventsRegistry
     {
-        return new EventsRegistry(new GenericContainer());
+        $container = new GenericContainer();
+        $container->singleton(Logger::class, $this->logger);
+
+        return new EventsRegistry($container);
     }
 
     public function test_it_reports_nothing_when_no_listeners_were_discovered(): void
@@ -75,5 +84,22 @@ final class EventsRegistryTest extends BaseTestCase
         $discord->gateway->events->emit('READY', [new \stdClass()]);
 
         $this->assertCount(2, ReadyListener::$received);
+    }
+
+    /**
+     * A listener that throws must not travel up into the gateway's payload
+     * handler, or one bad handler takes the whole connection down.
+     */
+    public function test_a_listener_that_throws_is_logged_rather_than_escaping(): void
+    {
+        $registry = $this->registry();
+        $registry->add($this->definition(ThrowingListener::class));
+
+        $discord = new FakeDiscord(new RecordingHttp());
+        $registry->listen($discord);
+
+        $discord->gateway->events->emit('READY', [new \stdClass()]);
+
+        $this->assertSame(['Listener for READY failed: nope'], $this->logger->messages);
     }
 }

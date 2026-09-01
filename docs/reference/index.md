@@ -9,11 +9,23 @@
 - [Subcommand](attributes/subcommand.md) — Declares a public method as a subcommand of the command its class declares.
 - [Option](attributes/option.md) — Declares a method parameter as a user-supplied command option.
 - [Event](attributes/event.md) — Declares an invokable class as a listener for a Discord gateway event.
+- [Autocomplete](attributes/autocomplete.md) — Declares a method as the source of suggestions for one of the command's options.
+- [Button](attributes/button.md) — Declares a class or method as the handler for a button press.
+- [SelectMenu](attributes/select-menu.md) — Declares a class or method as the handler for a select menu choice.
+- [ModalSubmit](attributes/modal-submit.md) — Declares a class or method as the handler for a submitted modal.
 
 ## Autocomplete
 
 - [Autocomplete](autocomplete/autocomplete.md)
 - [ArrayAutocomplete](autocomplete/array-autocomplete.md)
+
+## Cache
+
+- [Cache](cache/cache.md) — What the gateway has told the bot about the guilds it is in.
+
+## Components
+
+- [CustomId](components/custom-id.md) — A component's custom id, which may carry {placeholders}.
 
 ## Configuration
 

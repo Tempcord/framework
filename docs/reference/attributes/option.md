@@ -16,7 +16,7 @@ use Tempcord\Attributes\Option;
 | --- | --- | --- | --- |
 | `description` | `string` | *required* | shown beneath the option in Discord's picker |
 | `name` | `?string` | `null` | defaults to the parameter's own name |
-| `autocomplete` | `?Autocomplete` | `null` | suggests values as the user types; mutually exclusive with choices |
+| `autocomplete` | `Autocomplete\|string\|null` | `null` | suggests values as the user types; mutually exclusive with choices. Given a class name it is built by the container, so it may take dependencies; given an object it is used as it stands. Suggestions that belong to one command are usually better written as a method carrying #[Autocomplete]. |
 | `choices` | `array` | `[]` | the only values Discord will accept. A map uses its keys as the labels users see; a list shows each value as its own label. Mutually exclusive with autocomplete. |
 | `minValue` | `int\|float\|null` | `null` | smallest accepted number |
 | `maxValue` | `int\|float\|null` | `null` | largest accepted number |
