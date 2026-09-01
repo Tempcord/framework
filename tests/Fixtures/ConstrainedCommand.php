@@ -2,8 +2,8 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use CyberWolf\Discord\Enums\ChannelType;
-use CyberWolf\Discord\Parts\Channel;
+use Tempcord\Discord\Enums\ChannelType;
+use Tempcord\Discord\Parts\Channel;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 

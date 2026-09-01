@@ -9,7 +9,7 @@ An invokable class carrying `#[Button]` handles one button. With no id given, th
 name carries it — `ReportButton` answers `report`.
 
 ```php
-use CyberWolf\Discord\Interaction\ButtonInteraction;
+use Tempcord\Discord\Interaction\ButtonInteraction;
 use Tempcord\Attributes\Button;
 
 #[Button]

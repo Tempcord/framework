@@ -4,11 +4,11 @@ namespace Tempcord\Compiler;
 
 use BackedEnum;
 use LogicException;
-use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
-use CyberWolf\Discord\Enums\ApplicationCommandTypes;
-use CyberWolf\Discord\Parts\Channel;
-use CyberWolf\Discord\Parts\Role;
-use CyberWolf\Discord\Parts\User;
+use Tempcord\Discord\Enums\ApplicationCommandOptionType;
+use Tempcord\Discord\Enums\ApplicationCommandTypes;
+use Tempcord\Discord\Parts\Channel;
+use Tempcord\Discord\Parts\Role;
+use Tempcord\Discord\Parts\User;
 use RuntimeException;
 use Tempcord\Attributes\Autocomplete as AutocompleteAttribute;
 use Tempcord\Attributes\Command;

@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use CyberWolf\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 

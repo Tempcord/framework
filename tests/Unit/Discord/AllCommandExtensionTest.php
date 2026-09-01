@@ -4,10 +4,10 @@ namespace Tempcord\Tests\Unit\Discord;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
-use CyberWolf\Discord\Gateway\Events\InteractionCreate;
-use CyberWolf\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
-use CyberWolf\Discord\Parts\InteractionData;
+use Tempcord\Discord\Enums\ApplicationCommandOptionType;
+use Tempcord\Discord\Gateway\Events\InteractionCreate;
+use Tempcord\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
+use Tempcord\Discord\Parts\InteractionData;
 use Tempcord\Discord\AllCommandExtension;
 use ReflectionMethod;
 

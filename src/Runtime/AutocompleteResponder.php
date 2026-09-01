@@ -2,9 +2,9 @@
 
 namespace Tempcord\Runtime;
 
-use CyberWolf\Discord\Enums\InteractionCallbackType;
-use CyberWolf\Discord\Interaction\CommandInteraction;
-use CyberWolf\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
+use Tempcord\Discord\Enums\InteractionCallbackType;
+use Tempcord\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
 use Tempcord\Definitions\HandlerDefinition;
 use Tempcord\Definitions\OptionDefinition;
 use Tempcord\Discord\InteractionCallbackBuilder;

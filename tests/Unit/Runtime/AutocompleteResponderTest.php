@@ -3,13 +3,13 @@
 namespace Tempcord\Tests\Unit\Runtime;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
-use CyberWolf\Discord\Enums\InteractionCallbackType;
-use CyberWolf\Discord\Gateway\Events\InteractionCreate;
-use CyberWolf\Discord\Interaction\CommandInteraction;
-use CyberWolf\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
-use CyberWolf\Discord\Parts\ApplicationCommandOptionChoice;
-use CyberWolf\Discord\Parts\InteractionData;
+use Tempcord\Discord\Enums\ApplicationCommandOptionType;
+use Tempcord\Discord\Enums\InteractionCallbackType;
+use Tempcord\Discord\Gateway\Events\InteractionCreate;
+use Tempcord\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
+use Tempcord\Discord\Parts\ApplicationCommandOptionChoice;
+use Tempcord\Discord\Parts\InteractionData;
 use Tempcord\Definitions\HandlerDefinition;
 use Tempcord\Runtime\AutocompleteResolver;
 use Tempcord\Runtime\AutocompleteResponder;

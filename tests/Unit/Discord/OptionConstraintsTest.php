@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Unit\Discord;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use CyberWolf\Discord\Enums\ChannelType;
+use Tempcord\Discord\Enums\ChannelType;
 use Tempcord\Discord\CommandBuilderFactory;
 use Tempcord\Tests\Fixtures\ConstrainedCommand;
 use Tempcord\Tests\Fixtures\PingCommand;

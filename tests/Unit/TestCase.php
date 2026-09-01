@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Unit;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use CyberWolf\Discord\Bitwise\Bitwise;
+use Tempcord\Discord\Bitwise\Bitwise;
 use Tempcord\Cache\Cache;
 use Tempcord\Cache\CacheSubscriber;
 use Tempcord\Discord\AllCommandExtension;

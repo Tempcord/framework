@@ -2,8 +2,8 @@
 
 namespace Tempcord\Tests\Unit\Runtime;
 
-use CyberWolf\Discord\Constants\Events;
-use CyberWolf\Discord\Gateway\Events\InteractionCreate;
+use Tempcord\Discord\Constants\Events;
+use Tempcord\Discord\Gateway\Events\InteractionCreate;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Tempcord\Compiler\ComponentCompiler;

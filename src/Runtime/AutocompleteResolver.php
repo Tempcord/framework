@@ -2,7 +2,7 @@
 
 namespace Tempcord\Runtime;
 
-use CyberWolf\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Definitions\AutocompleteDefinition;
 use Tempest\Container\Container;
 use Tempest\Reflection\ParameterReflector;

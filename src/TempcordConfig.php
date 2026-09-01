@@ -2,7 +2,7 @@
 
 namespace Tempcord;
 
-use CyberWolf\Discord\Bitwise\Bitwise;
+use Tempcord\Discord\Bitwise\Bitwise;
 
 final readonly class TempcordConfig
 {

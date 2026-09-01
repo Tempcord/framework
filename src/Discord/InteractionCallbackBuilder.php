@@ -4,7 +4,7 @@ namespace Tempcord\Discord;
 
 use Discord\Http\Multipart\MultipartBody;
 
-final class InteractionCallbackBuilder extends \CyberWolf\Discord\Interaction\Helpers\InteractionCallbackBuilder
+final class InteractionCallbackBuilder extends \Tempcord\Discord\Interaction\Helpers\InteractionCallbackBuilder
 {
     public array $choices = [];
 

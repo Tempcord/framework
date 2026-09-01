@@ -2,28 +2,28 @@
 
 namespace Tempcord\Cache;
 
-use CyberWolf\Discord\Constants\Events;
-use CyberWolf\Discord\Discord;
-use CyberWolf\Discord\Gateway\Events\ChannelCreate;
-use CyberWolf\Discord\Gateway\Events\ChannelDelete;
-use CyberWolf\Discord\Gateway\Events\ChannelUpdate;
-use CyberWolf\Discord\Gateway\Events\GuildCreate;
-use CyberWolf\Discord\Gateway\Events\GuildDelete;
-use CyberWolf\Discord\Gateway\Events\GuildMemberAdd;
-use CyberWolf\Discord\Gateway\Events\GuildMemberRemove;
-use CyberWolf\Discord\Gateway\Events\GuildMemberUpdate;
-use CyberWolf\Discord\Gateway\Events\GuildMembersChunk;
-use CyberWolf\Discord\Gateway\Events\GuildRoleCreate;
-use CyberWolf\Discord\Gateway\Events\GuildRoleDelete;
-use CyberWolf\Discord\Gateway\Events\GuildRoleUpdate;
-use CyberWolf\Discord\Gateway\Events\GuildUpdate;
-use CyberWolf\Discord\Gateway\Events\ThreadCreate;
-use CyberWolf\Discord\Gateway\Events\ThreadDelete;
-use CyberWolf\Discord\Gateway\Events\ThreadUpdate;
-use CyberWolf\Discord\Gateway\Events\VoiceStateUpdate;
-use CyberWolf\Discord\Gateway\Helpers\RequestGuildMembersBuilder;
-use CyberWolf\Discord\Enums\Intent;
-use CyberWolf\Discord\Parts\GuildMember;
+use Tempcord\Discord\Constants\Events;
+use Tempcord\Discord\Discord;
+use Tempcord\Discord\Gateway\Events\ChannelCreate;
+use Tempcord\Discord\Gateway\Events\ChannelDelete;
+use Tempcord\Discord\Gateway\Events\ChannelUpdate;
+use Tempcord\Discord\Gateway\Events\GuildCreate;
+use Tempcord\Discord\Gateway\Events\GuildDelete;
+use Tempcord\Discord\Gateway\Events\GuildMemberAdd;
+use Tempcord\Discord\Gateway\Events\GuildMemberRemove;
+use Tempcord\Discord\Gateway\Events\GuildMemberUpdate;
+use Tempcord\Discord\Gateway\Events\GuildMembersChunk;
+use Tempcord\Discord\Gateway\Events\GuildRoleCreate;
+use Tempcord\Discord\Gateway\Events\GuildRoleDelete;
+use Tempcord\Discord\Gateway\Events\GuildRoleUpdate;
+use Tempcord\Discord\Gateway\Events\GuildUpdate;
+use Tempcord\Discord\Gateway\Events\ThreadCreate;
+use Tempcord\Discord\Gateway\Events\ThreadDelete;
+use Tempcord\Discord\Gateway\Events\ThreadUpdate;
+use Tempcord\Discord\Gateway\Events\VoiceStateUpdate;
+use Tempcord\Discord\Gateway\Helpers\RequestGuildMembersBuilder;
+use Tempcord\Discord\Enums\Intent;
+use Tempcord\Discord\Parts\GuildMember;
 use Tempcord\TempcordConfig;
 
 /**

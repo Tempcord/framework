@@ -3,12 +3,12 @@
 namespace Tempcord\Tests\Doubles;
 
 use Psr\Log\NullLogger;
-use CyberWolf\Discord\DataMapper;
-use CyberWolf\Discord\Discord;
-use CyberWolf\Discord\EventHandler;
-use CyberWolf\Discord\Gateway\Connection;
-use CyberWolf\Discord\Gateway\Helpers\RequestGuildMembersBuilder;
-use CyberWolf\Discord\Rest\Rest;
+use Tempcord\Discord\DataMapper;
+use Tempcord\Discord\Discord;
+use Tempcord\Discord\EventHandler;
+use Tempcord\Discord\Gateway\Connection;
+use Tempcord\Discord\Gateway\Helpers\RequestGuildMembersBuilder;
+use Tempcord\Discord\Rest\Rest;
 use ReflectionClass;
 
 /**

@@ -2,13 +2,13 @@
 
 namespace Tempcord\Tests\Doubles;
 
-use CyberWolf\Discord\Enums\ChannelType;
-use CyberWolf\Discord\Parts\Channel;
-use CyberWolf\Discord\Parts\Guild;
-use CyberWolf\Discord\Parts\GuildMember;
-use CyberWolf\Discord\Parts\Role;
-use CyberWolf\Discord\Parts\User;
-use CyberWolf\Discord\Parts\VoiceState;
+use Tempcord\Discord\Enums\ChannelType;
+use Tempcord\Discord\Parts\Channel;
+use Tempcord\Discord\Parts\Guild;
+use Tempcord\Discord\Parts\GuildMember;
+use Tempcord\Discord\Parts\Role;
+use Tempcord\Discord\Parts\User;
+use Tempcord\Discord\Parts\VoiceState;
 
 /**
  * The Discord objects the cache stores, built with only the fields under test.

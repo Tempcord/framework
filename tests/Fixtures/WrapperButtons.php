@@ -2,10 +2,10 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use CyberWolf\Discord\Gateway\Events\InteractionCreate;
-use CyberWolf\Discord\Interaction\ButtonInteraction;
-use CyberWolf\Discord\Interaction\ComponentInteraction;
-use CyberWolf\Discord\Interaction\ModalSubmitInteraction;
+use Tempcord\Discord\Gateway\Events\InteractionCreate;
+use Tempcord\Discord\Interaction\ButtonInteraction;
+use Tempcord\Discord\Interaction\ComponentInteraction;
+use Tempcord\Discord\Interaction\ModalSubmitInteraction;
 use Tempcord\Attributes\Button;
 use Tempcord\Attributes\ModalSubmit;
 

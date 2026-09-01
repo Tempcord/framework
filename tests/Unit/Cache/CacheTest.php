@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Unit\Cache;
 
-use CyberWolf\Discord\Parts\GuildMember;
+use Tempcord\Discord\Parts\GuildMember;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Tempcord\Cache\Cache;

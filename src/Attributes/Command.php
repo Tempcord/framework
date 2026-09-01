@@ -4,8 +4,8 @@ namespace Tempcord\Attributes;
 
 use Attribute;
 use BackedEnum;
-use CyberWolf\Discord\Enums\ApplicationCommandTypes;
-use CyberWolf\Discord\Enums\Permission;
+use Tempcord\Discord\Enums\ApplicationCommandTypes;
+use Tempcord\Discord\Enums\Permission;
 
 /**
  * Declares a class as a Discord application command.

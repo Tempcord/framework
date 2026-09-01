@@ -2,7 +2,7 @@
 
 namespace Tempcord\Runtime;
 
-use CyberWolf\Discord\Gateway\Events\InteractionCreate;
+use Tempcord\Discord\Gateway\Events\InteractionCreate;
 use Tempcord\Definitions\ComponentDefinition;
 use Tempest\Container\Container;
 use Tempest\Log\Logger;

@@ -10,7 +10,7 @@ The lightest way: a method carrying `#[Autocomplete]`, naming the option it comp
 extra class, and the command's own dependencies are already to hand.
 
 ```php
-use CyberWolf\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Attributes\Autocomplete;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
@@ -66,7 +66,7 @@ neither.
 never change.
 
 ```php
-use CyberWolf\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 use Tempcord\AutoCompletes\ArrayAutocomplete;
@@ -91,7 +91,7 @@ When the same suggestions are wanted by more than one command, name a class impl
 `Autocomplete`. It is built by the container, so it may take whatever dependencies it needs.
 
 ```php
-use CyberWolf\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Interfaces\Autocomplete;
 
 /**
@@ -116,7 +116,7 @@ final readonly class TrackAutocomplete implements Autocomplete
 Point the option at it by name:
 
 ```php
-use CyberWolf\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 

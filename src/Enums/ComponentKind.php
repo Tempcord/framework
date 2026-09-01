@@ -2,9 +2,9 @@
 
 namespace Tempcord\Enums;
 
-use CyberWolf\Discord\Enums\InteractionType;
-use CyberWolf\Discord\Enums\MessageComponentType;
-use CyberWolf\Discord\Gateway\Events\InteractionCreate;
+use Tempcord\Discord\Enums\InteractionType;
+use Tempcord\Discord\Enums\MessageComponentType;
+use Tempcord\Discord\Gateway\Events\InteractionCreate;
 
 /**
  * The kind of component interaction a handler answers.

@@ -3,9 +3,9 @@
 namespace Tempcord\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use CyberWolf\Discord\Bitwise\Bitwise;
-use CyberWolf\Discord\Constants\Events;
-use CyberWolf\Discord\Gateway\Events\Ready;
+use Tempcord\Discord\Bitwise\Bitwise;
+use Tempcord\Discord\Constants\Events;
+use Tempcord\Discord\Gateway\Events\Ready;
 use Tempcord\Cache\Cache;
 use Tempcord\Discord\AllCommandExtension;
 use Tempcord\Discord\CommandBuilderFactory;
@@ -131,7 +131,7 @@ final class TempcordTest extends TestCase
             $messages[0] ?? null,
         );
 
-        $guild = new \CyberWolf\Discord\Gateway\Events\GuildCreate();
+        $guild = new \Tempcord\Discord\Gateway\Events\GuildCreate();
         $guild->id = 'g1';
         $guild->name = 'Guild';
         $this->discord->gateway->events->emit(Events::GUILD_CREATE, [$guild]);

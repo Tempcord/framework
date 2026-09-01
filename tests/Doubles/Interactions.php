@@ -2,10 +2,10 @@
 
 namespace Tempcord\Tests\Doubles;
 
-use CyberWolf\Discord\Enums\InteractionType;
-use CyberWolf\Discord\Enums\MessageComponentType;
-use CyberWolf\Discord\Gateway\Events\InteractionCreate;
-use CyberWolf\Discord\Parts\InteractionData;
+use Tempcord\Discord\Enums\InteractionType;
+use Tempcord\Discord\Enums\MessageComponentType;
+use Tempcord\Discord\Gateway\Events\InteractionCreate;
+use Tempcord\Discord\Parts\InteractionData;
 
 /**
  * The interaction payloads Discord sends for components, built by hand so tests

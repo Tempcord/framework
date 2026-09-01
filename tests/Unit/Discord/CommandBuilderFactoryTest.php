@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Unit\Discord;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
+use Tempcord\Discord\Enums\ApplicationCommandOptionType;
 use Tempcord\Discord\CommandBuilderFactory;
 use Tempcord\Tests\Fixtures\BareCommand;
 use Tempcord\Tests\Fixtures\ModerationCommand;

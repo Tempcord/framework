@@ -10,7 +10,7 @@ Ask the container for the cache and read from it:
 
 ```php
 use Tempcord\Cache\Cache;
-use CyberWolf\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Attributes\Command;
 
 #[Command(description: 'Is this member blocked?')]

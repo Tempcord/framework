@@ -29,9 +29,9 @@ The Discord option type is read from the parameter's PHP type:
 | `int` | INTEGER |
 | `float` | NUMBER |
 | `bool` | BOOLEAN |
-| `CyberWolf\Discord\Parts\User` | USER |
-| `CyberWolf\Discord\Parts\Channel` | CHANNEL |
-| `CyberWolf\Discord\Parts\Role` | ROLE |
+| `Tempcord\Discord\Parts\User` | USER |
+| `Tempcord\Discord\Parts\Channel` | CHANNEL |
+| `Tempcord\Discord\Parts\Role` | ROLE |
 
 A parameter typed `User`, `Channel` or `Role` is fetched from Discord before your handler
 runs, so you receive the entity rather than an id.

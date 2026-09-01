@@ -2,7 +2,7 @@
 
 namespace Tempcord\Registries;
 
-use CyberWolf\Discord\Discord;
+use Tempcord\Discord\Discord;
 use Tempcord\Definitions\EventDefinition;
 use Tempcord\Runtime\EventDispatcher;
 use Tempcord\Runtime\Outcome;

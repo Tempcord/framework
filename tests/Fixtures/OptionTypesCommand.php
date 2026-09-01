@@ -2,9 +2,9 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use CyberWolf\Discord\Parts\Channel;
-use CyberWolf\Discord\Parts\Role;
-use CyberWolf\Discord\Parts\User;
+use Tempcord\Discord\Parts\Channel;
+use Tempcord\Discord\Parts\Role;
+use Tempcord\Discord\Parts\User;
 use Tempcord\Attributes\Command;
 use Tempcord\Attributes\Option;
 use Tempcord\Attributes\Subcommand;

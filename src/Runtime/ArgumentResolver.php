@@ -3,7 +3,7 @@
 namespace Tempcord\Runtime;
 
 use InvalidArgumentException;
-use CyberWolf\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Definitions\HandlerDefinition;
 use Throwable;
 

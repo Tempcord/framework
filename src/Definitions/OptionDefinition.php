@@ -2,8 +2,8 @@
 
 namespace Tempcord\Definitions;
 
-use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
-use CyberWolf\Discord\Enums\ChannelType;
+use Tempcord\Discord\Enums\ApplicationCommandOptionType;
+use Tempcord\Discord\Enums\ChannelType;
 use Tempest\Reflection\ParameterReflector;
 
 /**

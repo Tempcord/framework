@@ -2,9 +2,9 @@
 
 namespace Tempcord;
 
-use CyberWolf\Discord\Constants\Events;
-use CyberWolf\Discord\Discord;
-use CyberWolf\Discord\Gateway\Events\Ready;
+use Tempcord\Discord\Constants\Events;
+use Tempcord\Discord\Discord;
+use Tempcord\Discord\Gateway\Events\Ready;
 use Tempcord\Cache\CacheSubscriber;
 use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\ComponentsRegistry;

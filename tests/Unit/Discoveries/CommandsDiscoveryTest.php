@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Unit\Discoveries;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use CyberWolf\Discord\Bitwise\Bitwise;
+use Tempcord\Discord\Bitwise\Bitwise;
 use ReflectionProperty;
 use Tempcord\Compiler\CommandCompiler;
 use Tempcord\Definitions\CommandDefinition;

@@ -2,11 +2,11 @@
 
 namespace Tempcord\Discord;
 
-use CyberWolf\Discord\Constants\Events;
-use CyberWolf\Discord\Discord;
-use CyberWolf\Discord\Extension\Extension;
-use CyberWolf\Discord\FilteredEventEmitter;
-use CyberWolf\Discord\Gateway\Events\InteractionCreate;
+use Tempcord\Discord\Constants\Events;
+use Tempcord\Discord\Discord;
+use Tempcord\Discord\Extension\Extension;
+use Tempcord\Discord\FilteredEventEmitter;
+use Tempcord\Discord\Gateway\Events\InteractionCreate;
 use Evenement\EventEmitter;
 use Tempcord\Definitions\ComponentDefinition;
 use Tempcord\Enums\ComponentKind;

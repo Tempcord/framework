@@ -4,7 +4,7 @@ namespace Tempcord\Tests\Unit\Compiler;
 
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
-use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
+use Tempcord\Discord\Enums\ApplicationCommandOptionType;
 use RuntimeException;
 use Tempcord\Compiler\CommandCompiler;
 use Tempcord\Tests\Unit\TestCase;

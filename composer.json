@@ -28,7 +28,7 @@
     },
     "require": {
         "php": "^8.5",
-        "cyberwolf-studio/discord-php": "dev-fix/single-object-mapping-and-member-chunks",
+        "tempcord/discord-php": "^1.1",
         "tempest/console": "^3.18",
         "tempest/core": "^3.18",
         "tempest/event-bus": "^3.18",
@@ -63,11 +63,5 @@
     "config": {
         "sort-packages": true,
         "optimize-autoloader": true
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/CyberWolf-Studio/discord-php"
-        }
-    ]
+    }
 }

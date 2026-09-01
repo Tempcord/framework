@@ -2,7 +2,7 @@
 
 namespace Tempcord;
 
-use CyberWolf\Discord\Discord;
+use Tempcord\Discord\Discord;
 use Tempest\Container\Container;
 use Tempest\Container\Initializer;
 use Tempest\Container\Singleton;

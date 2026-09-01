@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use CyberWolf\Discord\Interaction\ButtonInteraction;
+use Tempcord\Discord\Interaction\ButtonInteraction;
 use Tempcord\Attributes\Button;
 
 #[Button]

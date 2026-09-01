@@ -2,23 +2,23 @@
 
 namespace Tempcord\Tests\Unit\Cache;
 
-use CyberWolf\Discord\Constants\Events;
-use CyberWolf\Discord\Gateway\Events\ChannelDelete;
-use CyberWolf\Discord\Gateway\Events\GuildCreate;
-use CyberWolf\Discord\Gateway\Events\GuildDelete;
-use CyberWolf\Discord\Gateway\Events\GuildMemberAdd;
-use CyberWolf\Discord\Gateway\Events\GuildMemberRemove;
-use CyberWolf\Discord\Gateway\Events\GuildMemberUpdate;
-use CyberWolf\Discord\Gateway\Events\GuildMembersChunk;
-use CyberWolf\Discord\Gateway\Events\GuildRoleCreate;
-use CyberWolf\Discord\Gateway\Events\GuildRoleDelete;
-use CyberWolf\Discord\Gateway\Events\GuildUpdate;
-use CyberWolf\Discord\Gateway\Events\ThreadCreate;
-use CyberWolf\Discord\Gateway\Events\VoiceStateUpdate;
+use Tempcord\Discord\Constants\Events;
+use Tempcord\Discord\Gateway\Events\ChannelDelete;
+use Tempcord\Discord\Gateway\Events\GuildCreate;
+use Tempcord\Discord\Gateway\Events\GuildDelete;
+use Tempcord\Discord\Gateway\Events\GuildMemberAdd;
+use Tempcord\Discord\Gateway\Events\GuildMemberRemove;
+use Tempcord\Discord\Gateway\Events\GuildMemberUpdate;
+use Tempcord\Discord\Gateway\Events\GuildMembersChunk;
+use Tempcord\Discord\Gateway\Events\GuildRoleCreate;
+use Tempcord\Discord\Gateway\Events\GuildRoleDelete;
+use Tempcord\Discord\Gateway\Events\GuildUpdate;
+use Tempcord\Discord\Gateway\Events\ThreadCreate;
+use Tempcord\Discord\Gateway\Events\VoiceStateUpdate;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use CyberWolf\Discord\Bitwise\Bitwise;
-use CyberWolf\Discord\Enums\Intent;
+use Tempcord\Discord\Bitwise\Bitwise;
+use Tempcord\Discord\Enums\Intent;
 use Tempcord\Cache\Cache;
 use Tempcord\Cache\CacheSubscriber;
 use Tempcord\TempcordConfig;
@@ -57,7 +57,7 @@ final class CacheSubscriberTest extends BaseTestCase
     }
 
     /**
-     * @param list<\CyberWolf\Discord\Parts\Channel> $channels
+     * @param list<\Tempcord\Discord\Parts\Channel> $channels
      */
     private function guildCreate(string $id, array $channels = [], array $roles = [], array $members = [], array $voiceStates = [], ?int $memberCount = null): GuildCreate
     {

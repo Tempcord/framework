@@ -2,10 +2,10 @@
 
 namespace Tempcord\Runtime;
 
-use CyberWolf\Discord\Discord;
-use CyberWolf\Discord\Enums\ApplicationCommandOptionType;
-use CyberWolf\Discord\Interaction\CommandInteraction;
-use CyberWolf\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
+use Tempcord\Discord\Discord;
+use Tempcord\Discord\Enums\ApplicationCommandOptionType;
+use Tempcord\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Parts\ApplicationCommandInteractionDataOptionStructure;
 use RuntimeException;
 use Throwable;
 use function React\Async\await;
