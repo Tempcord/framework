@@ -21,7 +21,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # Tags are how semantic-release knows the current version, so the
           # whole history has to be there.
