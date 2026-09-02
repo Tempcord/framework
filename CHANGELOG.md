@@ -1,3 +1,9 @@
+## [0.9.0](https://github.com/Tempcord/framework/compare/v0.8.0...v0.9.0) (2026-09-02)
+
+### Features
+
+* **commands:** hand a context menu what it was used on ([#15](https://github.com/Tempcord/framework/issues/15)) ([9910f0e](https://github.com/Tempcord/framework/commit/9910f0e761a1ed34e5c46a5c74ebb8fdbfa31394))
+
 ## [0.8.0](https://github.com/Tempcord/framework/compare/v0.7.0...v0.8.0) (2026-09-01)
 
 ### Features
