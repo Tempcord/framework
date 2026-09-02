@@ -31,10 +31,6 @@
         {
             "title": "Cache",
             "slug": "guides/08-cache"
-        },
-        {
-            "title": "Scheduled tasks",
-            "slug": "guides/09-scheduled-tasks"
         }
     ],
     "reference": {
@@ -324,25 +320,6 @@
                         "default": "null",
                         "required": false,
                         "summary": "the modal's custom id, which may carry {placeholders}. Defaults to the class name with a ModalSubmit or Modal prefix or suffix stripped and the rest snake_cased."
-                    }
-                ],
-                "cases": [],
-                "methods": []
-            },
-            {
-                "name": "Scheduled",
-                "fqcn": "Tempcord\\Attributes\\Scheduled",
-                "kind": "attribute",
-                "target": "class",
-                "summary": "Declares an invokable class as work the bot does on a timer.",
-                "slug": "reference/attributes/scheduled",
-                "parameters": [
-                    {
-                        "name": "everySeconds",
-                        "type": "float",
-                        "default": null,
-                        "required": true,
-                        "summary": ""
                     }
                 ],
                 "cases": [],

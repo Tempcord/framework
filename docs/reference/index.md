@@ -13,7 +13,6 @@
 - [Button](attributes/button.md) — Declares a class or method as the handler for a button press.
 - [SelectMenu](attributes/select-menu.md) — Declares a class or method as the handler for a select menu choice.
 - [ModalSubmit](attributes/modal-submit.md) — Declares a class or method as the handler for a submitted modal.
-- [Scheduled](attributes/scheduled.md) — Declares an invokable class as work the bot does on a timer.
 
 ## Autocomplete
 

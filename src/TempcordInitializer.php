@@ -8,7 +8,6 @@ use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\ComponentsRegistry;
 use Tempcord\Registries\EventsRegistry;
 use Tempcord\Registries\PluginsRegistry;
-use Tempcord\Registries\ScheduledTasksRegistry;
 use Tempcord\Runtime\CommandBinder;
 use Tempcord\Runtime\CommandRegistrar;
 use Tempcord\Runtime\ComponentBinder;
@@ -28,7 +27,6 @@ final readonly class TempcordInitializer implements Initializer
             componentsRegistry: $container->get(ComponentsRegistry::class),
             eventsRegistry: $container->get(EventsRegistry::class),
             pluginsRegistry: $container->get(PluginsRegistry::class),
-            scheduledTasksRegistry: $container->get(ScheduledTasksRegistry::class),
             registrar: $container->get(CommandRegistrar::class),
             binder: $container->get(CommandBinder::class),
             componentBinder: $container->get(ComponentBinder::class),
