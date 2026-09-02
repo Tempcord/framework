@@ -29,6 +29,8 @@ Generated from the source, so it describes what the framework actually does.
 
 **Configuration** — [TempcordConfig](reference/configuration/tempcord-config.md)
 
+**Messaging** — [DirectMessage](reference/messaging/direct-message.md)
+
 **Enums** — [DiscordLocale](reference/enums/discord-locale.md)
 
 **Plugins** — [Plugin](reference/plugins/plugin.md)

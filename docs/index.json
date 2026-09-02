@@ -460,6 +460,34 @@
                 "methods": []
             }
         ],
+        "messaging": [
+            {
+                "name": "DirectMessage",
+                "fqcn": "Tempcord\\Messaging\\DirectMessage",
+                "kind": "class",
+                "target": null,
+                "summary": "Writes to a member privately, on a best-effort basis.",
+                "slug": "reference/messaging/direct-message",
+                "parameters": [
+                    {
+                        "name": "discord",
+                        "type": "Discord",
+                        "default": null,
+                        "required": true,
+                        "summary": ""
+                    },
+                    {
+                        "name": "logger",
+                        "type": "Logger",
+                        "default": null,
+                        "required": true,
+                        "summary": ""
+                    }
+                ],
+                "cases": [],
+                "methods": []
+            }
+        ],
         "enums": [
             {
                 "name": "DiscordLocale",
