@@ -161,3 +161,44 @@ final class GuildAlphaCommand
 ```
 
 <small>From [`tests/Fixtures/GuildAlphaCommand.php`](../../tests/Fixtures/GuildAlphaCommand.php) — compiled and exercised by the test suite.</small>
+
+## Context menus
+
+A command can also be something people reach for by right-clicking a user or a
+message, rather than by typing. Say so with `type`, and give it a name — Discord
+shows that name verbatim, so it is not derived from the class:
+
+```php
+use Tempcord\Discord\Enums\ApplicationCommandTypes;
+use Tempcord\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Parts\User;
+use Tempcord\Attributes\Command;
+
+/**
+ * A context menu on a user. Discord shows the name verbatim, so it is given
+ * rather than derived from the class.
+ */
+#[Command(name: 'Профіль', type: ApplicationCommandTypes::USER)]
+final class ProfileContextMenu
+{
+    /** @var list<string> */
+    public static array $targets = [];
+
+    public function __invoke(CommandInteraction $interaction, User $target): void
+    {
+        self::$targets[] = $target->id;
+    }
+}
+```
+
+<small>From [`tests/Fixtures/ProfileContextMenu.php`](../../tests/Fixtures/ProfileContextMenu.php) — compiled and exercised by the test suite.</small>
+
+There are no options on a context menu. What it was used on arrives beside them,
+and the parameter's own type says which shape of it you want: `User` or
+`GuildMember` for a user menu, `Message` for a message menu.
+
+A member target is given back its user, which Discord leaves empty because it
+sends the two halves separately.
+
+A context menu needs no description, and giving one is refused — Discord has
+nowhere to show it.

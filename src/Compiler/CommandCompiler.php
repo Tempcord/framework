@@ -108,6 +108,17 @@ final readonly class CommandCompiler
             throw new LogicException("Description for command [{$name}] is required when type=CHAT_INPUT");
         }
 
+        /*
+         * Discord has nowhere to show a description on a context menu, so one
+         * written here would be dropped on the way out. Saying so is cheaper
+         * than wondering later why it never appears.
+         */
+        if ($command->type !== ApplicationCommandTypes::CHAT_INPUT && $command->description !== null) {
+            throw new LogicException(
+                "Command [{$name}] is a context menu, which Discord shows without a description",
+            );
+        }
+
         return new CommandDefinition(
             name: $name,
             description: $command->description,

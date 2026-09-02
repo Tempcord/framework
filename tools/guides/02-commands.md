@@ -69,3 +69,21 @@ immediately, which makes them useful while developing; global commands can take 
 hour to propagate.
 
 <!-- include: tests/Fixtures/GuildAlphaCommand.php -->
+
+## Context menus
+
+A command can also be something people reach for by right-clicking a user or a
+message, rather than by typing. Say so with `type`, and give it a name — Discord
+shows that name verbatim, so it is not derived from the class:
+
+<!-- include: tests/Fixtures/ProfileContextMenu.php -->
+
+There are no options on a context menu. What it was used on arrives beside them,
+and the parameter's own type says which shape of it you want: `User` or
+`GuildMember` for a user menu, `Message` for a message menu.
+
+A member target is given back its user, which Discord leaves empty because it
+sends the two halves separately.
+
+A context menu needs no description, and giving one is refused — Discord has
+nowhere to show it.
