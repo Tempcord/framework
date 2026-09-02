@@ -23,6 +23,7 @@ final readonly class ArgumentResolver
 
     public function __construct(
         private OptionValueResolver $values,
+        private TargetResolver $targets = new TargetResolver(),
     ) {}
 
     /**
@@ -55,6 +56,18 @@ final readonly class ArgumentResolver
 
             if (array_key_exists($name, $supplied)) {
                 $arguments[] = $supplied[$name];
+                continue;
+            }
+
+            /*
+             * A context menu has no options at all: what it was used on
+             * arrives beside them, and the parameter's type says which shape
+             * of it the handler wants.
+             */
+            $target = $this->targets->resolve($interaction, $parameter);
+
+            if ($target !== null) {
+                $arguments[] = $target;
                 continue;
             }
 
