@@ -46,10 +46,10 @@ final readonly class ArgumentResolver
                 continue;
             }
 
-            $supplied[$option->parameter->getName()] = $this->values->resolve(
+            $supplied[$option->parameterName] = $this->values->resolve(
                 $structure,
                 $interaction,
-                $option->parameter,
+                $option->parameter(),
             );
         }
 

@@ -98,7 +98,7 @@ final class EnumOptionTest extends TestCase
         return new OptionValueResolver(new FakeDiscord(new RecordingHttp()))->resolve(
             $structure,
             new CommandInteraction($interaction, new FakeDiscord(new RecordingHttp())),
-            $this->option($option)->parameter,
+            $this->option($option)->parameter(),
         );
     }
 
