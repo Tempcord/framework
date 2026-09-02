@@ -12,7 +12,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['8.5', '8.6']
+        # 8.6 is out until the tree can install on it: tempest/generation pins
+        # nette/php-generator, which caps at 8.5, so composer cannot resolve and
+        # the job fails before a single test runs. A permanently red matrix leg
+        # is worse than no leg — it taught us to ignore this workflow, and a
+        # release went out on a red tick because of it.
+        php: ['8.5']
 
     steps:
       - uses: actions/checkout@v7
