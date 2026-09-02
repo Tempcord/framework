@@ -31,6 +31,10 @@
 
 - [TempcordConfig](configuration/tempcord-config.md)
 
+## Messaging
+
+- [DirectMessage](messaging/direct-message.md) — Writes to a member privately, on a best-effort basis.
+
 ## Enums
 
 - [DiscordLocale](enums/discord-locale.md) — The locales Discord accepts for name and description localizations.

@@ -48,6 +48,9 @@ final readonly class ApiReflector
         'configuration' => [
             \Tempcord\TempcordConfig::class,
         ],
+        'messaging' => [
+            \Tempcord\Messaging\DirectMessage::class,
+        ],
         'enums' => [
             \Tempcord\Enums\DiscordLocale::class,
         ],

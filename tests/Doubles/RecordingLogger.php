@@ -17,8 +17,12 @@ final class RecordingLogger extends AbstractLogger implements Logger
     /** @var list<string> */
     public array $messages = [];
 
+    /** @var list<string> the level each message was logged at, in step with $messages */
+    public array $levels = [];
+
     public function log($level, string|Stringable $message, array $context = []): void
     {
         $this->messages[] = (string) $message;
+        $this->levels[] = (string) $level;
     }
 }
