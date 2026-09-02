@@ -10,13 +10,11 @@ use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\ComponentsRegistry;
 use Tempcord\Registries\EventsRegistry;
 use Tempcord\Registries\PluginsRegistry;
-use Tempcord\Registries\ScheduledTasksRegistry;
 use Tempcord\Runtime\CommandBinder;
 use Tempcord\Runtime\CommandRegistrar;
 use Tempcord\Runtime\ComponentBinder;
 use Tempcord\Runtime\Outcome;
 use Tempcord\Runtime\PluginBooter;
-use React\EventLoop\Loop;
 
 /**
  * The bot itself: the Discord connection, the registries that were filled
@@ -32,7 +30,6 @@ final class Tempcord
         private readonly ComponentsRegistry $componentsRegistry,
         private readonly EventsRegistry $eventsRegistry,
         private readonly PluginsRegistry $pluginsRegistry,
-        private readonly ScheduledTasksRegistry $scheduledTasksRegistry,
         private readonly CommandRegistrar $registrar,
         private readonly CommandBinder $binder,
         private readonly ComponentBinder $componentBinder,
@@ -59,11 +56,8 @@ final class Tempcord
      *
      * The cache subscribes first, so a listener reading it sees the state the
      * event it is handling has already produced. Plugins boot last, so whatever
-     * they do runs against a bot whose commands, events and timers are already
-     * in place, and still before the gateway opens.
-     *
-     * Scheduled tasks are only put on the loop here; none of them takes a turn
-     * until the loop itself runs, which is after the gateway opens.
+     * they do runs against a bot whose commands and events are already bound,
+     * and still before the gateway opens.
      *
      * @return list<Outcome>
      */
@@ -74,7 +68,6 @@ final class Tempcord
             ...$this->binder->bindAll($this->commandsRegistry->all()),
             ...$this->componentBinder->bindAll($this->componentsRegistry->all()),
             ...$this->eventsRegistry->listen($this->discord),
-            ...$this->scheduledTasksRegistry->start(Loop::get()),
             ...$this->pluginBooter->bootAll($this->pluginsRegistry->all(), $this),
         ];
     }
