@@ -13,6 +13,7 @@ use Tempcord\Registries\CommandsRegistry;
 use Tempcord\Registries\ComponentsRegistry;
 use Tempcord\Registries\EventsRegistry;
 use Tempcord\Registries\PluginsRegistry;
+use Tempcord\Registries\ScheduledTasksRegistry;
 use Tempcord\Runtime\ArgumentResolver;
 use Tempcord\Runtime\AutocompleteResolver;
 use Tempcord\Runtime\AutocompleteResponder;
@@ -49,6 +50,7 @@ abstract class TestCase extends BaseTestCase
         ?ComponentsRegistry $components = null,
         ?EventsRegistry $events = null,
         ?PluginsRegistry $plugins = null,
+        ?ScheduledTasksRegistry $scheduledTasks = null,
         ?RecordingHttp $http = null,
         ?RecordingLogger $logger = null,
         ?Cache $cache = null,
@@ -67,6 +69,7 @@ abstract class TestCase extends BaseTestCase
             componentsRegistry: $components,
             eventsRegistry: $events ?? new EventsRegistry($container),
             pluginsRegistry: $plugins ?? new PluginsRegistry(),
+            scheduledTasksRegistry: $scheduledTasks ?? new ScheduledTasksRegistry($container),
             registrar: new CommandRegistrar(
                 new CommandBuilderFactory(),
                 new TempcordConfig('::token::', new Bitwise()),
