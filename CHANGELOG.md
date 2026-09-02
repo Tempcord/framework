@@ -1,3 +1,9 @@
+## [0.12.1](https://github.com/Tempcord/framework/compare/v0.12.0...v0.12.1) (2026-09-02)
+
+### Bug Fixes
+
+* **discovery:** keep command definitions exportable so discovery can cache ([860d959](https://github.com/Tempcord/framework/commit/860d959ac83f650a60bec84ab97fc62185bd2c66))
+
 ## [0.12.0](https://github.com/Tempcord/framework/compare/v0.11.0...v0.12.0) (2026-09-02)
 
 ### Features
