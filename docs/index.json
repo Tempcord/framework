@@ -326,6 +326,24 @@
                 "methods": []
             }
         ],
+        "options": [
+            {
+                "name": "Choosable",
+                "fqcn": "Tempcord\\Interfaces\\Choosable",
+                "kind": "interface",
+                "target": null,
+                "summary": "An enum that says how each of its cases should read in Discord.",
+                "slug": "reference/options/choosable",
+                "parameters": [],
+                "cases": [],
+                "methods": [
+                    {
+                        "signature": "label(): string",
+                        "summary": "What a member reads when picking this case."
+                    }
+                ]
+            }
+        ],
         "autocomplete": [
             {
                 "name": "Autocomplete",

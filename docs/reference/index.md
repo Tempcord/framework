@@ -14,6 +14,10 @@
 - [SelectMenu](attributes/select-menu.md) — Declares a class or method as the handler for a select menu choice.
 - [ModalSubmit](attributes/modal-submit.md) — Declares a class or method as the handler for a submitted modal.
 
+## Options
+
+- [Choosable](options/choosable.md) — An enum that says how each of its cases should read in Discord.
+
 ## Autocomplete
 
 - [Autocomplete](autocomplete/autocomplete.md)
