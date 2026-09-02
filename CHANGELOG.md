@@ -1,3 +1,9 @@
+## [0.12.0](https://github.com/Tempcord/framework/compare/v0.11.0...v0.12.0) (2026-09-02)
+
+### Features
+
+* **commands:** take a backed enum as a command option ([#20](https://github.com/Tempcord/framework/issues/20)) ([326704b](https://github.com/Tempcord/framework/commit/326704b14595b0c0eec80a7b1f2972525a823cf0))
+
 ## [0.11.0](https://github.com/Tempcord/framework/compare/v0.10.0...v0.11.0) (2026-09-02)
 
 ### Features
