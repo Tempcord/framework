@@ -24,6 +24,8 @@ use Tempcord\Definitions\SubcommandGroupDefinition;
 use Tempcord\Interfaces\Autocomplete;
 use Tempcord\Localization\LocalizationProvider;
 use Tempcord\Localization\NullLocalizations;
+use ReflectionEnum;
+use Tempcord\Interfaces\Choosable;
 use Tempest\Reflection\ClassReflector;
 use Tempest\Reflection\MethodReflector;
 use Tempest\Reflection\ParameterReflector;
@@ -242,7 +244,7 @@ final readonly class CommandCompiler
                 isRequired: !$parameter->isOptional(),
                 autocomplete: $this->autocompleteFor($option, $completers[$name] ?? null),
                 parameter: $parameter,
-                choices: $this->choicesOf($option),
+                choices: $this->choicesOf($option, $parameter),
                 minValue: $option->minValue,
                 maxValue: $option->maxValue,
                 minLength: $option->minLength,
@@ -312,10 +314,10 @@ final readonly class CommandCompiler
      *
      * @return array<string, string|int|float>
      */
-    private function choicesOf(Option $option): array
+    private function choicesOf(Option $option, ParameterReflector $parameter): array
     {
         if ($option->choices === []) {
-            return [];
+            return $this->casesOf($parameter);
         }
 
         if (!array_is_list($option->choices)) {
@@ -331,14 +333,68 @@ final readonly class CommandCompiler
         return $choices;
     }
 
+    /**
+     * Every case of an enum typed option, labelled the way the enum labels
+     * itself.
+     *
+     * Naming them is the whole reason to reach for an enum here rather than a
+     * string with a hand written choice list that has to be kept in step with
+     * it. An enum implementing Choosable says how each case reads; otherwise
+     * the case name is used, which is at least a name someone chose.
+     *
+     * @return array<string, string|int>
+     */
+    private function casesOf(ParameterReflector $parameter): array
+    {
+        if (!$parameter->getReflection()->hasType()) {
+            return [];
+        }
+
+        $name = $parameter->getType()->getName();
+
+        if (!self::isBackedEnum($name)) {
+            return [];
+        }
+
+        $choices = [];
+
+        foreach ($name::cases() as $case) {
+            $label = $case instanceof Choosable ? $case->label() : $case->name;
+            $choices[$label] = $case->value;
+        }
+
+        return $choices;
+    }
+
     private function typeOf(ParameterReflector $parameter): ApplicationCommandOptionType
     {
         if (!$parameter->getReflection()->hasType()) {
             throw new LogicException('Command option does not have type');
         }
 
-        return self::OPTION_TYPES[$parameter->getType()->getName()]
+        $name = $parameter->getType()->getName();
+
+        if (self::isBackedEnum($name)) {
+            /*
+             * Discord has no enum of its own; a backed enum is a fixed set of
+             * values, which is a string or an integer option whose choices
+             * happen to be all of them.
+             */
+            return (new ReflectionEnum($name))->getBackingType()?->getName() === 'int'
+                ? ApplicationCommandOptionType::INTEGER
+                : ApplicationCommandOptionType::STRING;
+        }
+
+        return self::OPTION_TYPES[$name]
             ?? throw new LogicException('Command option type not supported');
+    }
+
+    /**
+     * @phpstan-assert-if-true class-string<BackedEnum> $name
+     */
+    private static function isBackedEnum(string $name): bool
+    {
+        return is_subclass_of($name, BackedEnum::class);
     }
 
     /**

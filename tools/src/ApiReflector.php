@@ -35,6 +35,9 @@ final readonly class ApiReflector
             \Tempcord\Attributes\SelectMenu::class,
             \Tempcord\Attributes\ModalSubmit::class,
         ],
+        'options' => [
+            \Tempcord\Interfaces\Choosable::class,
+        ],
         'autocomplete' => [
             \Tempcord\Interfaces\Autocomplete::class,
             \Tempcord\AutoCompletes\ArrayAutocomplete::class,

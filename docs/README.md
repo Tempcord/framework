@@ -21,6 +21,8 @@ Generated from the source, so it describes what the framework actually does.
 
 **Attributes** — [Command](reference/attributes/command.md), [SubcommandGroup](reference/attributes/subcommand-group.md), [Subcommand](reference/attributes/subcommand.md), [Option](reference/attributes/option.md), [Event](reference/attributes/event.md), [Autocomplete](reference/attributes/autocomplete.md), [Button](reference/attributes/button.md), [SelectMenu](reference/attributes/select-menu.md), [ModalSubmit](reference/attributes/modal-submit.md)
 
+**Options** — [Choosable](reference/options/choosable.md)
+
 **Autocomplete** — [Autocomplete](reference/autocomplete/autocomplete.md), [ArrayAutocomplete](reference/autocomplete/array-autocomplete.md)
 
 **Cache** — [Cache](reference/cache/cache.md)
