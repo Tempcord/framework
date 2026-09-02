@@ -1,3 +1,9 @@
+## [0.10.0](https://github.com/Tempcord/framework/compare/v0.9.0...v0.10.0) (2026-09-02)
+
+### Features
+
+* **scheduling:** declare recurring work with #[Scheduled] ([#16](https://github.com/Tempcord/framework/issues/16)) ([7e5e5c4](https://github.com/Tempcord/framework/commit/7e5e5c4298f786c55115dc5c5ece0a4144edc6ec))
+
 ## [0.9.0](https://github.com/Tempcord/framework/compare/v0.8.0...v0.9.0) (2026-09-02)
 
 ### Features
