@@ -51,8 +51,16 @@ final readonly class CommandBuilderFactory
             ->setDmPermission($command->directMessage)
             ->setType($command->type);
 
-        if ($command->type === ApplicationCommandTypes::CHAT_INPUT) {
-            // The compiler guarantees a description for chat input commands.
+        if ($command->handler !== null) {
+            $builder->setHandler($command->handler);
+        }
+
+        /*
+         * A context menu is the only kind without one; an entry point is shown
+         * in the launcher with its description just as a chat input is.
+         */
+        if ($command->type !== ApplicationCommandTypes::USER && $command->type !== ApplicationCommandTypes::MESSAGE) {
+            // The compiler guarantees a description wherever Discord shows one.
             $builder->setDescription((string) $command->description);
 
             if ($command->descriptionLocalizations !== []) {

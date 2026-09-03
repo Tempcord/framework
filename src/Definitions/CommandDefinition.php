@@ -3,6 +3,7 @@
 namespace Tempcord\Definitions;
 
 use Tempcord\Discord\Enums\ApplicationCommandTypes;
+use Tempcord\Discord\Enums\EntryPointCommandHandlerType;
 use Tempcord\Discord\Enums\Permission;
 
 /**
@@ -30,6 +31,7 @@ final readonly class CommandDefinition
         public array $permissions,
         public array $options,
         public array $handlers,
+        public ?EntryPointCommandHandlerType $handler = null,
         public array $nameLocalizations = [],
         public array $descriptionLocalizations = [],
     ) {}

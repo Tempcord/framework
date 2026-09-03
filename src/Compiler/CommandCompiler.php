@@ -6,6 +6,7 @@ use BackedEnum;
 use LogicException;
 use Tempcord\Discord\Enums\ApplicationCommandOptionType;
 use Tempcord\Discord\Enums\ApplicationCommandTypes;
+use Tempcord\Discord\Enums\EntryPointCommandHandlerType;
 use Tempcord\Discord\Parts\Channel;
 use Tempcord\Discord\Parts\Role;
 use Tempcord\Discord\Parts\User;
@@ -59,6 +60,9 @@ final readonly class CommandCompiler
     public function compile(ClassReflector $class, Command $command): CommandDefinition
     {
         $name = $this->nameOf($class, $command);
+
+        $this->check($name, $command);
+
         $options = [];
         $handlers = [];
 
@@ -91,7 +95,7 @@ final readonly class CommandCompiler
                     optionPath: $subcommand->name,
                 );
             }
-        } else {
+        } elseif (!$this->isLaunchedByDiscord($command)) {
             /*
              * No subcommands anywhere means __invoke is the command, and its
              * parameters are the command's options.
@@ -106,21 +110,6 @@ final readonly class CommandCompiler
             );
         }
 
-        if ($command->type === ApplicationCommandTypes::CHAT_INPUT && $command->description === null) {
-            throw new LogicException("Description for command [{$name}] is required when type=CHAT_INPUT");
-        }
-
-        /*
-         * Discord has nowhere to show a description on a context menu, so one
-         * written here would be dropped on the way out. Saying so is cheaper
-         * than wondering later why it never appears.
-         */
-        if ($command->type !== ApplicationCommandTypes::CHAT_INPUT && $command->description !== null) {
-            throw new LogicException(
-                "Command [{$name}] is a context menu, which Discord shows without a description",
-            );
-        }
-
         return new CommandDefinition(
             name: $name,
             description: $command->description,
@@ -131,9 +120,58 @@ final readonly class CommandCompiler
             permissions: $command->permissions,
             options: $options,
             handlers: $handlers,
+            handler: $command->handler,
             nameLocalizations: $this->translate($key, 'name'),
             descriptionLocalizations: $this->translate($key, 'description'),
         );
+    }
+
+    /**
+     * An entry point Discord answers itself never reaches the application, so
+     * the class describes the command and nothing more — there is no method to
+     * look for and nothing to bind.
+     */
+    private function isLaunchedByDiscord(Command $command): bool
+    {
+        return $command->handler === EntryPointCommandHandlerType::DISCORD_LAUNCH_ACTIVITY;
+    }
+
+    /**
+     * What Discord will and will not accept, said here rather than found out
+     * from a Bad Request that names the offender by its index in a list.
+     */
+    private function check(string $name, Command $command): void
+    {
+        $isEntryPoint = $command->type === ApplicationCommandTypes::PRIMARY_ENTRY_POINT;
+
+        if ($isEntryPoint !== ($command->handler !== null)) {
+            throw new LogicException($isEntryPoint
+                ? "Entry point command [{$name}] must say which handler answers it"
+                : "Command [{$name}] declares a handler, which only an entry point command has");
+        }
+
+        /*
+         * A context menu is the only kind Discord shows without one: it has
+         * nowhere to put it, so a description written here would be dropped on
+         * the way out.
+         */
+        $described = in_array(
+            $command->type,
+            [ApplicationCommandTypes::CHAT_INPUT, ApplicationCommandTypes::PRIMARY_ENTRY_POINT],
+            true,
+        );
+
+        if ($described && $command->description === null) {
+            throw new LogicException(
+                "Description for command [{$name}] is required when type={$command->type->name}",
+            );
+        }
+
+        if (!$described && $command->description !== null) {
+            throw new LogicException(
+                "Command [{$name}] is a context menu, which Discord shows without a description",
+            );
+        }
     }
 
     /**

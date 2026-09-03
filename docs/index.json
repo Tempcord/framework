@@ -93,6 +93,13 @@
                         "summary": ""
                     },
                     {
+                        "name": "handler",
+                        "type": "?EntryPointCommandHandlerType",
+                        "default": "null",
+                        "required": false,
+                        "summary": ""
+                    },
+                    {
                         "name": "translationKey",
                         "type": "?string",
                         "default": "null",

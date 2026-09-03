@@ -5,6 +5,7 @@ namespace Tempcord\Attributes;
 use Attribute;
 use BackedEnum;
 use Tempcord\Discord\Enums\ApplicationCommandTypes;
+use Tempcord\Discord\Enums\EntryPointCommandHandlerType;
 use Tempcord\Discord\Enums\Permission;
 
 /**
@@ -42,6 +43,7 @@ final readonly class Command
         public array $permissions = [],
         public bool $directMessage = true,
         public ApplicationCommandTypes $type = ApplicationCommandTypes::CHAT_INPUT,
+        public ?EntryPointCommandHandlerType $handler = null,
         public ?string $translationKey = null,
     ) {
         $this->guildId = $guildId === null ? null : (string) $guildId;
