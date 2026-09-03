@@ -1,3 +1,9 @@
+## [0.12.2](https://github.com/Tempcord/framework/compare/v0.12.1...v0.12.2) (2026-09-03)
+
+### Bug Fixes
+
+* **commands:** name an option after its parameter in snake_case ([f773d7b](https://github.com/Tempcord/framework/commit/f773d7b030a3da0531597734576d343dabc1a0dd))
+
 ## [0.12.1](https://github.com/Tempcord/framework/compare/v0.12.0...v0.12.1) (2026-09-02)
 
 ### Bug Fixes
