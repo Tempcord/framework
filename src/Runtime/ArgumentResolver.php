@@ -3,7 +3,9 @@
 namespace Tempcord\Runtime;
 
 use InvalidArgumentException;
+use Tempcord\Discord\Gateway\Events\InteractionCreate;
 use Tempcord\Discord\Interaction\CommandInteraction;
+use Tempest\Reflection\ParameterReflector;
 use Tempcord\Definitions\HandlerDefinition;
 use Throwable;
 
@@ -64,6 +66,22 @@ final readonly class ArgumentResolver
             }
 
             /*
+             * The interaction itself, asked for by type rather than by the one
+             * name this resolver used to recognise. A component handler has
+             * always been able to take either shape of it this way, and a
+             * command handler wanting the raw gateway event — for the member
+             * who ran it, say — had no way to say so: it failed at the moment
+             * somebody used the command, with nothing at discovery to warn
+             * that half the commands could not be called.
+             */
+            $wrapper = $this->wrapperFor($interaction, $parameter);
+
+            if ($wrapper !== null) {
+                $arguments[] = $wrapper;
+                continue;
+            }
+
+            /*
              * A context menu has no options at all: what it was used on
              * arrives beside them, and the parameter's type says which shape
              * of it the handler wants.
@@ -86,5 +104,21 @@ final readonly class ArgumentResolver
         }
 
         return $arguments;
+    }
+
+    /**
+     * The interaction in whichever shape the parameter is typed for.
+     */
+    private function wrapperFor(CommandInteraction $interaction, ParameterReflector $parameter): ?object
+    {
+        if (!$parameter->getReflection()->hasType()) {
+            return null;
+        }
+
+        return match ($parameter->getType()->getName()) {
+            CommandInteraction::class => $interaction,
+            InteractionCreate::class => $interaction->interaction,
+            default => null,
+        };
     }
 }

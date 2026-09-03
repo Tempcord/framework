@@ -14,6 +14,7 @@ use Tempcord\Runtime\ArgumentResolver;
 use Tempcord\Runtime\OptionValueResolver;
 use Tempcord\Tests\Doubles\FakeDiscord;
 use Tempcord\Tests\Doubles\RecordingHttp;
+use Tempcord\Tests\Fixtures\GatewayEventCommand;
 use Tempcord\Tests\Fixtures\MusicCommand;
 use Tempcord\Tests\Fixtures\OptionTypesCommand;
 use Tempcord\Tests\Fixtures\PingCommand;
@@ -118,5 +119,39 @@ final class ArgumentResolverTest extends TestCase
         $this->expectExceptionMessage('Missing required parameter: title for command "music.playlist.play"');
 
         $this->resolver()->resolve($handler, $this->interaction('music', []));
+    }
+
+    /**
+     * A handler that wants the raw gateway event — for the member who ran the
+     * command, which the wrapper does not carry — could not say so. The
+     * resolver knew one parameter name and the context menu target types, and
+     * anything else was a required parameter it could not supply, so the
+     * command failed the moment somebody used it. Nine of this bot's twenty
+     * commands were unusable that way, and discovery said nothing.
+     */
+    public function test_it_supplies_the_gateway_event_by_type(): void
+    {
+        $interaction = $this->interaction('gateway_event', []);
+
+        $arguments = $this->resolver()->resolve(
+            $this->handler(GatewayEventCommand::class, 'gateway_event'),
+            $interaction,
+        );
+
+        $this->assertSame($interaction, $arguments[0]);
+        $this->assertSame($interaction->interaction, $arguments[1]);
+    }
+
+    public function test_the_wrapper_is_still_supplied_by_type_not_only_by_name(): void
+    {
+        $interaction = $this->interaction('gateway_event', []);
+
+        $arguments = $this->resolver()->resolve(
+            $this->handler(GatewayEventCommand::class, 'gateway_event'),
+            $interaction,
+        );
+
+        $this->assertInstanceOf(CommandInteraction::class, $arguments[0]);
+        $this->assertInstanceOf(InteractionCreate::class, $arguments[1]);
     }
 }
