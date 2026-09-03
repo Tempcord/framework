@@ -19,6 +19,7 @@ use Tempcord\Runtime\AutocompleteResponder;
 use Tempcord\Runtime\ChoiceFactory;
 use Tempcord\Runtime\CommandBinder;
 use Tempcord\Runtime\CommandDispatcher;
+use Tempcord\Runtime\MiddlewarePipeline;
 use Tempcord\Runtime\CommandRegistrar;
 use Tempcord\Runtime\ComponentArgumentResolver;
 use Tempcord\Runtime\ComponentBinder;
@@ -79,6 +80,7 @@ abstract class TestCase extends BaseTestCase
                     new ArgumentResolver(new OptionValueResolver($discord)),
                     new GenericContainer(),
                     new RecordingLogger(),
+                    new MiddlewarePipeline(new GenericContainer()),
                 ),
                 new AutocompleteResponder(
                     new ChoiceFactory(),

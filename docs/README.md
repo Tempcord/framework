@@ -37,3 +37,5 @@ Generated from the source, so it describes what the framework actually does.
 
 **Plugins** — [Plugin](reference/plugins/plugin.md)
 
+**Middleware** — [Middleware](reference/middleware/middleware.md), [RequiresPermissions](reference/middleware/requires-permissions.md)
+

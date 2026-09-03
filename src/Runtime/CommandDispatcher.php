@@ -19,6 +19,7 @@ final readonly class CommandDispatcher
         private ArgumentResolver $arguments,
         private Container $container,
         private Logger $logger,
+        private MiddlewarePipeline $middleware,
     ) {}
 
     public function dispatch(HandlerDefinition $handler, CommandInteraction $interaction): void
@@ -30,9 +31,20 @@ final readonly class CommandDispatcher
          */
         async(function () use ($handler, $interaction): void {
             try {
-                $handler->method->invokeArgs(
-                    $this->container->get($handler->method->getDeclaringClass()->getName()),
-                    $this->arguments->resolve($handler, $interaction),
+                /*
+                 * Arguments are resolved inside the chain rather than before
+                 * it: resolving them can cost a REST call, and a command a
+                 * middleware is about to refuse should not pay for one.
+                 */
+                $this->middleware->run(
+                    $handler->middleware,
+                    $interaction,
+                    function (CommandInteraction $interaction) use ($handler): void {
+                        $handler->method->invokeArgs(
+                            $this->container->get($handler->method->getDeclaringClass()->getName()),
+                            $this->arguments->resolve($handler, $interaction),
+                        );
+                    },
                 );
             } catch (Throwable $throwable) {
                 $this->logger->error(

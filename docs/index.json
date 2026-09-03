@@ -105,6 +105,13 @@
                         "default": "null",
                         "required": false,
                         "summary": "the catalog key this command's translations live under. Keys for everything beneath it are derived from position, so \"commands.music\" gives commands.music.description for the command, commands.music.playlist.play.description for a subcommand, and commands.music.playlist.play.title.description for its option."
+                    },
+                    {
+                        "name": "middleware",
+                        "type": "array",
+                        "default": "[]",
+                        "required": false,
+                        "summary": "run in the order given, outermost first, before any handler this command has; any of them may answer instead of letting it run"
                     }
                 ],
                 "cases": [],
@@ -131,6 +138,13 @@
                         "default": null,
                         "required": true,
                         "summary": ""
+                    },
+                    {
+                        "name": "middleware",
+                        "type": "array",
+                        "default": "[]",
+                        "required": false,
+                        "summary": "run after whatever the command declares, before the subcommand's own"
                     }
                 ],
                 "cases": [],
@@ -157,6 +171,13 @@
                         "default": null,
                         "required": true,
                         "summary": ""
+                    },
+                    {
+                        "name": "middleware",
+                        "type": "array",
+                        "default": "[]",
+                        "required": false,
+                        "summary": "run after whatever the command and the group around it declare"
                     }
                 ],
                 "cases": [],
@@ -718,6 +739,50 @@
                         "summary": "Called once, after commands and events are bound and before the gateway opens."
                     }
                 ]
+            }
+        ],
+        "middleware": [
+            {
+                "name": "Middleware",
+                "fqcn": "Tempcord\\Interfaces\\Middleware",
+                "kind": "interface",
+                "target": null,
+                "summary": "Something that runs before a command, and may decide it never runs.",
+                "slug": "reference/middleware/middleware",
+                "parameters": [],
+                "cases": [],
+                "methods": [
+                    {
+                        "signature": "__invoke(CommandInteraction $interaction, callable $next): void",
+                        "summary": ""
+                    }
+                ]
+            },
+            {
+                "name": "RequiresPermissions",
+                "fqcn": "Tempcord\\Middleware\\RequiresPermissions",
+                "kind": "class",
+                "target": null,
+                "summary": "Refuses anyone whose permissions in the channel fall short.",
+                "slug": "reference/middleware/requires-permissions",
+                "parameters": [
+                    {
+                        "name": "permissions",
+                        "type": "array",
+                        "default": null,
+                        "required": true,
+                        "summary": "every one of which the caller must hold; an administrator holds all of them by definition"
+                    },
+                    {
+                        "name": "refusal",
+                        "type": "string",
+                        "default": "'You are not allowed to use this command.'",
+                        "required": false,
+                        "summary": "what the caller is told, ephemerally"
+                    }
+                ],
+                "cases": [],
+                "methods": []
             }
         ]
     }
