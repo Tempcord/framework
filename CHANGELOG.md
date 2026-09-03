@@ -1,3 +1,9 @@
+## [0.12.4](https://github.com/Tempcord/framework/compare/v0.12.3...v0.12.4) (2026-09-03)
+
+### Bug Fixes
+
+* **commands:** give a handler the interaction it asks for by type ([cbe23ee](https://github.com/Tempcord/framework/commit/cbe23eead12b512e9165e0a2f44de26866495481))
+
 ## [0.12.3](https://github.com/Tempcord/framework/compare/v0.12.2...v0.12.3) (2026-09-03)
 
 ### Bug Fixes
