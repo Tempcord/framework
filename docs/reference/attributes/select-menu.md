@@ -15,4 +15,5 @@ use Tempcord\Attributes\SelectMenu;
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `id` | `BackedEnum\|string\|null` | `null` | the menu's custom id, which may carry {placeholders}. Defaults to the class name with a SelectMenu prefix or suffix stripped and the rest snake_cased. |
+| `middleware` | `array` | `[]` | run in the order given, outermost first; any of them may answer instead of letting the handler run |
 

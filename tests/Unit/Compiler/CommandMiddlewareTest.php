@@ -13,7 +13,9 @@ use Tempcord\Tests\Fixtures\InnerMiddleware;
 use Tempcord\Tests\Fixtures\NotMiddlewareCommand;
 use Tempcord\Tests\Fixtures\OuterMiddleware;
 use Tempcord\Tests\Fixtures\PingCommand;
+use Tempcord\Tests\Fixtures\ModerationOnly;
 use Tempcord\Tests\Fixtures\RefusingMiddleware;
+use Tempcord\Tests\Fixtures\SuggestionCommand;
 use Tempcord\Tests\Unit\TestCase;
 
 /**
@@ -58,6 +60,19 @@ final class CommandMiddlewareTest extends TestCase
         $this->assertCount(1, $middleware);
         $this->assertInstanceOf(RequiresPermissions::class, $middleware[0]);
         $this->assertSame('Not for you.', $middleware[0]->refusal);
+    }
+
+    /**
+     * The case the whole thing exists for: one command whose subcommands do not
+     * share an audience, which Discord's own permissions cannot express because
+     * they are scoped to the command as a whole.
+     */
+    public function test_one_command_can_guard_some_subcommands_and_not_others(): void
+    {
+        $handlers = $this->definition(SuggestionCommand::class)->handlers;
+
+        $this->assertSame([], $handlers['suggestion.add']->middleware);
+        $this->assertSame([ModerationOnly::class], $handlers['suggestion.close']->middleware);
     }
 
     public function test_a_command_declaring_none_carries_none(): void

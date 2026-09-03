@@ -3,6 +3,7 @@
 namespace Tempcord\Definitions;
 
 use Tempcord\Enums\ComponentKind;
+use Tempcord\Interfaces\Middleware;
 use Tempcord\Runtime\CustomId;
 use Tempest\Reflection\MethodReflector;
 
@@ -12,11 +13,16 @@ use Tempest\Reflection\MethodReflector;
  */
 final readonly class ComponentDefinition
 {
+    /**
+     * @param list<Middleware|class-string<Middleware>> $middleware run around
+     *        this handler, outermost first
+     */
     public function __construct(
         public ComponentKind $kind,
         public CustomId $customId,
         public string $handler,
         public MethodReflector $method,
+        public array $middleware = [],
     ) {}
 
     /**

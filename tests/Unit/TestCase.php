@@ -94,6 +94,8 @@ abstract class TestCase extends BaseTestCase
                     new ComponentArgumentResolver($discord),
                     new GenericContainer(),
                     new RecordingLogger(),
+                    new MiddlewarePipeline(new GenericContainer()),
+                    $discord,
                 ),
             ),
             pluginBooter: new PluginBooter($logger),

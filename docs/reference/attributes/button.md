@@ -15,4 +15,5 @@ use Tempcord\Attributes\Button;
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `id` | `BackedEnum\|string\|null` | `null` | the button's custom id. It may carry {placeholders}, as in "tournament.accept.{team}", which are matched out of the incoming id and passed to same-named parameters. Defaults to the class name with a Button prefix or suffix stripped and the rest snake_cased. |
+| `middleware` | `array` | `[]` | run in the order given, outermost first; any of them may answer instead of letting the handler run |
 

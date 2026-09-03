@@ -2,7 +2,10 @@
 
 namespace Tempcord\Tests\Fixtures;
 
+use Tempcord\Discord\Interaction\ButtonInteraction;
 use Tempcord\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\ComponentInteraction;
+use Tempcord\Discord\Interaction\ModalSubmitInteraction;
 use Tempcord\Interfaces\Middleware;
 
 /**
@@ -18,7 +21,7 @@ class TrailMiddleware implements Middleware
         public string $label = 'anonymous',
     ) {}
 
-    public function __invoke(CommandInteraction $interaction, callable $next): void
+    public function __invoke(CommandInteraction|ButtonInteraction|ComponentInteraction|ModalSubmitInteraction $interaction, callable $next): void
     {
         self::$trail[] = $this->label;
 

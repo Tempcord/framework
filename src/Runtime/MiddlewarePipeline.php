@@ -2,7 +2,10 @@
 
 namespace Tempcord\Runtime;
 
+use Tempcord\Discord\Interaction\ButtonInteraction;
 use Tempcord\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\ComponentInteraction;
+use Tempcord\Discord\Interaction\ModalSubmitInteraction;
 use Tempcord\Interfaces\Middleware;
 use Tempest\Container\Container;
 
@@ -25,16 +28,22 @@ final readonly class MiddlewarePipeline
 
     /**
      * @param list<Middleware|class-string<Middleware>> $middleware
-     * @param callable(CommandInteraction): void $handler
+     * @param CommandInteraction|ButtonInteraction|ComponentInteraction|ModalSubmitInteraction $interaction
+     * @param callable(CommandInteraction|ButtonInteraction|ComponentInteraction|ModalSubmitInteraction): void $handler
      */
-    public function run(array $middleware, CommandInteraction $interaction, callable $handler): void
-    {
+    public function run(
+        array $middleware,
+        CommandInteraction|ButtonInteraction|ComponentInteraction|ModalSubmitInteraction $interaction,
+        callable $handler,
+    ): void {
         $next = $handler;
 
         foreach (array_reverse($middleware) as $entry) {
             $inner = $next;
 
-            $next = function (CommandInteraction $interaction) use ($entry, $inner): void {
+            $next = function (
+                CommandInteraction|ButtonInteraction|ComponentInteraction|ModalSubmitInteraction $interaction,
+            ) use ($entry, $inner): void {
                 ($this->resolve($entry))($interaction, $inner);
             };
         }

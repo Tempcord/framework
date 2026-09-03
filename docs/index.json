@@ -31,6 +31,10 @@
         {
             "title": "Cache",
             "slug": "guides/08-cache"
+        },
+        {
+            "title": "Middleware",
+            "slug": "guides/09-middleware"
         }
     ],
     "reference": {
@@ -310,6 +314,13 @@
                         "default": "null",
                         "required": false,
                         "summary": "the button's custom id. It may carry {placeholders}, as in \"tournament.accept.{team}\", which are matched out of the incoming id and passed to same-named parameters. Defaults to the class name with a Button prefix or suffix stripped and the rest snake_cased."
+                    },
+                    {
+                        "name": "middleware",
+                        "type": "array",
+                        "default": "[]",
+                        "required": false,
+                        "summary": "run in the order given, outermost first; any of them may answer instead of letting the handler run"
                     }
                 ],
                 "cases": [],
@@ -329,6 +340,13 @@
                         "default": "null",
                         "required": false,
                         "summary": "the menu's custom id, which may carry {placeholders}. Defaults to the class name with a SelectMenu prefix or suffix stripped and the rest snake_cased."
+                    },
+                    {
+                        "name": "middleware",
+                        "type": "array",
+                        "default": "[]",
+                        "required": false,
+                        "summary": "run in the order given, outermost first; any of them may answer instead of letting the handler run"
                     }
                 ],
                 "cases": [],
@@ -348,6 +366,13 @@
                         "default": "null",
                         "required": false,
                         "summary": "the modal's custom id, which may carry {placeholders}. Defaults to the class name with a ModalSubmit or Modal prefix or suffix stripped and the rest snake_cased."
+                    },
+                    {
+                        "name": "middleware",
+                        "type": "array",
+                        "default": "[]",
+                        "required": false,
+                        "summary": "run in the order given, outermost first; any of them may answer instead of letting the handler run"
                     }
                 ],
                 "cases": [],
@@ -747,13 +772,13 @@
                 "fqcn": "Tempcord\\Interfaces\\Middleware",
                 "kind": "interface",
                 "target": null,
-                "summary": "Something that runs before a command, and may decide it never runs.",
+                "summary": "Something that runs before a handler, and may decide it never runs.",
                 "slug": "reference/middleware/middleware",
                 "parameters": [],
                 "cases": [],
                 "methods": [
                     {
-                        "signature": "__invoke(CommandInteraction $interaction, callable $next): void",
+                        "signature": "__invoke(CommandInteraction|ButtonInteraction|ComponentInteraction|ModalSubmitInteraction $interaction, callable $next): void",
                         "summary": ""
                     }
                 ]

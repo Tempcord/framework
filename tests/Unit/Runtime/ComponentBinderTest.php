@@ -12,6 +12,7 @@ use Tempcord\Registries\ComponentsRegistry;
 use Tempcord\Runtime\ComponentArgumentResolver;
 use Tempcord\Runtime\ComponentBinder;
 use Tempcord\Runtime\ComponentDispatcher;
+use Tempcord\Runtime\MiddlewarePipeline;
 use Tempcord\Runtime\Outcome;
 use Tempcord\Tests\Doubles\FakeDiscord;
 use Tempcord\Tests\Doubles\Interactions;
@@ -59,6 +60,8 @@ final class ComponentBinderTest extends BaseTestCase
                 new ComponentArgumentResolver($this->discord),
                 new GenericContainer(),
                 $this->logger,
+                new MiddlewarePipeline(new GenericContainer()),
+                $this->discord,
             ),
         );
     }

@@ -14,6 +14,7 @@ Build Discord bots with PHP, on top of [Tempest](https://tempestphp.com).
 - [Plugins](guides/06-plugins.md)
 - [Components](guides/07-components.md)
 - [Cache](guides/08-cache.md)
+- [Middleware](guides/09-middleware.md)
 
 ## Reference
 

@@ -23,7 +23,6 @@ use Tempcord\Definitions\OptionDefinition;
 use Tempcord\Definitions\SubcommandDefinition;
 use Tempcord\Definitions\SubcommandGroupDefinition;
 use Tempcord\Interfaces\Autocomplete;
-use Tempcord\Interfaces\Middleware;
 use Tempcord\Localization\LocalizationProvider;
 use Tempcord\Localization\NullLocalizations;
 use ReflectionEnum;
@@ -68,7 +67,7 @@ final readonly class CommandCompiler
         $handlers = [];
 
         $key = $command->translationKey;
-        $around = $this->middlewareOf($command->middleware, 'Command [' . $name . ']');
+        $around = DeclaredMiddleware::checked($command->middleware, 'Command [' . $name . ']');
         $group = $this->groupOf($class, $key);
         $subcommands = $this->subcommandsOf($class, $key);
 
@@ -216,7 +215,7 @@ final readonly class CommandCompiler
             subcommands: $this->subcommandsOf($class, $groupKey),
             nameLocalizations: $this->translate($groupKey, 'name'),
             descriptionLocalizations: $this->translate($groupKey, 'description'),
-            middleware: $this->middlewareOf($group->middleware, 'Subcommand group [' . $name . ']'),
+            middleware: DeclaredMiddleware::checked($group->middleware, 'Subcommand group [' . $name . ']'),
         );
     }
 
@@ -245,7 +244,7 @@ final readonly class CommandCompiler
                 method: $method,
                 nameLocalizations: $this->translate($subcommandKey, 'name'),
                 descriptionLocalizations: $this->translate($subcommandKey, 'description'),
-                middleware: $this->middlewareOf($subcommand->middleware, 'Subcommand [' . $name . ']'),
+                middleware: DeclaredMiddleware::checked($subcommand->middleware, 'Subcommand [' . $name . ']'),
             );
         }
 
@@ -351,43 +350,6 @@ final readonly class CommandCompiler
         }
 
         return null;
-    }
-
-    /**
-     * Middleware as declared, checked before anything is built out of it.
-     *
-     * A class name that turns out not to be middleware is a mistake worth
-     * catching here: discovery runs at start-up, so the bot refuses to boot
-     * rather than failing the first time somebody uses the command it was meant
-     * to guard — which, for a guard, is the worst moment to find out.
-     *
-     * @param array<mixed> $declared
-     *
-     * @return list<Middleware|class-string<Middleware>>
-     */
-    private function middlewareOf(array $declared, string $where): array
-    {
-        $middleware = [];
-
-        foreach ($declared as $entry) {
-            if ($entry instanceof Middleware) {
-                $middleware[] = $entry;
-                continue;
-            }
-
-            if (is_string($entry) && is_subclass_of($entry, Middleware::class)) {
-                $middleware[] = $entry;
-                continue;
-            }
-
-            throw new LogicException(
-                $where . ' declares middleware ['
-                . (is_string($entry) ? $entry : get_debug_type($entry))
-                . '], which does not implement ' . Middleware::class,
-            );
-        }
-
-        return $middleware;
     }
 
     /**
