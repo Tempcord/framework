@@ -1,3 +1,13 @@
+## [1.0.0](https://github.com/Tempcord/framework/compare/v0.14.0...v1.0.0) (2026-09-03)
+
+### ⚠ BREAKING CHANGES
+
+* **middleware:** guard a component the way a command is guarded (#22)
+
+### Features
+
+* **middleware:** guard a component the way a command is guarded ([#22](https://github.com/Tempcord/framework/issues/22)) ([b1f6e4e](https://github.com/Tempcord/framework/commit/b1f6e4ebde5c4f23bbd4b963560f7bed001f1e2c))
+
 ## [0.14.0](https://github.com/Tempcord/framework/compare/v0.13.0...v0.14.0) (2026-09-03)
 
 ### Features
