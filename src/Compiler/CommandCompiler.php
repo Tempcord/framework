@@ -233,7 +233,7 @@ final readonly class CommandCompiler
 
             /** @var Option $option */
             $option = $parameter->getAttribute(Option::class);
-            $name = $option->name ?? $parameter->getName();
+            $name = $option->name ?? $this->optionNameOf($parameter);
 
             $optionKey = $this->nest($key, $name);
 
@@ -257,6 +257,24 @@ final readonly class CommandCompiler
         }
 
         return $options;
+    }
+
+    /**
+     * The name an option takes from the parameter carrying it.
+     *
+     * Discord will not accept an option name with a capital in it, and rejects
+     * the whole set of commands over one — through a Bad Request that names the
+     * offender only by its position in the list. A parameter is idiomatically
+     * camelCase, so left alone it is a trap. Commands and components already
+     * take their names from PHP this way; options were the one place that did
+     * not.
+     */
+    private function optionNameOf(ParameterReflector $parameter): string
+    {
+        return str($parameter->getName())
+            ->snake('_')
+            ->lower()
+            ->toString();
     }
 
     /**
