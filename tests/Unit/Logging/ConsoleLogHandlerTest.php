@@ -24,6 +24,38 @@ final class ConsoleLogHandlerTest extends BaseTestCase
         );
     }
 
+    /**
+     * The REST layer logs every request it sends and every bucket it queues one
+     * in, all at debug. Left through, four lines of that arrive for each thing
+     * the bot does, and a warning in the middle of them goes unread.
+     */
+    public function test_it_writes_nothing_below_its_level(): void
+    {
+        $console = $this->createMock(Console::class);
+        $console->expects($this->never())->method('info');
+
+        new ConsoleLogHandler($console, level: Level::Info)
+            ->handle($this->record('BUCKET queued REQ GET channels/1/messages', level: Level::Debug));
+    }
+
+    public function test_it_writes_what_is_at_or_above_its_level(): void
+    {
+        $console = $this->createMock(Console::class);
+        $console->expects($this->once())->method('warning');
+
+        new ConsoleLogHandler($console, includeTimestamp: false, includeContext: false, level: Level::Info)
+            ->handle($this->record('rate limited', level: Level::Warning));
+    }
+
+    public function test_debug_still_gets_through_when_that_is_what_was_asked_for(): void
+    {
+        $console = $this->createMock(Console::class);
+        $console->expects($this->once())->method('info');
+
+        new ConsoleLogHandler($console, includeTimestamp: false, includeContext: false, level: Level::Debug)
+            ->handle($this->record('a detail', level: Level::Debug));
+    }
+
     public function test_it_prefixes_the_timestamp_when_asked(): void
     {
         $console = $this->createMock(Console::class);
