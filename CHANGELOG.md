@@ -1,3 +1,9 @@
+## [0.14.0](https://github.com/Tempcord/framework/compare/v0.13.0...v0.14.0) (2026-09-03)
+
+### Features
+
+* **commands:** run middleware around a command ([#21](https://github.com/Tempcord/framework/issues/21)) ([270afd4](https://github.com/Tempcord/framework/commit/270afd4de13cd9fa2db79f14292b7219b6781b24))
+
 ## [0.13.0](https://github.com/Tempcord/framework/compare/v0.12.4...v0.13.0) (2026-09-03)
 
 ### Features
