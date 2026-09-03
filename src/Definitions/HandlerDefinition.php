@@ -2,6 +2,7 @@
 
 namespace Tempcord\Definitions;
 
+use Tempcord\Interfaces\Middleware;
 use Tempest\Reflection\MethodReflector;
 
 /**
@@ -17,12 +18,16 @@ final readonly class HandlerDefinition
      * @param array<string, OptionDefinition> $options keyed by option name
      * @param string $optionPath the prefix getOption() needs to reach this
      *                           handler's options, empty for an invokable command
+     * @param list<Middleware|class-string<Middleware>> $middleware everything
+     *        declared around this handler, flattened outermost first — the
+     *        command's, then its group's, then the subcommand's own
      */
     public function __construct(
         public string $path,
         public MethodReflector $method,
         public array $options,
         public string $optionPath = '',
+        public array $middleware = [],
     ) {}
 
     /**

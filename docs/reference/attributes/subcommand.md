@@ -16,4 +16,5 @@ use Tempcord\Attributes\Subcommand;
 | --- | --- | --- | --- |
 | `name` | `BackedEnum\|string` | *required* |  |
 | `description` | `string` | *required* |  |
+| `middleware` | `array` | `[]` | run after whatever the command and the group around it declare |
 

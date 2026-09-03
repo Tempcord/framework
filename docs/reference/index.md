@@ -47,3 +47,8 @@
 
 - [Plugin](plugins/plugin.md) — A package that extends a bot with its own behaviour.
 
+## Middleware
+
+- [Middleware](middleware/middleware.md) — Something that runs before a command, and may decide it never runs.
+- [RequiresPermissions](middleware/requires-permissions.md) — Refuses anyone whose permissions in the channel fall short.
+

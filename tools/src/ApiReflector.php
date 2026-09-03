@@ -60,6 +60,10 @@ final readonly class ApiReflector
         'plugins' => [
             \Tempcord\Plugins\Plugin::class,
         ],
+        'middleware' => [
+            \Tempcord\Interfaces\Middleware::class,
+            \Tempcord\Middleware\RequiresPermissions::class,
+        ],
     ];
 
     /**

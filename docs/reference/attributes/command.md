@@ -23,4 +23,5 @@ use Tempcord\Attributes\Command;
 | `type` | `ApplicationCommandTypes` | `ApplicationCommandTypes::CHAT_INPUT` |  |
 | `handler` | `?EntryPointCommandHandlerType` | `null` |  |
 | `translationKey` | `?string` | `null` | the catalog key this command's translations live under. Keys for everything beneath it are derived from position, so "commands.music" gives commands.music.description for the command, commands.music.playlist.play.description for a subcommand, and commands.music.playlist.play.title.description for its option. |
+| `middleware` | `array` | `[]` | run in the order given, outermost first, before any handler this command has; any of them may answer instead of letting it run |
 

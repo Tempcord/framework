@@ -11,11 +11,14 @@ use Tempcord\Discord\Parts\InteractionData;
 use Tempcord\Definitions\HandlerDefinition;
 use Tempcord\Runtime\ArgumentResolver;
 use Tempcord\Runtime\CommandDispatcher;
+use Tempcord\Runtime\MiddlewarePipeline;
 use Tempcord\Runtime\OptionValueResolver;
 use Tempcord\Tests\Doubles\FakeDiscord;
 use Tempcord\Tests\Doubles\RecordingHttp;
 use Tempcord\Tests\Doubles\RecordingLogger;
+use Tempcord\Tests\Fixtures\GuardedCommand;
 use Tempcord\Tests\Fixtures\RecordingCommand;
+use Tempcord\Tests\Fixtures\TrailMiddleware;
 use Tempcord\Tests\Fixtures\ThrowingCommand;
 use Tempcord\Tests\Unit\TestCase;
 use Tempest\Container\GenericContainer;
@@ -28,6 +31,8 @@ final class CommandDispatcherTest extends TestCase
     protected function setUp(): void
     {
         RecordingCommand::$calls = [];
+        GuardedCommand::$calls = [];
+        TrailMiddleware::$trail = [];
         $this->logger = new RecordingLogger();
     }
 
@@ -37,6 +42,7 @@ final class CommandDispatcherTest extends TestCase
             new ArgumentResolver(new OptionValueResolver(new FakeDiscord(new RecordingHttp()))),
             new GenericContainer(),
             $this->logger,
+            new MiddlewarePipeline(new GenericContainer()),
         );
     }
 
@@ -79,6 +85,17 @@ final class CommandDispatcherTest extends TestCase
 
         $this->assertSame(['world'], RecordingCommand::$calls);
         $this->assertSame([], $this->logger->messages);
+    }
+
+    public function test_it_runs_the_middleware_declared_around_a_handler(): void
+    {
+        $this->dispatcher()->dispatch(
+            $this->handler(GuardedCommand::class, 'guarded.shut'),
+            $this->interaction('guarded', []),
+        );
+
+        $this->assertSame(['outer', 'inner'], TrailMiddleware::$trail);
+        $this->assertSame(['shut'], GuardedCommand::$calls);
     }
 
     /**

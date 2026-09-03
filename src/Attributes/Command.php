@@ -34,6 +34,9 @@ final readonly class Command
      *        commands.music.description for the command,
      *        commands.music.playlist.play.description for a subcommand, and
      *        commands.music.playlist.play.title.description for its option.
+     * @param list<\Tempcord\Interfaces\Middleware|class-string<\Tempcord\Interfaces\Middleware>> $middleware
+     *        run in the order given, outermost first, before any handler this
+     *        command has; any of them may answer instead of letting it run
      */
     public function __construct(
         public string|BackedEnum|null $name = null,
@@ -45,6 +48,7 @@ final readonly class Command
         public ApplicationCommandTypes $type = ApplicationCommandTypes::CHAT_INPUT,
         public ?EntryPointCommandHandlerType $handler = null,
         public ?string $translationKey = null,
+        public array $middleware = [],
     ) {
         $this->guildId = $guildId === null ? null : (string) $guildId;
     }

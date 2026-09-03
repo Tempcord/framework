@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\VarExporter\VarExporter;
 use Tempcord\Compiler\CommandCompiler;
 use Tempcord\Definitions\OptionDefinition;
+use Tempcord\Tests\Fixtures\InlineGuardedCommand;
 use Tempcord\Tests\Fixtures\PlatformCommand;
 use Tempcord\Tests\Unit\TestCase;
 use Throwable;
@@ -49,6 +50,40 @@ final class DefinitionsAreCacheableTest extends TestCase
 
         $this->assertEquals($definition, $restored);
         $this->assertSame('platform', $restored->options['platform']->parameter()->getName());
+    }
+
+    /**
+     * Middleware written as an object inside an attribute is held in the
+     * definition as that object, so it goes through the cache the same way an
+     * inline autocomplete does — and would take the whole location's cache down
+     * with it if it could not be written back out as PHP.
+     */
+    public function test_middleware_written_inline_survives_the_cache(): void
+    {
+        $definition = $this->definition(InlineGuardedCommand::class);
+
+        $this->assertNotEmpty($definition->handlers['inline_guarded']->middleware);
+
+        try {
+            $exported = VarExporter::export($definition);
+        } catch (Throwable $throwable) {
+            $this->fail('Middleware written inline must be exportable, but: ' . $throwable->getMessage());
+        }
+
+        $file = tempnam(sys_get_temp_dir(), 'definition') . '.php';
+        file_put_contents($file, '<?php return ' . $exported . ';');
+
+        try {
+            $restored = require $file;
+        } finally {
+            unlink($file);
+        }
+
+        $this->assertEquals($definition, $restored);
+        $this->assertSame(
+            'Not for you.',
+            $restored->handlers['inline_guarded']->middleware[0]->refusal,
+        );
     }
 
     public function test_an_option_still_reaches_the_parameter_it_feeds(): void
