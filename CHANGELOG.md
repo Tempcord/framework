@@ -1,3 +1,9 @@
+## [0.13.0](https://github.com/Tempcord/framework/compare/v0.12.4...v0.13.0) (2026-09-03)
+
+### Features
+
+* **commands:** let a command be an activity entry point ([8794dbb](https://github.com/Tempcord/framework/commit/8794dbbfda9560fbc66fa06246516d76c6bd6e1c))
+
 ## [0.12.4](https://github.com/Tempcord/framework/compare/v0.12.3...v0.12.4) (2026-09-03)
 
 ### Bug Fixes
