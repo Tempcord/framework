@@ -1,3 +1,9 @@
+## [0.12.3](https://github.com/Tempcord/framework/compare/v0.12.2...v0.12.3) (2026-09-03)
+
+### Bug Fixes
+
+* **logging:** keep a console channel at its configured level ([d03eaad](https://github.com/Tempcord/framework/commit/d03eaad259970f8809a01376ac7859ca514f497a))
+
 ## [0.12.2](https://github.com/Tempcord/framework/compare/v0.12.1...v0.12.2) (2026-09-03)
 
 ### Bug Fixes
