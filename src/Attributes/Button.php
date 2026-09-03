@@ -21,8 +21,12 @@ final readonly class Button
      *        out of the incoming id and passed to same-named parameters.
      *        Defaults to the class name with a Button prefix or suffix stripped
      *        and the rest snake_cased.
+     * @param list<\Tempcord\Interfaces\Middleware|class-string<\Tempcord\Interfaces\Middleware>> $middleware
+     *        run in the order given, outermost first; any of them may
+     *        answer instead of letting the handler run
      */
     public function __construct(
         public string|BackedEnum|null $id = null,
+        public array $middleware = [],
     ) {}
 }

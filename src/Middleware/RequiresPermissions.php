@@ -3,7 +3,10 @@
 namespace Tempcord\Middleware;
 
 use Tempcord\Discord\Enums\Permission;
+use Tempcord\Discord\Interaction\ButtonInteraction;
 use Tempcord\Discord\Interaction\CommandInteraction;
+use Tempcord\Discord\Interaction\ComponentInteraction;
+use Tempcord\Discord\Interaction\ModalSubmitInteraction;
 use Tempcord\Interfaces\Middleware;
 
 /**
@@ -39,7 +42,10 @@ final readonly class RequiresPermissions implements Middleware
         public string $refusal = 'You are not allowed to use this command.',
     ) {}
 
-    public function __invoke(CommandInteraction $interaction, callable $next): void
+    public function __invoke(
+        CommandInteraction|ButtonInteraction|ComponentInteraction|ModalSubmitInteraction $interaction,
+        callable $next,
+    ): void
     {
         if (!$this->allows($interaction)) {
             $interaction->reply($this->refusal, ephemeral: true);
@@ -50,7 +56,9 @@ final readonly class RequiresPermissions implements Middleware
         $next($interaction);
     }
 
-    private function allows(CommandInteraction $interaction): bool
+    private function allows(
+        CommandInteraction|ButtonInteraction|ComponentInteraction|ModalSubmitInteraction $interaction,
+    ): bool
     {
         $held = $interaction->interaction->member?->permissions;
 

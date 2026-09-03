@@ -2,7 +2,7 @@
 
 # Middleware
 
-Something that runs before a command, and may decide it never runs.
+Something that runs before a handler, and may decide it never runs.
 
 ```php
 use Tempcord\Interfaces\Middleware;
@@ -10,5 +10,5 @@ use Tempcord\Interfaces\Middleware;
 
 ## Methods
 
-### `__invoke(CommandInteraction $interaction, callable $next): void`
+### `__invoke(CommandInteraction|ButtonInteraction|ComponentInteraction|ModalSubmitInteraction $interaction, callable $next): void`
 

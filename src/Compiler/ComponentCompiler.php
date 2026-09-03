@@ -55,12 +55,24 @@ final readonly class ComponentCompiler
 
         foreach (self::ATTRIBUTES as $attribute => $kind) {
             foreach ($class->getAttributes($attribute) as $declaration) {
-                $definitions[] = $this->definition($class, $this->invokerOf($class, $kind), $kind, $declaration->id);
+                $definitions[] = $this->definition(
+                    $class,
+                    $this->invokerOf($class, $kind),
+                    $kind,
+                    $declaration->id,
+                    $declaration->middleware,
+                );
             }
 
             foreach ($class->getPublicMethods() as $method) {
                 foreach ($method->getAttributes($attribute) as $declaration) {
-                    $definitions[] = $this->definition($class, $method, $kind, $declaration->id);
+                    $definitions[] = $this->definition(
+                        $class,
+                        $method,
+                        $kind,
+                        $declaration->id,
+                        $declaration->middleware,
+                    );
                 }
             }
         }
@@ -68,17 +80,27 @@ final readonly class ComponentCompiler
         return $definitions;
     }
 
+    /**
+     * @param array<mixed> $middleware
+     */
     private function definition(
         ClassReflector $class,
         MethodReflector $method,
         ComponentKind $kind,
         string|BackedEnum|null $id,
+        array $middleware,
     ): ComponentDefinition {
+        $customId = CustomId::compile($this->idOf($class, $method, $kind, $id));
+
         return new ComponentDefinition(
             kind: $kind,
-            customId: CustomId::compile($this->idOf($class, $method, $kind, $id)),
+            customId: $customId,
             handler: $class->getName(),
             method: $method,
+            middleware: DeclaredMiddleware::checked(
+                $middleware,
+                ucfirst($kind->value) . ' "' . $customId->pattern . '"',
+            ),
         );
     }
 

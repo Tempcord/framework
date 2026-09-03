@@ -19,8 +19,12 @@ final readonly class SelectMenu
      * @param string|BackedEnum|null $id the menu's custom id, which may carry
      *        {placeholders}. Defaults to the class name with a SelectMenu prefix
      *        or suffix stripped and the rest snake_cased.
+     * @param list<\Tempcord\Interfaces\Middleware|class-string<\Tempcord\Interfaces\Middleware>> $middleware
+     *        run in the order given, outermost first; any of them may
+     *        answer instead of letting the handler run
      */
     public function __construct(
         public string|BackedEnum|null $id = null,
+        public array $middleware = [],
     ) {}
 }
