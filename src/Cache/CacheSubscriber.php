@@ -73,10 +73,10 @@ final class CacheSubscriber
 
         $events->on(Events::GUILD_MEMBER_ADD, fn(GuildMemberAdd $m) => $this->cache->putMember($m->guild_id, $m));
         $events->on(Events::GUILD_MEMBER_UPDATE, $this->onMemberUpdate(...));
-        $events->on(Events::GUILD_MEMBER_REMOVE, fn(GuildMemberRemove $m) => $this->cache->forgetMember($m->guild_id, $m->user->id));
+        $events->on(Events::GUILD_MEMBER_REMOVE, $this->onMemberRemove(...));
         $events->on(Events::GUILD_MEMBERS_CHUNK, $this->onMembersChunk(...));
 
-        $events->on(Events::VOICE_STATE_UPDATE, fn(VoiceStateUpdate $state) => $this->cache->putVoiceState($state));
+        $events->on(Events::VOICE_STATE_UPDATE, $this->onVoiceStateUpdate(...));
     }
 
     private function onGuildCreate(GuildCreate $guild): void
@@ -171,7 +171,14 @@ final class CacheSubscriber
      */
     private function onMemberUpdate(GuildMemberUpdate $update): void
     {
-        $member = $this->cache->member($update->guild_id, $update->user->id) ?? new GuildMember();
+        $cached = $this->cache->member($update->guild_id, $update->user->id);
+        /*
+         * The cache mutates the merged member below. A clone is the boundary
+         * that makes oldMember actually old, rather than another handle to the
+         * same object after its roles were replaced.
+         */
+        $update->oldMember = $cached === null ? null : clone $cached;
+        $member = $cached ?? new GuildMember();
         $member->user = $update->user;
 
         foreach (self::MEMBER_FIELDS as $field) {
@@ -181,5 +188,27 @@ final class CacheSubscriber
         }
 
         $this->cache->putMember($update->guild_id, $member);
+        $update->newMember = $member;
+    }
+
+    private function onMemberRemove(GuildMemberRemove $member): void
+    {
+        $cached = $this->cache->member($member->guild_id, $member->user->id);
+        $member->oldMember = $cached === null ? null : clone $cached;
+        $this->cache->forgetMember($member->guild_id, $member->user->id);
+    }
+
+    /**
+     * The gateway payload is the new state. Capture the old cached value
+     * before replacing or removing it, so voice listeners can distinguish a
+     * join, a move and a leave without a duplicate session cache.
+     */
+    private function onVoiceStateUpdate(VoiceStateUpdate $state): void
+    {
+        $state->oldState = $state->guild_id === null
+            ? null
+            : $this->cache->voiceState($state->guild_id, $state->user_id);
+
+        $this->cache->putVoiceState($state);
     }
 }

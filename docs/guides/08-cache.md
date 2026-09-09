@@ -60,6 +60,31 @@ $this->cache->putMember($guildId, $member);
 Command, component and event handlers all run inside a fiber, so awaiting like that is
 allowed anywhere your own code runs.
 
+## Before and after a state change
+
+For stateful gateway events, the cache subscriber also enriches the payload before any
+application listener receives it. A `GuildMemberUpdate` therefore has `oldMember` and
+`newMember`; `VoiceStateUpdate` is the new state and has `oldState`; and a
+`GuildMemberRemove` carries the cached member as `oldMember`. This makes a role or voice
+move a direct diff instead of an application maintaining a second, fragile cache:
+
+```php
+#[Event(name: Events::GUILD_MEMBER_UPDATE)]
+final readonly class RoleLog
+{
+    public function __invoke(GuildMemberUpdate $event): void
+    {
+        $before = $event->oldMember?->roles ?? [];
+        $after = $event->newMember?->roles ?? [];
+        $added = array_values(array_diff($after, $before));
+    }
+}
+```
+
+`oldMember` and `oldState` are null on the first event for an uncached member. They are
+also unavailable when `cache: false`, because there is deliberately no prior state to
+compare against.
+
 ## Turning it off
 
 The cache is on by default and can be switched off in `app/config/tempcord.config.php`:

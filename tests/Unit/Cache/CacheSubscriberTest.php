@@ -193,6 +193,7 @@ final class CacheSubscriberTest extends BaseTestCase
         $this->arrive(Events::GUILD_MEMBER_REMOVE, $left);
 
         $this->assertNull($this->cache->member('g1', 'u1'));
+        $this->assertSame(['r1'], $left->oldMember?->roles);
     }
 
     /**
@@ -213,6 +214,8 @@ final class CacheSubscriberTest extends BaseTestCase
         $this->arrive(Events::GUILD_MEMBER_UPDATE, $update);
 
         $this->assertSame(['r1', 'r2'], $this->cache->member('g1', 'u1')?->roles);
+        $this->assertSame(['r1'], $update->oldMember?->roles);
+        $this->assertSame(['r1', 'r2'], $update->newMember?->roles);
     }
 
     public function test_a_member_update_leaves_fields_it_does_not_carry_alone(): void
@@ -272,6 +275,8 @@ final class CacheSubscriberTest extends BaseTestCase
 
         $this->assertSame([], $this->cache->voiceStates('a'));
         $this->assertCount(1, $this->cache->voiceStates('b'));
+        $this->assertSame('a', $moved->oldState?->channel_id);
+        $this->assertSame('b', $moved->channel_id, 'the event itself is the new state');
     }
 
     /**
