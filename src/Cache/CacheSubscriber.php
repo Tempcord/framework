@@ -17,6 +17,10 @@ use Tempcord\Discord\Gateway\Events\GuildRoleCreate;
 use Tempcord\Discord\Gateway\Events\GuildRoleDelete;
 use Tempcord\Discord\Gateway\Events\GuildRoleUpdate;
 use Tempcord\Discord\Gateway\Events\GuildUpdate;
+use Tempcord\Discord\Gateway\Events\MessageCreate;
+use Tempcord\Discord\Gateway\Events\MessageDelete;
+use Tempcord\Discord\Gateway\Events\MessageDeleteBulk;
+use Tempcord\Discord\Gateway\Events\MessageUpdate;
 use Tempcord\Discord\Gateway\Events\ThreadCreate;
 use Tempcord\Discord\Gateway\Events\ThreadDelete;
 use Tempcord\Discord\Gateway\Events\ThreadUpdate;
@@ -24,6 +28,7 @@ use Tempcord\Discord\Gateway\Events\VoiceStateUpdate;
 use Tempcord\Discord\Gateway\Helpers\RequestGuildMembersBuilder;
 use Tempcord\Discord\Enums\Intent;
 use Tempcord\Discord\Parts\GuildMember;
+use Tempcord\Discord\Parts\Message;
 use Tempcord\TempcordConfig;
 
 /**
@@ -44,6 +49,9 @@ final class CacheSubscriber
         'nick', 'avatar', 'roles', 'joined_at', 'premium_since',
         'deaf', 'mute', 'pending', 'communication_disabled_until',
     ];
+
+    /** The subset Discord may send for an edit and a log needs to preserve. */
+    private const array MESSAGE_FIELDS = ['content', 'edited_timestamp', 'attachments', 'embeds', 'components'];
 
     public function __construct(
         private readonly Cache $cache,
@@ -75,6 +83,11 @@ final class CacheSubscriber
         $events->on(Events::GUILD_MEMBER_UPDATE, $this->onMemberUpdate(...));
         $events->on(Events::GUILD_MEMBER_REMOVE, $this->onMemberRemove(...));
         $events->on(Events::GUILD_MEMBERS_CHUNK, $this->onMembersChunk(...));
+
+        $events->on(Events::MESSAGE_CREATE, $this->onMessageCreate(...));
+        $events->on(Events::MESSAGE_UPDATE, $this->onMessageUpdate(...));
+        $events->on(Events::MESSAGE_DELETE, $this->onMessageDelete(...));
+        $events->on(Events::MESSAGE_DELETE_BULK, $this->onMessagesDeleteBulk(...));
 
         $events->on(Events::VOICE_STATE_UPDATE, $this->onVoiceStateUpdate(...));
     }
@@ -196,6 +209,62 @@ final class CacheSubscriber
         $cached = $this->cache->member($member->guild_id, $member->user->id);
         $member->oldMember = $cached === null ? null : clone $cached;
         $this->cache->forgetMember($member->guild_id, $member->user->id);
+    }
+
+    private function onMessageCreate(MessageCreate $message): void
+    {
+        if ($message->guild_id !== null) {
+            $this->cache->putMessage($message->guild_id, $message);
+        }
+    }
+
+    private function onMessageUpdate(MessageUpdate $update): void
+    {
+        if ($update->guild_id === null) {
+            return;
+        }
+
+        $cached = $this->cache->message($update->guild_id, $update->id);
+        $update->oldMessage = $cached === null ? null : clone $cached;
+        if ($cached === null) {
+            return;
+        }
+
+        foreach (self::MESSAGE_FIELDS as $field) {
+            if (isset($update->{$field})) {
+                $cached->{$field} = $update->{$field};
+            }
+        }
+
+        $this->cache->putMessage($update->guild_id, $cached);
+        $update->newMessage = clone $cached;
+    }
+
+    private function onMessageDelete(MessageDelete $message): void
+    {
+        if ($message->guild_id === null) {
+            return;
+        }
+
+        $cached = $this->cache->message($message->guild_id, $message->id);
+        $message->oldMessage = $cached === null ? null : clone $cached;
+        $this->cache->forgetMessage($message->guild_id, $message->id);
+    }
+
+    private function onMessagesDeleteBulk(MessageDeleteBulk $event): void
+    {
+        if ($event->guild_id === null) {
+            return;
+        }
+
+        foreach ($event->ids as $id) {
+            $message = $this->cache->message($event->guild_id, $id);
+            if ($message !== null) {
+                $event->oldMessages[] = clone $message;
+            }
+
+            $this->cache->forgetMessage($event->guild_id, $id);
+        }
     }
 
     /**

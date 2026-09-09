@@ -38,7 +38,9 @@ $this->cache->role($guildId, $roleId);
 ## What it holds, and what it does not
 
 The cache fills from `GUILD_CREATE` and then keeps step with the events that follow:
-channels, threads, roles, members and voice states. It only ever holds what your intents
+channels, threads, roles, members, messages and voice states. Messages begin at the
+first `MESSAGE_CREATE` the bot sees, so they can provide old content for an edit or
+delete during that connection; they are not durable message storage. It only ever holds what your intents
 already deliver — with no `GUILD_MEMBERS` intent there are no members in it.
 
 Two limits are worth knowing before you lean on it:

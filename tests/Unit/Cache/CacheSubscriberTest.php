@@ -13,6 +13,10 @@ use Tempcord\Discord\Gateway\Events\GuildMembersChunk;
 use Tempcord\Discord\Gateway\Events\GuildRoleCreate;
 use Tempcord\Discord\Gateway\Events\GuildRoleDelete;
 use Tempcord\Discord\Gateway\Events\GuildUpdate;
+use Tempcord\Discord\Gateway\Events\MessageCreate;
+use Tempcord\Discord\Gateway\Events\MessageDelete;
+use Tempcord\Discord\Gateway\Events\MessageDeleteBulk;
+use Tempcord\Discord\Gateway\Events\MessageUpdate;
 use Tempcord\Discord\Gateway\Events\ThreadCreate;
 use Tempcord\Discord\Gateway\Events\VoiceStateUpdate;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -277,6 +281,61 @@ final class CacheSubscriberTest extends BaseTestCase
         $this->assertCount(1, $this->cache->voiceStates('b'));
         $this->assertSame('a', $moved->oldState?->channel_id);
         $this->assertSame('b', $moved->channel_id, 'the event itself is the new state');
+    }
+
+    public function test_messages_keep_their_old_content_through_edits_and_deletes(): void
+    {
+        $this->arrive(Events::GUILD_CREATE, $this->guildCreate('g1'));
+
+        $created = new MessageCreate();
+        $created->id = 'm1';
+        $created->guild_id = 'g1';
+        $created->channel_id = 'c1';
+        $created->author = Parts::user('u1');
+        $created->content = 'before';
+        $this->arrive(Events::MESSAGE_CREATE, $created);
+
+        $edited = new MessageUpdate();
+        $edited->id = 'm1';
+        $edited->guild_id = 'g1';
+        $edited->channel_id = 'c1';
+        $edited->content = 'after';
+        $this->arrive(Events::MESSAGE_UPDATE, $edited);
+
+        $this->assertSame('before', $edited->oldMessage?->content);
+        $this->assertSame('after', $edited->newMessage?->content);
+
+        $deleted = new MessageDelete();
+        $deleted->id = 'm1';
+        $deleted->guild_id = 'g1';
+        $deleted->channel_id = 'c1';
+        $this->arrive(Events::MESSAGE_DELETE, $deleted);
+
+        $this->assertSame('after', $deleted->oldMessage?->content);
+        $this->assertNull($this->cache->message('g1', 'm1'));
+    }
+
+    public function test_a_bulk_delete_keeps_every_message_that_was_cached(): void
+    {
+        $this->arrive(Events::GUILD_CREATE, $this->guildCreate('g1'));
+
+        foreach (['m1', 'm2'] as $id) {
+            $message = new MessageCreate();
+            $message->id = $id;
+            $message->guild_id = 'g1';
+            $message->channel_id = 'c1';
+            $message->author = Parts::user('u1');
+            $message->content = $id;
+            $this->arrive(Events::MESSAGE_CREATE, $message);
+        }
+
+        $deleted = new MessageDeleteBulk();
+        $deleted->guild_id = 'g1';
+        $deleted->channel_id = 'c1';
+        $deleted->ids = ['m1', 'm2', 'uncached'];
+        $this->arrive(Events::MESSAGE_DELETE_BULK, $deleted);
+
+        $this->assertSame(['m1', 'm2'], array_map(static fn($message) => $message->id, $deleted->oldMessages));
     }
 
     /**

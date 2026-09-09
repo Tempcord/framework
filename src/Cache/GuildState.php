@@ -5,6 +5,7 @@ namespace Tempcord\Cache;
 use Tempcord\Discord\Parts\Channel;
 use Tempcord\Discord\Parts\Guild;
 use Tempcord\Discord\Parts\GuildMember;
+use Tempcord\Discord\Parts\Message;
 use Tempcord\Discord\Parts\Role;
 use Tempcord\Discord\Parts\VoiceState;
 
@@ -26,6 +27,9 @@ final class GuildState
 
     /** @var array<string, GuildMember> */
     public array $members = [];
+
+    /** @var array<string, Message> */
+    public array $messages = [];
 
     /** @var array<string, VoiceState> keyed by user id */
     public array $voiceStates = [];

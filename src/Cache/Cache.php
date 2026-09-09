@@ -5,6 +5,7 @@ namespace Tempcord\Cache;
 use Tempcord\Discord\Parts\Channel;
 use Tempcord\Discord\Parts\Guild;
 use Tempcord\Discord\Parts\GuildMember;
+use Tempcord\Discord\Parts\Message;
 use Tempcord\Discord\Parts\Role;
 use Tempcord\Discord\Parts\VoiceState;
 use Tempest\Container\Singleton;
@@ -76,6 +77,16 @@ final class Cache
     public function member(string $guildId, string $userId): ?GuildMember
     {
         return $this->guilds[$guildId]->members[$userId] ?? null;
+    }
+
+    /**
+     * Messages are intentionally short-lived in memory only: this lets event
+     * listeners read a deleted or edited message without turning the cache
+     * into permanent message storage.
+     */
+    public function message(string $guildId, string $messageId): ?Message
+    {
+        return $this->guilds[$guildId]->messages[$messageId] ?? null;
     }
 
     /**
@@ -196,6 +207,20 @@ final class Cache
     public function forgetMember(string $guildId, string $userId): void
     {
         unset($this->guilds[$guildId]->members[$userId]);
+    }
+
+    public function putMessage(string $guildId, Message $message): void
+    {
+        $state = $this->guilds[$guildId] ?? null;
+
+        if ($state !== null) {
+            $state->messages[$message->id] = $message;
+        }
+    }
+
+    public function forgetMessage(string $guildId, string $messageId): void
+    {
+        unset($this->guilds[$guildId]->messages[$messageId]);
     }
 
     /**

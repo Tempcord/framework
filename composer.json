@@ -28,7 +28,7 @@
     },
     "require": {
         "php": "^8.5",
-        "tempcord/discord-php": "^1.5",
+        "tempcord/discord-php": "^1.6",
         "tempest/console": "^3.18",
         "tempest/core": "^3.18",
         "tempest/database": "^3.18",
