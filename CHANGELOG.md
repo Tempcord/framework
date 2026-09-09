@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/Tempcord/framework/compare/v1.1.1...v1.2.0) (2026-09-09)
+
+### Features
+
+* **cache:** expose state transitions ([7988157](https://github.com/Tempcord/framework/commit/7988157f5f9e320ed4e8b8a347cc67d4033dd1ae))
+
 ## [1.0.0](https://github.com/Tempcord/framework/compare/v0.14.0...v1.0.0) (2026-09-03)
 
 ### ⚠ BREAKING CHANGES
