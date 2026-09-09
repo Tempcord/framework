@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/Tempcord/framework/compare/v1.2.0...v1.3.0) (2026-09-09)
+
+### Features
+
+* **cache:** retain message transitions ([28eb2de](https://github.com/Tempcord/framework/commit/28eb2dedd352a8cd9666697183949246c9c82624))
+
 ## [1.2.0](https://github.com/Tempcord/framework/compare/v1.1.1...v1.2.0) (2026-09-09)
 
 ### Features
