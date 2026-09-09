@@ -50,8 +50,8 @@ final class Pagination
         return $this->response($id, $session, 1, $ephemeral ? Response::ephemeral() : Response::message());
     }
 
-    #[Button(id: 'pagination.{session}.{page}')]
-    public function page(ButtonInteraction $interaction, string $session, int $page): void
+    #[Button(id: 'pagination.{session}.{action}.{page}')]
+    public function page(ButtonInteraction $interaction, string $session, string $action, int $page): void
     {
         $this->prune();
         $stored = $this->sessions[$session] ?? null;
@@ -83,16 +83,16 @@ final class Pagination
         }
 
         return $response
-            ->addButton(new SecondaryButton($this->buttonId($id, 1), '«', disabled: !$page->hasPrevious()))
-            ->addButton(new SecondaryButton($this->buttonId($id, $page->number - 1), '‹', disabled: !$page->hasPrevious()))
-            ->addButton(new PrimaryButton($this->buttonId($id, $page->number), $page->number . ' / ' . $page->totalPages, disabled: true))
-            ->addButton(new SecondaryButton($this->buttonId($id, $page->number + 1), '›', disabled: !$page->hasNext()))
-            ->addButton(new SecondaryButton($this->buttonId($id, $page->totalPages), '»', disabled: !$page->hasNext()));
+            ->addButton(new SecondaryButton($this->buttonId($id, 'first', 1), '«', disabled: !$page->hasPrevious()))
+            ->addButton(new SecondaryButton($this->buttonId($id, 'previous', $page->number - 1), '‹', disabled: !$page->hasPrevious()))
+            ->addButton(new PrimaryButton($this->buttonId($id, 'current', $page->number), $page->number . ' / ' . $page->totalPages, disabled: true))
+            ->addButton(new SecondaryButton($this->buttonId($id, 'next', $page->number + 1), '›', disabled: !$page->hasNext()))
+            ->addButton(new SecondaryButton($this->buttonId($id, 'last', $page->totalPages), '»', disabled: !$page->hasNext()));
     }
 
-    private function buttonId(string $session, int $page): string
+    private function buttonId(string $session, string $action, int $page): string
     {
-        return 'pagination.' . $session . '.' . max(1, $page);
+        return 'pagination.' . $session . '.' . $action . '.' . max(1, $page);
     }
 
     private function resolve(mixed $value): mixed

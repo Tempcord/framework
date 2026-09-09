@@ -45,11 +45,12 @@ final class PaginationTest extends TestCase
         $buttons = $response['data']['components'][0]['components'];
 
         $this->assertCount(5, $buttons);
+        $this->assertCount(5, array_unique(array_column($buttons, 'custom_id')));
         $this->assertTrue($buttons[0]['disabled']);
         $this->assertTrue($buttons[1]['disabled']);
         $this->assertSame('1 / 2', $buttons[2]['label']);
         $this->assertFalse($buttons[3]['disabled']);
-        $this->assertMatchesRegularExpression('/^pagination\.[a-f0-9]{12}\.2$/', $buttons[3]['custom_id']);
+        $this->assertMatchesRegularExpression('/^pagination\.[a-f0-9]{12}\.next\.2$/', $buttons[3]['custom_id']);
     }
 
     public function test_a_custom_async_paginator_receives_the_requested_page(): void
@@ -79,6 +80,6 @@ final class PaginationTest extends TestCase
         $definitions = (new ComponentCompiler())->compile(new ClassReflector(Pagination::class));
 
         $this->assertCount(1, $definitions);
-        $this->assertSame('pagination.{session}.{page}', $definitions[0]->customId->pattern);
+        $this->assertSame('pagination.{session}.{action}.{page}', $definitions[0]->customId->pattern);
     }
 }
