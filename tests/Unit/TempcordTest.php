@@ -84,6 +84,25 @@ final class TempcordTest extends TestCase
     }
 
     /**
+     * A non-resumable reconnect ends in a fresh READY. Registering the
+     * extensions again would add a second set of gateway listeners, and every
+     * interaction would then be dispatched twice — the second reply rejected by
+     * Discord as already acknowledged (40060).
+     */
+    public function test_a_second_ready_does_not_register_the_extensions_again(): void
+    {
+        $this->bot();
+        $events = $this->discord->gateway->events;
+
+        $events->emit(Events::READY, [new Ready()]);
+        $listeners = count($events->listeners(Events::INTERACTION_CREATE));
+
+        $events->emit(Events::READY, [new Ready()]);
+
+        $this->assertCount($listeners, $events->listeners(Events::INTERACTION_CREATE));
+    }
+
+    /**
      * Listening covers both registries, so a bot with commands and events gets
      * one report describing everything that was wired up.
      */

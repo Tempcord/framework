@@ -36,7 +36,12 @@ final class Tempcord
         private readonly PluginBooter $pluginBooter,
         private readonly ?CacheSubscriber $cacheSubscriber = null,
     ) {
-        $this->discord->gateway->events->on(Events::READY, function (Ready $ready): void {
+        /*
+         * Once, not on every READY: a non-resumable reconnect ends in another
+         * one, and the extensions' gateway listeners outlive the session.
+         * Registering them again would dispatch every interaction twice.
+         */
+        $this->discord->gateway->events->once(Events::READY, function (Ready $ready): void {
             $this->discord->registerExtension($this->binder->extension);
             $this->discord->registerExtension($this->componentBinder->extension);
             $this->booted = true;

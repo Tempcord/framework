@@ -40,12 +40,13 @@ Definitions → Registries → Binder/Dispatcher**. Рефлексия выпо�
   каждый `MESSAGE_CREATE`, удаление — только на `MESSAGE_DELETE`. Комментарий
   обещает «short-lived», но вытеснения нет. Нужен лимит (LRU / ring buffer на
   guild или канал) или TTL.
-- [ ] **2. Дублирование handler'ов после reconnect (вероятно).**
+- [x] **2. Дублирование handler'ов после reconnect.** Исправлено в 2.0.1
+  (`once(READY)`). В боте apex-ua воспроизведено: Discord отвечал 40060.
   `Tempcord::__construct` регистрирует extension'ы на каждый `READY`. При
   невозобновляемом reconnect `Connection::startNewConnection()` заново делает
   identify → новый `READY` → `initialize()` создаёт ещё один
   `FilteredEventEmitter` на том же `gateway->events`. Каждая команда и кнопка
-  срабатывает N раз. Вживую не воспроизведено. Регистрировать один раз.
+  срабатывает N раз.
 - [ ] **3. USER/CHANNEL/ROLE-опции всегда идут в REST.**
   `OptionValueResolver` делает `await rest->user->get()` и т. п., хотя Discord
   присылает объекты в `interaction.data.resolved` (их уже использует
@@ -108,7 +109,9 @@ Definitions → Registries → Binder/Dispatcher**. Рефлексия выпо�
   уже исправлен, обход можно удалить.
 - [ ] `CommandRegistrar::buildHttp()` — второй HTTP-клиент; в форке уже есть
   `GlobalCommand::bulkOverwriteApplicationCommands`.
-- [ ] `src/Discord/InteractionCallbackBuilder.php` — подкласс ради `choices`.
+- [ ] `Runtime/Autocomplete/InteractionCallbackBuilder.php` — подкласс ради
+  `choices`. В 2.0.1 исправлен пустой список: раньше `data.choices` не
+  отправлялось, и Discord отвечал 50035. Сам подкласс ещё надо перенести в форк.
 - [ ] `src/Discord/AllCommandExtension.php` — расширение ради autocomplete.
 
 ## Оверинжиниринг
