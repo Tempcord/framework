@@ -1,3 +1,20 @@
+## [2.0.0](https://github.com/Tempcord/framework/compare/v1.3.0...v2.0.0) (2026-10-31)
+
+### ⚠ BREAKING CHANGES
+
+* every public class has a new namespace, e.g.
+Tempcord\Attributes\Command is now Tempcord\Declare\Command\Command and
+Tempcord\Plugins\Plugin is now Tempcord\Declare\Contracts\Plugin. See
+"Upgrading from 1.x" in the README and the full mapping in
+docs/internal/architecture-review.md. Clear Tempest's discovery cache
+after upgrading.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+### Features
+
+* reorganise source into Declare, Compile, Runtime and Support ([a46108e](https://github.com/Tempcord/framework/commit/a46108eb6dd154826427b03d759c5c4aa2957c31))
+
 ## [1.3.0](https://github.com/Tempcord/framework/compare/v1.2.0...v1.3.0) (2026-09-09)
 
 ### Features
