@@ -20,13 +20,17 @@ final class InteractionCallbackBuilderTest extends BaseTestCase
         return $choice;
     }
 
-    public function test_it_omits_the_choices_key_when_none_were_set(): void
+    /**
+     * No suggestions is still an answer: Discord requires data.choices on an
+     * autocomplete result and rejects one without it (50035, BASE_TYPE_REQUIRED).
+     */
+    public function test_it_sends_an_empty_choice_list_when_there_are_no_suggestions(): void
     {
         $data = InteractionCallbackBuilder::new()
             ->setType(InteractionCallbackType::APPLICATION_COMMAND_AUTOCOMPLETE_RESULT)
             ->get();
 
-        $this->assertArrayNotHasKey('choices', $data['data'] ?? []);
+        $this->assertSame([], $data['data']['choices']);
     }
 
     public function test_it_adds_choices_to_the_callback_payload(): void
