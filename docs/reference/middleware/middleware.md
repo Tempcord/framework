@@ -5,7 +5,7 @@
 Something that runs before a handler, and may decide it never runs.
 
 ```php
-use Tempcord\Interfaces\Middleware;
+use Tempcord\Declare\Contracts\Middleware;
 ```
 
 ## Methods

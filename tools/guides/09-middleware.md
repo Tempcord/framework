@@ -5,7 +5,7 @@ A middleware runs before a handler and may decide it never runs. It is the answe
 handler that needs it.
 
 ```php
-use Tempcord\Interfaces\Middleware;
+use Tempcord\Declare\Contracts\Middleware;
 
 final readonly class ModerationOnly implements Middleware
 {
@@ -100,7 +100,7 @@ message) holds nothing:
 
 ```php
 use Tempcord\Discord\Enums\Permission;
-use Tempcord\Middleware\RequiresPermissions;
+use Tempcord\Support\Middleware\RequiresPermissions;
 
 #[Subcommand(
     name: 'panel',

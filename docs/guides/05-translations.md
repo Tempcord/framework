@@ -20,10 +20,10 @@ Without it, commands register with their declared names and descriptions and not
 A command declares one key. Everything beneath it follows from its position in the tree.
 
 ```php
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
-use Tempcord\Attributes\Subcommand;
-use Tempcord\Attributes\SubcommandGroup;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
+use Tempcord\Declare\Command\Subcommand;
+use Tempcord\Declare\Command\SubcommandGroup;
 
 #[Command(description: 'Music controls', translationKey: 'commands.music')]
 #[SubcommandGroup(name: 'playlist', description: 'Playlist controls')]

@@ -2,9 +2,9 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
-use Tempcord\Attributes\Subcommand;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
+use Tempcord\Declare\Command\Subcommand;
 
 #[Command(description: 'Moderation tools')]
 final class ModerationCommand

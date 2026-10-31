@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\ModalSubmit;
+use Tempcord\Declare\Component\ModalSubmit;
 
 #[ModalSubmit(id: 'ban.{member}')]
 final class BanModal

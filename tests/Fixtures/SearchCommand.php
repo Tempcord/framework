@@ -3,9 +3,9 @@
 namespace Tempcord\Tests\Fixtures;
 
 use Tempcord\Discord\Interaction\CommandInteraction;
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
-use Tempcord\AutoCompletes\ArrayAutocomplete;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
+use Tempcord\Support\Autocomplete\ArrayAutocomplete;
 
 #[Command(description: 'Suggests as you type')]
 final class SearchCommand

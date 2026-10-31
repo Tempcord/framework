@@ -3,7 +3,7 @@
 # ArrayAutocomplete
 
 ```php
-use Tempcord\AutoCompletes\ArrayAutocomplete;
+use Tempcord\Support\Autocomplete\ArrayAutocomplete;
 ```
 
 ## Parameters

@@ -5,7 +5,7 @@
 Groups every subcommand its class declares under one more level of nesting.
 
 ```php
-use Tempcord\Attributes\SubcommandGroup;
+use Tempcord\Declare\Command\SubcommandGroup;
 ```
 
 **Applies to:** class

@@ -11,9 +11,9 @@ extra class, and the command's own dependencies are already to hand.
 
 ```php
 use Tempcord\Discord\Interaction\CommandInteraction;
-use Tempcord\Attributes\Autocomplete;
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
+use Tempcord\Declare\Command\Autocomplete;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
 
 /**
  * A command that suggests its own values, using the dependencies it already has.
@@ -67,9 +67,9 @@ never change.
 
 ```php
 use Tempcord\Discord\Interaction\CommandInteraction;
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
-use Tempcord\AutoCompletes\ArrayAutocomplete;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
+use Tempcord\Support\Autocomplete\ArrayAutocomplete;
 
 #[Command(description: 'Suggests as you type')]
 final class SearchCommand
@@ -92,7 +92,7 @@ When the same suggestions are wanted by more than one command, name a class impl
 
 ```php
 use Tempcord\Discord\Interaction\CommandInteraction;
-use Tempcord\Interfaces\Autocomplete;
+use Tempcord\Declare\Contracts\Autocomplete;
 
 /**
  * An autocomplete with a dependency, which only works because it is named by
@@ -117,8 +117,8 @@ Point the option at it by name:
 
 ```php
 use Tempcord\Discord\Interaction\CommandInteraction;
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
 
 #[Command(description: 'Suggests from a service')]
 final class InjectedSearchCommand

@@ -2,8 +2,8 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
 use Tempcord\Discord\Interaction\CommandInteraction;
 
 #[Command(description: 'Options named after camelCase parameters')]

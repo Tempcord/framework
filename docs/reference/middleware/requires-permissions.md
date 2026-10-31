@@ -5,7 +5,7 @@
 Refuses anyone whose permissions in the channel fall short.
 
 ```php
-use Tempcord\Middleware\RequiresPermissions;
+use Tempcord\Support\Middleware\RequiresPermissions;
 ```
 
 ## Parameters

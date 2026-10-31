@@ -5,7 +5,7 @@
 Writes to a member privately, on a best-effort basis.
 
 ```php
-use Tempcord\Messaging\DirectMessage;
+use Tempcord\Support\Messaging\DirectMessage;
 ```
 
 ## Parameters

@@ -9,9 +9,9 @@ has already told the bot, and hands it back synchronously.
 Ask the container for the cache and read from it:
 
 ```php
-use Tempcord\Cache\Cache;
+use Tempcord\Support\Cache\Cache;
 use Tempcord\Discord\Interaction\CommandInteraction;
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 #[Command(description: 'Is this member blocked?')]
 final readonly class BlockedCommand

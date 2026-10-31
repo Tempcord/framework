@@ -6,8 +6,8 @@ use Tempcord\Discord\Gateway\Events\InteractionCreate;
 use Tempcord\Discord\Interaction\ButtonInteraction;
 use Tempcord\Discord\Interaction\ComponentInteraction;
 use Tempcord\Discord\Interaction\ModalSubmitInteraction;
-use Tempcord\Attributes\Button;
-use Tempcord\Attributes\ModalSubmit;
+use Tempcord\Declare\Component\Button;
+use Tempcord\Declare\Component\ModalSubmit;
 
 /**
  * Every shape a handler may ask for the interaction in.

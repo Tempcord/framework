@@ -5,7 +5,7 @@
 A package that extends a bot with its own behaviour.
 
 ```php
-use Tempcord\Plugins\Plugin;
+use Tempcord\Declare\Contracts\Plugin;
 ```
 
 ## Methods

@@ -33,8 +33,8 @@ handles it, and each parameter marked `#[Option]` becomes an option Discord show
 
 ```php
 use Tempcord\Discord\Interaction\CommandInteraction;
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
 
 #[Command(description: 'Replies with pong')]
 final class PingCommand

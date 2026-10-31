@@ -5,7 +5,7 @@
 A component's custom id, which may carry {placeholders}.
 
 ```php
-use Tempcord\Runtime\CustomId;
+use Tempcord\Compile\Component\CustomId;
 ```
 
 ## Parameters

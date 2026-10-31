@@ -5,6 +5,6 @@
 What the gateway has told the bot about the guilds it is in.
 
 ```php
-use Tempcord\Cache\Cache;
+use Tempcord\Support\Cache\Cache;
 ```
 

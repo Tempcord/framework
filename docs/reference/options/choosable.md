@@ -5,7 +5,7 @@
 An enum that says how each of its cases should read in Discord.
 
 ```php
-use Tempcord\Interfaces\Choosable;
+use Tempcord\Declare\Contracts\Choosable;
 ```
 
 ## Methods

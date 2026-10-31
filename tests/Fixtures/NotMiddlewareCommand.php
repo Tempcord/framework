@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 /**
  * Names something that is not middleware at all, which discovery has to refuse.

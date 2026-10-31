@@ -5,7 +5,7 @@ namespace Tempcord\Tests\Fixtures;
 use Tempcord\Discord\Enums\ApplicationCommandTypes;
 use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Discord\Parts\User;
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 /**
  * A context menu on a user. Discord shows the name verbatim, so it is given

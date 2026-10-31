@@ -5,7 +5,7 @@
 Declares a class or method as the handler for a select menu choice.
 
 ```php
-use Tempcord\Attributes\SelectMenu;
+use Tempcord\Declare\Component\SelectMenu;
 ```
 
 **Applies to:** class, method

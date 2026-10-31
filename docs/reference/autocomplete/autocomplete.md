@@ -3,7 +3,7 @@
 # Autocomplete
 
 ```php
-use Tempcord\Interfaces\Autocomplete;
+use Tempcord\Declare\Contracts\Autocomplete;
 ```
 
 ## Methods

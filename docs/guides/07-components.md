@@ -10,7 +10,7 @@ name carries it — `ReportButton` answers `report`.
 
 ```php
 use Tempcord\Discord\Interaction\ButtonInteraction;
-use Tempcord\Attributes\Button;
+use Tempcord\Declare\Component\Button;
 
 #[Button]
 final class ReportButton
@@ -41,7 +41,7 @@ The attribute is repeatable and may sit on a method, so a family of related butt
 on one class:
 
 ```php
-use Tempcord\Attributes\Button;
+use Tempcord\Declare\Component\Button;
 
 /**
  * Several buttons on one class, keyed by what travels in the custom id.
@@ -71,7 +71,7 @@ final class TournamentButtons
 To build a matching id when you create the button, compile the same pattern:
 
 ```php
-use Tempcord\Runtime\CustomId;
+use Tempcord\Compile\Component\CustomId;
 
 CustomId::compile('tournament.accept.{team}')->build(['team' => $team->id]);
 ```
@@ -86,7 +86,7 @@ since Discord reports them all alike. A `$values` parameter receives everything 
 picked, and `$value` the first pick, which is null when the menu was cleared.
 
 ```php
-use Tempcord\Attributes\SelectMenu;
+use Tempcord\Declare\Component\SelectMenu;
 
 #[SelectMenu]
 final class PunishmentSelectMenu
@@ -113,7 +113,7 @@ named after a field's custom id receives what was typed into it. A field the use
 is not supplied at all, so the parameter's own default applies.
 
 ```php
-use Tempcord\Attributes\ModalSubmit;
+use Tempcord\Declare\Component\ModalSubmit;
 
 #[ModalSubmit(id: 'ban.{member}')]
 final class BanModal

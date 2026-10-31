@@ -5,7 +5,7 @@
 The locales Discord accepts for name and description localizations.
 
 ```php
-use Tempcord\Enums\DiscordLocale;
+use Tempcord\Support\Localization\DiscordLocale;
 ```
 
 ## Methods

@@ -25,44 +25,44 @@ final readonly class ApiReflector
      */
     private const array SURFACE = [
         'attributes' => [
-            \Tempcord\Attributes\Command::class,
-            \Tempcord\Attributes\SubcommandGroup::class,
-            \Tempcord\Attributes\Subcommand::class,
-            \Tempcord\Attributes\Option::class,
-            \Tempcord\Attributes\Event::class,
-            \Tempcord\Attributes\Autocomplete::class,
-            \Tempcord\Attributes\Button::class,
-            \Tempcord\Attributes\SelectMenu::class,
-            \Tempcord\Attributes\ModalSubmit::class,
+            \Tempcord\Declare\Command\Command::class,
+            \Tempcord\Declare\Command\SubcommandGroup::class,
+            \Tempcord\Declare\Command\Subcommand::class,
+            \Tempcord\Declare\Command\Option::class,
+            \Tempcord\Declare\Event\Event::class,
+            \Tempcord\Declare\Command\Autocomplete::class,
+            \Tempcord\Declare\Component\Button::class,
+            \Tempcord\Declare\Component\SelectMenu::class,
+            \Tempcord\Declare\Component\ModalSubmit::class,
         ],
         'options' => [
-            \Tempcord\Interfaces\Choosable::class,
+            \Tempcord\Declare\Contracts\Choosable::class,
         ],
         'autocomplete' => [
-            \Tempcord\Interfaces\Autocomplete::class,
-            \Tempcord\AutoCompletes\ArrayAutocomplete::class,
+            \Tempcord\Declare\Contracts\Autocomplete::class,
+            \Tempcord\Support\Autocomplete\ArrayAutocomplete::class,
         ],
         'cache' => [
-            \Tempcord\Cache\Cache::class,
+            \Tempcord\Support\Cache\Cache::class,
         ],
         'components' => [
-            \Tempcord\Runtime\CustomId::class,
+            \Tempcord\Compile\Component\CustomId::class,
         ],
         'configuration' => [
             \Tempcord\TempcordConfig::class,
         ],
         'messaging' => [
-            \Tempcord\Messaging\DirectMessage::class,
+            \Tempcord\Support\Messaging\DirectMessage::class,
         ],
         'enums' => [
-            \Tempcord\Enums\DiscordLocale::class,
+            \Tempcord\Support\Localization\DiscordLocale::class,
         ],
         'plugins' => [
-            \Tempcord\Plugins\Plugin::class,
+            \Tempcord\Declare\Contracts\Plugin::class,
         ],
         'middleware' => [
-            \Tempcord\Interfaces\Middleware::class,
-            \Tempcord\Middleware\RequiresPermissions::class,
+            \Tempcord\Declare\Contracts\Middleware::class,
+            \Tempcord\Support\Middleware\RequiresPermissions::class,
         ],
     ];
 

@@ -2,8 +2,8 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
 
 #[Command(description: 'Points at a class that cannot suggest anything')]
 final class NotAnAutocompleteCommand

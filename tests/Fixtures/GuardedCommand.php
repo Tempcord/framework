@@ -2,8 +2,8 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Subcommand;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Subcommand;
 
 #[Command(description: 'Guarded at every level', middleware: [OuterMiddleware::class])]
 final class GuardedCommand

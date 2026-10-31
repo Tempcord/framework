@@ -5,7 +5,7 @@
 Declares a class or method as the handler for a button press.
 
 ```php
-use Tempcord\Attributes\Button;
+use Tempcord\Declare\Component\Button;
 ```
 
 **Applies to:** class, method

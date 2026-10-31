@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Button;
+use Tempcord\Declare\Component\Button;
 
 /**
  * Several buttons on one class, keyed by what travels in the custom id.

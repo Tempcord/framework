@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Fixtures;
 
 use Tempcord\Discord\Enums\ApplicationCommandTypes;
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 #[Command(name: 'Опис', description: 'Discord has nowhere to show this', type: ApplicationCommandTypes::USER)]
 final class DescribedContextMenu

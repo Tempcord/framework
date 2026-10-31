@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Fixtures;
 
 use Tempcord\Discord\Interaction\CommandInteraction;
-use Tempcord\Interfaces\Autocomplete;
+use Tempcord\Declare\Contracts\Autocomplete;
 
 /**
  * An autocomplete with a dependency, which only works because it is named by

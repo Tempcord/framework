@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 use Tempcord\Discord\Enums\ApplicationCommandTypes;
 use Tempcord\Discord\Enums\EntryPointCommandHandlerType;
 

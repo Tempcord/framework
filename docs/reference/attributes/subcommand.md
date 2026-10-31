@@ -5,7 +5,7 @@
 Declares a public method as a subcommand of the command its class declares.
 
 ```php
-use Tempcord\Attributes\Subcommand;
+use Tempcord\Declare\Command\Subcommand;
 ```
 
 **Applies to:** method

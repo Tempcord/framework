@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Fixtures;
 
 use RuntimeException;
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 #[Command(description: 'Always fails')]
 final class ThrowingCommand

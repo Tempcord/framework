@@ -28,7 +28,7 @@ on one class:
 To build a matching id when you create the button, compile the same pattern:
 
 ```php
-use Tempcord\Runtime\CustomId;
+use Tempcord\Compile\Component\CustomId;
 
 CustomId::compile('tournament.accept.{team}')->build(['team' => $team->id]);
 ```

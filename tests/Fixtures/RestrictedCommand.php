@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Fixtures;
 
 use Tempcord\Discord\Enums\Permission;
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 #[Command(
     description: 'Only for moderators',

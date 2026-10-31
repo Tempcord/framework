@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\SelectMenu;
+use Tempcord\Declare\Component\SelectMenu;
 
 #[SelectMenu]
 final class PunishmentSelectMenu

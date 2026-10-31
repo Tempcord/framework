@@ -6,7 +6,7 @@ use Tempcord\Discord\Interaction\ButtonInteraction;
 use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Discord\Interaction\ComponentInteraction;
 use Tempcord\Discord\Interaction\ModalSubmitInteraction;
-use Tempcord\Interfaces\Middleware;
+use Tempcord\Declare\Contracts\Middleware;
 
 /**
  * Writes its own name into a shared trail on the way in, so a test can read

@@ -2,10 +2,10 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
-use Tempcord\Attributes\Subcommand;
-use Tempcord\Attributes\SubcommandGroup;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
+use Tempcord\Declare\Command\Subcommand;
+use Tempcord\Declare\Command\SubcommandGroup;
 
 #[Command(description: 'Music controls')]
 #[SubcommandGroup(name: 'playlist', description: 'Playlist controls')]

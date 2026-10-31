@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Fixtures;
 
 use Tempcord\Discord\Interaction\ButtonInteraction;
-use Tempcord\Attributes\Button;
+use Tempcord\Declare\Component\Button;
 
 #[Button]
 final class ReportButton

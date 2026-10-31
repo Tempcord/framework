@@ -2,9 +2,9 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Button;
-use Tempcord\Attributes\ModalSubmit;
-use Tempcord\Attributes\SelectMenu;
+use Tempcord\Declare\Component\Button;
+use Tempcord\Declare\Component\ModalSubmit;
+use Tempcord\Declare\Component\SelectMenu;
 use Tempcord\Discord\Interaction\ButtonInteraction;
 use Tempcord\Discord\Interaction\ComponentInteraction;
 use Tempcord\Discord\Interaction\ModalSubmitInteraction;

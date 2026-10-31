@@ -1,0 +1,446 @@
+<?php
+
+namespace Tempcord\Compile\Command;
+
+use LogicException;
+use Tempcord\Discord\Enums\ApplicationCommandOptionType;
+use Tempcord\Discord\Enums\ApplicationCommandTypes;
+use Tempcord\Discord\Enums\EntryPointCommandHandlerType;
+use Tempcord\Discord\Parts\Channel;
+use Tempcord\Discord\Parts\Role;
+use Tempcord\Discord\Parts\User;
+use Tempcord\Declare\Command\Autocomplete as AutocompleteAttribute;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
+use Tempcord\Declare\Command\Subcommand;
+use Tempcord\Declare\Command\SubcommandGroup;
+use Tempcord\Compile\Command\Definitions\AutocompleteDefinition;
+use Tempcord\Compile\Command\Definitions\CommandDefinition;
+use Tempcord\Compile\Command\Definitions\HandlerDefinition;
+use Tempcord\Compile\Command\Definitions\OptionDefinition;
+use Tempcord\Compile\Command\Definitions\SubcommandDefinition;
+use Tempcord\Compile\Command\Definitions\SubcommandGroupDefinition;
+use Tempcord\Declare\Contracts\Autocomplete;
+use Tempcord\Support\Localization\LocalizationProvider;
+use Tempcord\Support\Localization\NullLocalizations;
+use ReflectionEnum;
+use Tempcord\Declare\Contracts\Choosable;
+use Tempest\Reflection\ClassReflector;
+use Tempest\Reflection\MethodReflector;
+use Tempest\Reflection\ParameterReflector;
+use Tempcord\Compile\Concerns\DerivesNames;
+use Tempcord\Compile\Concerns\ReadsParameterTypes;
+use Tempcord\Compile\Concerns\RequiresInvoker;
+use Tempcord\Compile\Middleware\DeclaredMiddleware;
+
+/**
+ * Turns the attributes a user wrote into an immutable CommandDefinition.
+ *
+ * All reflection happens here, once, at discovery time. Attributes stay inert
+ * declarations and nothing downstream has to walk a class again.
+ */
+final readonly class CommandCompiler
+{
+    use DerivesNames;
+    use ReadsParameterTypes;
+    use RequiresInvoker;
+
+    public function __construct(
+        private LocalizationProvider $localizations = new NullLocalizations(),
+    ) {}
+
+    /**
+     * PHP parameter types the framework knows how to ask Discord for.
+     */
+    private const array OPTION_TYPES = [
+        'string' => ApplicationCommandOptionType::STRING,
+        'int' => ApplicationCommandOptionType::INTEGER,
+        'float' => ApplicationCommandOptionType::NUMBER,
+        'bool' => ApplicationCommandOptionType::BOOLEAN,
+        User::class => ApplicationCommandOptionType::USER,
+        Channel::class => ApplicationCommandOptionType::CHANNEL,
+        Role::class => ApplicationCommandOptionType::ROLE,
+    ];
+
+    public function compile(ClassReflector $class, Command $command): CommandDefinition
+    {
+        $name = $this->nameOf($class, $command);
+
+        $this->check($name, $command);
+
+        $options = [];
+        $handlers = [];
+
+        $key = $command->translationKey;
+        $around = DeclaredMiddleware::checked($command->middleware, 'Command [' . $name . ']');
+        $group = $this->groupOf($class, $key);
+        $subcommands = $this->subcommandsOf($class, $key);
+
+        if ($group !== null) {
+            $options[$group->name] = $group;
+
+            foreach ($group->subcommands as $subcommand) {
+                $path = $name . '.' . $group->name . '.' . $subcommand->name;
+
+                $handlers[$path] = new HandlerDefinition(
+                    path: $path,
+                    method: $subcommand->method,
+                    options: $subcommand->options,
+                    optionPath: $group->name . '.' . $subcommand->name,
+                    middleware: [...$around, ...$group->middleware, ...$subcommand->middleware],
+                );
+            }
+        } elseif ($subcommands !== []) {
+            foreach ($subcommands as $subcommand) {
+                $options[$subcommand->name] = $subcommand;
+                $path = $name . '.' . $subcommand->name;
+
+                $handlers[$path] = new HandlerDefinition(
+                    path: $path,
+                    method: $subcommand->method,
+                    options: $subcommand->options,
+                    optionPath: $subcommand->name,
+                    middleware: [...$around, ...$subcommand->middleware],
+                );
+            }
+        } elseif (!$this->isLaunchedByDiscord($command)) {
+            /*
+             * No subcommands anywhere means __invoke is the command, and its
+             * parameters are the command's options.
+             */
+            $invoke = $this->requireInvoker($class, 'should declare public sub-commands or have an __invoke method');
+            $options = $this->optionsOf($class, $invoke, $key);
+
+            $handlers[$name] = new HandlerDefinition(
+                path: $name,
+                method: $invoke,
+                options: $options,
+                middleware: $around,
+            );
+        }
+
+        return new CommandDefinition(
+            name: $name,
+            description: $command->description,
+            guildId: $command->guildId,
+            isNsfw: $command->isNsfw,
+            directMessage: $command->directMessage,
+            type: $command->type,
+            permissions: $command->permissions,
+            options: $options,
+            handlers: $handlers,
+            handler: $command->handler,
+            nameLocalizations: $this->translate($key, 'name'),
+            descriptionLocalizations: $this->translate($key, 'description'),
+        );
+    }
+
+    /**
+     * An entry point Discord answers itself never reaches the application, so
+     * the class describes the command and nothing more — there is no method to
+     * look for and nothing to bind.
+     */
+    private function isLaunchedByDiscord(Command $command): bool
+    {
+        return $command->handler === EntryPointCommandHandlerType::DISCORD_LAUNCH_ACTIVITY;
+    }
+
+    /**
+     * What Discord will and will not accept, said here rather than found out
+     * from a Bad Request that names the offender by its index in a list.
+     */
+    private function check(string $name, Command $command): void
+    {
+        $isEntryPoint = $command->type === ApplicationCommandTypes::PRIMARY_ENTRY_POINT;
+
+        if ($isEntryPoint !== ($command->handler !== null)) {
+            throw new LogicException($isEntryPoint
+                ? "Entry point command [{$name}] must say which handler answers it"
+                : "Command [{$name}] declares a handler, which only an entry point command has");
+        }
+
+        /*
+         * A context menu is the only kind Discord shows without one: it has
+         * nowhere to put it, so a description written here would be dropped on
+         * the way out.
+         */
+        $described = in_array(
+            $command->type,
+            [ApplicationCommandTypes::CHAT_INPUT, ApplicationCommandTypes::PRIMARY_ENTRY_POINT],
+            true,
+        );
+
+        if ($described && $command->description === null) {
+            throw new LogicException(
+                "Description for command [{$name}] is required when type={$command->type->name}",
+            );
+        }
+
+        if (!$described && $command->description !== null) {
+            throw new LogicException(
+                "Command [{$name}] is a context menu, which Discord shows without a description",
+            );
+        }
+    }
+
+    /**
+     * An explicit name wins; otherwise the class name carries it, with the
+     * conventional Command prefix or suffix stripped and the rest snake_cased.
+     */
+    private function nameOf(ClassReflector $class, Command $command): string
+    {
+        return $command->name !== null
+            ? $this->declaredName($command->name)
+            : $this->nameFromClass($class, ['Command']);
+    }
+
+    private function groupOf(ClassReflector $class, ?string $key): ?SubcommandGroupDefinition
+    {
+        if (!$class->hasAttribute(SubcommandGroup::class)) {
+            return null;
+        }
+
+        /** @var SubcommandGroup $group */
+        $group = $class->getAttribute(SubcommandGroup::class);
+        $name = $this->declaredName($group->name);
+        $groupKey = $this->nest($key, $name);
+
+        return new SubcommandGroupDefinition(
+            name: $name,
+            description: $group->description,
+            subcommands: $this->subcommandsOf($class, $groupKey),
+            nameLocalizations: $this->translate($groupKey, 'name'),
+            descriptionLocalizations: $this->translate($groupKey, 'description'),
+            middleware: DeclaredMiddleware::checked($group->middleware, 'Subcommand group [' . $name . ']'),
+        );
+    }
+
+    /**
+     * @return array<string, SubcommandDefinition>
+     */
+    private function subcommandsOf(ClassReflector $class, ?string $key): array
+    {
+        $subcommands = [];
+
+        foreach ($class->getPublicMethods() as $method) {
+            if (!$method->hasAttribute(Subcommand::class)) {
+                continue;
+            }
+
+            /** @var Subcommand $subcommand */
+            $subcommand = $method->getAttribute(Subcommand::class);
+            $name = $this->declaredName($subcommand->name);
+
+            $subcommandKey = $this->nest($key, $name);
+
+            $subcommands[$name] = new SubcommandDefinition(
+                name: $name,
+                description: $subcommand->description,
+                options: $this->optionsOf($class, $method, $subcommandKey),
+                method: $method,
+                nameLocalizations: $this->translate($subcommandKey, 'name'),
+                descriptionLocalizations: $this->translate($subcommandKey, 'description'),
+                middleware: DeclaredMiddleware::checked($subcommand->middleware, 'Subcommand [' . $name . ']'),
+            );
+        }
+
+        return $subcommands;
+    }
+
+    /**
+     * @return array<string, OptionDefinition>
+     */
+    private function optionsOf(ClassReflector $class, MethodReflector $method, ?string $key): array
+    {
+        $options = [];
+        $completers = $this->completersOf($class);
+
+        foreach ($method->getParameters() as $parameter) {
+            if (!$parameter->hasAttribute(Option::class)) {
+                continue;
+            }
+
+            /** @var Option $option */
+            $option = $parameter->getAttribute(Option::class);
+            $name = $option->name ?? $this->optionNameOf($parameter);
+
+            $optionKey = $this->nest($key, $name);
+
+            $options[$name] = new OptionDefinition(
+                name: $name,
+                description: $option->description,
+                type: $this->typeOf($parameter),
+                isRequired: !$parameter->isOptional(),
+                autocomplete: $this->autocompleteFor($option, $completers[$name] ?? null),
+                method: $method,
+                parameterName: $parameter->getName(),
+                choices: $this->choicesOf($option, $parameter),
+                minValue: $option->minValue,
+                maxValue: $option->maxValue,
+                minLength: $option->minLength,
+                maxLength: $option->maxLength,
+                channelTypes: $option->channelTypes,
+                nameLocalizations: $this->translate($optionKey, 'name'),
+                descriptionLocalizations: $this->translate($optionKey, 'description'),
+            );
+        }
+
+        return $options;
+    }
+
+    /**
+     * The name an option takes from the parameter carrying it.
+     *
+     * Discord will not accept an option name with a capital in it, and rejects
+     * the whole set of commands over one — through a Bad Request that names the
+     * offender only by its position in the list. A parameter is idiomatically
+     * camelCase, so left alone it is a trap. Commands and components already
+     * take their names from PHP this way; options were the one place that did
+     * not.
+     */
+    private function optionNameOf(ParameterReflector $parameter): string
+    {
+        return $this->snakeName($parameter->getName());
+    }
+
+    /**
+     * Where this option's suggestions come from.
+     *
+     * A method carrying #[Autocomplete] wins over the attribute's own argument:
+     * declaring both is a mistake, and the method is the more specific of the
+     * two, sitting on the command rather than beside the option.
+     */
+    private function autocompleteFor(Option $option, ?MethodReflector $completer): ?AutocompleteDefinition
+    {
+        if ($completer !== null) {
+            return AutocompleteDefinition::fromMethod($completer);
+        }
+
+        if ($option->autocomplete instanceof Autocomplete) {
+            return AutocompleteDefinition::fromInstance($option->autocomplete);
+        }
+
+        if (is_string($option->autocomplete)) {
+            if (!is_subclass_of($option->autocomplete, Autocomplete::class)) {
+                throw new LogicException(
+                    'Autocomplete [' . $option->autocomplete . '] does not implement '
+                    . Autocomplete::class,
+                );
+            }
+
+            return AutocompleteDefinition::fromClass($option->autocomplete);
+        }
+
+        return null;
+    }
+
+    /**
+     * The command's own methods that complete an option, keyed by the option
+     * each one answers for.
+     *
+     * @return array<string, MethodReflector>
+     */
+    private function completersOf(ClassReflector $class): array
+    {
+        $completers = [];
+
+        foreach ($class->getPublicMethods() as $method) {
+            foreach ($method->getAttributes(AutocompleteAttribute::class) as $attribute) {
+                $completers[$this->declaredName($attribute->option)] = $method;
+            }
+        }
+
+        return $completers;
+    }
+
+    /**
+     * A list of choices labels each entry with itself; a map uses its keys as
+     * the labels, matching how ArrayAutocomplete already reads its items.
+     *
+     * @return array<string, string|int|float>
+     */
+    private function choicesOf(Option $option, ParameterReflector $parameter): array
+    {
+        if ($option->choices === []) {
+            return $this->casesOf($parameter);
+        }
+
+        if (!array_is_list($option->choices)) {
+            return $option->choices;
+        }
+
+        $choices = [];
+
+        foreach ($option->choices as $choice) {
+            $choices[(string) $choice] = $choice;
+        }
+
+        return $choices;
+    }
+
+    /**
+     * Every case of an enum typed option, labelled the way the enum labels
+     * itself.
+     *
+     * Naming them is the whole reason to reach for an enum here rather than a
+     * string with a hand written choice list that has to be kept in step with
+     * it. An enum implementing Choosable says how each case reads; otherwise
+     * the case name is used, which is at least a name someone chose.
+     *
+     * @return array<string, string|int>
+     */
+    private function casesOf(ParameterReflector $parameter): array
+    {
+        $name = $this->parameterType($parameter);
+
+        if (!self::isBackedEnum($name)) {
+            return [];
+        }
+
+        $choices = [];
+
+        foreach ($name::cases() as $case) {
+            $label = $case instanceof Choosable ? $case->label() : $case->name;
+            $choices[$label] = $case->value;
+        }
+
+        return $choices;
+    }
+
+    private function typeOf(ParameterReflector $parameter): ApplicationCommandOptionType
+    {
+        $name = $this->parameterType($parameter)
+            ?? throw new LogicException('Command option does not have type');
+
+        if (self::isBackedEnum($name)) {
+            /*
+             * Discord has no enum of its own; a backed enum is a fixed set of
+             * values, which is a string or an integer option whose choices
+             * happen to be all of them.
+             */
+            return (new ReflectionEnum($name))->getBackingType()?->getName() === 'int'
+                ? ApplicationCommandOptionType::INTEGER
+                : ApplicationCommandOptionType::STRING;
+        }
+
+        return self::OPTION_TYPES[$name]
+            ?? throw new LogicException('Command option type not supported');
+    }
+
+    /**
+     * Extends a translation key one step down the command tree. Null stays
+     * null, so a command that declares no key localizes nothing.
+     */
+    private function nest(?string $key, string $segment): ?string
+    {
+        return $key === null ? null : $key . '.' . $segment;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function translate(?string $key, string $field): array
+    {
+        return $key === null ? [] : $this->localizations->forKey($key . '.' . $field);
+    }
+}

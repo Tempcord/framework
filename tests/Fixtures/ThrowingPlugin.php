@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Fixtures;
 
 use RuntimeException;
-use Tempcord\Plugins\Plugin;
+use Tempcord\Declare\Contracts\Plugin;
 use Tempcord\Tempcord;
 
 final class ThrowingPlugin implements Plugin

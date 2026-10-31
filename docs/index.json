@@ -41,7 +41,7 @@
         "attributes": [
             {
                 "name": "Command",
-                "fqcn": "Tempcord\\Attributes\\Command",
+                "fqcn": "Tempcord\\Declare\\Command\\Command",
                 "kind": "attribute",
                 "target": "class, method",
                 "summary": "Declares a class as a Discord application command.",
@@ -123,7 +123,7 @@
             },
             {
                 "name": "SubcommandGroup",
-                "fqcn": "Tempcord\\Attributes\\SubcommandGroup",
+                "fqcn": "Tempcord\\Declare\\Command\\SubcommandGroup",
                 "kind": "attribute",
                 "target": "class",
                 "summary": "Groups every subcommand its class declares under one more level of nesting.",
@@ -156,7 +156,7 @@
             },
             {
                 "name": "Subcommand",
-                "fqcn": "Tempcord\\Attributes\\Subcommand",
+                "fqcn": "Tempcord\\Declare\\Command\\Subcommand",
                 "kind": "attribute",
                 "target": "method",
                 "summary": "Declares a public method as a subcommand of the command its class declares.",
@@ -189,7 +189,7 @@
             },
             {
                 "name": "Option",
-                "fqcn": "Tempcord\\Attributes\\Option",
+                "fqcn": "Tempcord\\Declare\\Command\\Option",
                 "kind": "attribute",
                 "target": "parameter",
                 "summary": "Declares a method parameter as a user-supplied command option.",
@@ -264,7 +264,7 @@
             },
             {
                 "name": "Event",
-                "fqcn": "Tempcord\\Attributes\\Event",
+                "fqcn": "Tempcord\\Declare\\Event\\Event",
                 "kind": "attribute",
                 "target": "class",
                 "summary": "Declares an invokable class as a listener for a Discord gateway event.",
@@ -283,7 +283,7 @@
             },
             {
                 "name": "Autocomplete",
-                "fqcn": "Tempcord\\Attributes\\Autocomplete",
+                "fqcn": "Tempcord\\Declare\\Command\\Autocomplete",
                 "kind": "attribute",
                 "target": "method",
                 "summary": "Declares a method as the source of suggestions for one of the command's options.",
@@ -302,7 +302,7 @@
             },
             {
                 "name": "Button",
-                "fqcn": "Tempcord\\Attributes\\Button",
+                "fqcn": "Tempcord\\Declare\\Component\\Button",
                 "kind": "attribute",
                 "target": "class, method",
                 "summary": "Declares a class or method as the handler for a button press.",
@@ -328,7 +328,7 @@
             },
             {
                 "name": "SelectMenu",
-                "fqcn": "Tempcord\\Attributes\\SelectMenu",
+                "fqcn": "Tempcord\\Declare\\Component\\SelectMenu",
                 "kind": "attribute",
                 "target": "class, method",
                 "summary": "Declares a class or method as the handler for a select menu choice.",
@@ -354,7 +354,7 @@
             },
             {
                 "name": "ModalSubmit",
-                "fqcn": "Tempcord\\Attributes\\ModalSubmit",
+                "fqcn": "Tempcord\\Declare\\Component\\ModalSubmit",
                 "kind": "attribute",
                 "target": "class, method",
                 "summary": "Declares a class or method as the handler for a submitted modal.",
@@ -382,7 +382,7 @@
         "options": [
             {
                 "name": "Choosable",
-                "fqcn": "Tempcord\\Interfaces\\Choosable",
+                "fqcn": "Tempcord\\Declare\\Contracts\\Choosable",
                 "kind": "interface",
                 "target": null,
                 "summary": "An enum that says how each of its cases should read in Discord.",
@@ -400,7 +400,7 @@
         "autocomplete": [
             {
                 "name": "Autocomplete",
-                "fqcn": "Tempcord\\Interfaces\\Autocomplete",
+                "fqcn": "Tempcord\\Declare\\Contracts\\Autocomplete",
                 "kind": "interface",
                 "target": null,
                 "summary": "",
@@ -416,7 +416,7 @@
             },
             {
                 "name": "ArrayAutocomplete",
-                "fqcn": "Tempcord\\AutoCompletes\\ArrayAutocomplete",
+                "fqcn": "Tempcord\\Support\\Autocomplete\\ArrayAutocomplete",
                 "kind": "class",
                 "target": null,
                 "summary": "",
@@ -444,7 +444,7 @@
         "cache": [
             {
                 "name": "Cache",
-                "fqcn": "Tempcord\\Cache\\Cache",
+                "fqcn": "Tempcord\\Support\\Cache\\Cache",
                 "kind": "class",
                 "target": null,
                 "summary": "What the gateway has told the bot about the guilds it is in.",
@@ -457,7 +457,7 @@
         "components": [
             {
                 "name": "CustomId",
-                "fqcn": "Tempcord\\Runtime\\CustomId",
+                "fqcn": "Tempcord\\Compile\\Component\\CustomId",
                 "kind": "class",
                 "target": null,
                 "summary": "A component's custom id, which may carry {placeholders}.",
@@ -534,7 +534,7 @@
         "messaging": [
             {
                 "name": "DirectMessage",
-                "fqcn": "Tempcord\\Messaging\\DirectMessage",
+                "fqcn": "Tempcord\\Support\\Messaging\\DirectMessage",
                 "kind": "class",
                 "target": null,
                 "summary": "Writes to a member privately, on a best-effort basis.",
@@ -562,7 +562,7 @@
         "enums": [
             {
                 "name": "DiscordLocale",
-                "fqcn": "Tempcord\\Enums\\DiscordLocale",
+                "fqcn": "Tempcord\\Support\\Localization\\DiscordLocale",
                 "kind": "enum",
                 "target": null,
                 "summary": "The locales Discord accepts for name and description localizations.",
@@ -751,7 +751,7 @@
         "plugins": [
             {
                 "name": "Plugin",
-                "fqcn": "Tempcord\\Plugins\\Plugin",
+                "fqcn": "Tempcord\\Declare\\Contracts\\Plugin",
                 "kind": "interface",
                 "target": null,
                 "summary": "A package that extends a bot with its own behaviour.",
@@ -769,7 +769,7 @@
         "middleware": [
             {
                 "name": "Middleware",
-                "fqcn": "Tempcord\\Interfaces\\Middleware",
+                "fqcn": "Tempcord\\Declare\\Contracts\\Middleware",
                 "kind": "interface",
                 "target": null,
                 "summary": "Something that runs before a handler, and may decide it never runs.",
@@ -785,7 +785,7 @@
             },
             {
                 "name": "RequiresPermissions",
-                "fqcn": "Tempcord\\Middleware\\RequiresPermissions",
+                "fqcn": "Tempcord\\Support\\Middleware\\RequiresPermissions",
                 "kind": "class",
                 "target": null,
                 "summary": "Refuses anyone whose permissions in the channel fall short.",

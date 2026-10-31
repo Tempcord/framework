@@ -2,9 +2,9 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 use Tempcord\Discord\Enums\Permission;
-use Tempcord\Middleware\RequiresPermissions;
+use Tempcord\Support\Middleware\RequiresPermissions;
 
 /**
  * Middleware written as an object inside the attribute, which is the shape a

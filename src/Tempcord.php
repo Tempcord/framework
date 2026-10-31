@@ -5,16 +5,16 @@ namespace Tempcord;
 use Tempcord\Discord\Constants\Events;
 use Tempcord\Discord\Discord;
 use Tempcord\Discord\Gateway\Events\Ready;
-use Tempcord\Cache\CacheSubscriber;
-use Tempcord\Registries\CommandsRegistry;
-use Tempcord\Registries\ComponentsRegistry;
-use Tempcord\Registries\EventsRegistry;
-use Tempcord\Registries\PluginsRegistry;
-use Tempcord\Runtime\CommandBinder;
-use Tempcord\Runtime\CommandRegistrar;
-use Tempcord\Runtime\ComponentBinder;
-use Tempcord\Runtime\Outcome;
-use Tempcord\Runtime\PluginBooter;
+use Tempcord\Support\Cache\CacheSubscriber;
+use Tempcord\Compile\Command\CommandsRegistry;
+use Tempcord\Compile\Component\ComponentsRegistry;
+use Tempcord\Compile\Event\EventsRegistry;
+use Tempcord\Compile\Plugin\PluginsRegistry;
+use Tempcord\Runtime\Command\CommandBinder;
+use Tempcord\Runtime\Registration\CommandRegistrar;
+use Tempcord\Runtime\Component\ComponentBinder;
+use Tempcord\Runtime\Boot\Outcome;
+use Tempcord\Runtime\Plugin\PluginBooter;
 
 /**
  * The bot itself: the Discord connection, the registries that were filled

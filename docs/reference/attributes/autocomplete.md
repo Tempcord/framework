@@ -5,7 +5,7 @@
 Declares a method as the source of suggestions for one of the command's options.
 
 ```php
-use Tempcord\Attributes\Autocomplete;
+use Tempcord\Declare\Command\Autocomplete;
 ```
 
 **Applies to:** method

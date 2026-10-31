@@ -3,15 +3,15 @@
 namespace Tempcord;
 
 use Tempcord\Discord\Discord;
-use Tempcord\Cache\CacheSubscriber;
-use Tempcord\Registries\CommandsRegistry;
-use Tempcord\Registries\ComponentsRegistry;
-use Tempcord\Registries\EventsRegistry;
-use Tempcord\Registries\PluginsRegistry;
-use Tempcord\Runtime\CommandBinder;
-use Tempcord\Runtime\CommandRegistrar;
-use Tempcord\Runtime\ComponentBinder;
-use Tempcord\Runtime\PluginBooter;
+use Tempcord\Support\Cache\CacheSubscriber;
+use Tempcord\Compile\Command\CommandsRegistry;
+use Tempcord\Compile\Component\ComponentsRegistry;
+use Tempcord\Compile\Event\EventsRegistry;
+use Tempcord\Compile\Plugin\PluginsRegistry;
+use Tempcord\Runtime\Command\CommandBinder;
+use Tempcord\Runtime\Registration\CommandRegistrar;
+use Tempcord\Runtime\Component\ComponentBinder;
+use Tempcord\Runtime\Plugin\PluginBooter;
 use Tempest\Container\Container;
 use Tempest\Container\Initializer;
 use Tempest\Container\Singleton;

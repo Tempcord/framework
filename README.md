@@ -1,230 +1,272 @@
 # Tempcord Framework
 
-[![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](https://github.com/tempcord/framework)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Latest Version](https://img.shields.io/packagist/v/tempcord/framework.svg)](https://packagist.org/packages/tempcord/framework)
+[![Tests](https://github.com/Tempcord/framework/actions/workflows/tests.yml/badge.svg)](https://github.com/Tempcord/framework/actions/workflows/tests.yml)
+[![Static Analysis](https://github.com/Tempcord/framework/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/Tempcord/framework/actions/workflows/static-analysis.yml)
 [![PHP Version](https://img.shields.io/badge/php-%5E8.5-blue.svg)](https://php.net)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-## Description
+Tempcord is a PHP framework for Discord bots, built on [Tempest](https://tempestphp.com) and
+[`tempcord/discord-php`](https://github.com/Tempcord/discord-php). A command is a class, its
+options are typed parameters, and the framework works out the rest when the bot boots.
 
-Tempcord is a modern, elegant PHP framework designed specifically for building Discord bots with ease. Built on top of the powerful Tempest Console framework and Ragnarok Fenrir Discord library, Tempcord provides a clean, attribute-based approach to creating sophisticated Discord bots with minimal boilerplate code.
-
-The framework leverages PHP 8.5+ features and modern development practices to deliver a robust foundation for Discord bot development, featuring automatic command registration, event handling, and seamless integration with Discord's API.
-
-> **Getting Started**: Use the `tempcord/tempcord` boilerplate to quickly create new Discord bot applications. This repository contains the core framework - for building applications, use `composer create-project tempcord/tempcord your-bot-name`.
+> This repository is the framework itself. To start a bot, use the application skeleton:
+> `composer create-project tempcord/tempcord my-bot`.
 
 ## Features
 
-- 🚀 **Modern PHP 8.5+** - Leverages the latest PHP features and syntax
-- 🎯 **Attribute-Based Commands** - Define Discord commands using PHP attributes
-- 📡 **Event-Driven Architecture** - Handle Discord events with clean, organized handlers
-- 🔧 **Auto-Discovery** - Automatic command and event registration
-- 🏗️ **Dependency Injection** - Built-in container for clean architecture
-- 📝 **Console Integration** - Rich console output and logging capabilities
-- 🔌 **Extensible** - Easy to extend with custom functionality
-- 🛡️ **Type Safety** - Full type hints and strict typing throughout
-- 📊 **Logging Support** - Comprehensive logging with multiple channels
-- ⚡ **Performance Optimized** - Efficient command and event handling
+- **Commands from attributes** — `#[Command]`, `#[Subcommand]`, `#[SubcommandGroup]`, with the
+  Discord option type read from each parameter's PHP type, backed enums included.
+- **Autocomplete** — from a method on the command, a fixed list, or a class of its own.
+- **Context menus and activity entry points** alongside slash commands.
+- **Components** — `#[Button]`, `#[SelectMenu]` and `#[ModalSubmit]`, routed by custom id, with
+  `{placeholders}` that carry state through the id.
+- **Middleware** — guards that run before a command or component handler and may refuse it.
+- **Gateway events** — `#[Event]` listeners, each run in its own fiber with failures contained.
+- **Cache** — guilds, channels, roles, members and voice states the gateway reports, readable
+  without an HTTP round trip.
+- **Translations** for command names and descriptions through `tempest/intl`.
+- **Plugins** — Composer packages whose commands and events are discovered like your own.
+- **Checked at boot** — a malformed declaration stops the bot starting, rather than failing the
+  first time somebody uses it.
 
-## Installation
+## Requirements
 
-### Prerequisites
+- PHP 8.5 or newer
+- A Discord application with a bot token, from the
+  [Discord Developer Portal](https://discord.com/developers/applications)
 
-- PHP 8.5 or higher
-- Composer
-- A Discord Bot Token (from [Discord Developer Portal](https://discord.com/developers/applications))
-
-### Step 1: Create New Application
-
-Use the Tempcord application boilerplate to create a new Discord bot project:
-
-```bash
-composer create-project tempcord/tempcord my-discord-bot
-cd my-discord-bot
-```
-
-### Step 2: Configure Your Bot
-
-Copy the example environment file and configure your bot:
+## Getting started
 
 ```bash
+composer create-project tempcord/tempcord my-bot
+cd my-bot
 cp .env.example .env
 ```
 
-Edit the `.env` file with your Discord bot credentials:
+Add your token to `.env`:
 
 ```env
 DISCORD_TOKEN=your_bot_token_here
 ```
 
-### Step 3: Install Dependencies
-
-```bash
-composer install
-```
-
-### Step 4: Create Your First Command
-
-The boilerplate includes example commands. Create a new command in any folder, for example inside `app/Commands/`:
+### Your first command
 
 ```php
-<?php
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
+use Tempcord\Discord\Interaction\CommandInteraction;
 
-namespace App\Commands;
-
-use Tempcord\Attributes\Command;
-use CyberWolf\Discord\Gateway\Events\InteractionCreate;
-
-#[Command(name: 'hello', description: 'Say hello!')]
-class HelloCommand
+#[Command(description: 'Say hello')]
+final class HelloCommand
 {
-    public function __invoke(InteractionCreate $interaction): void
-    {
-        $interaction->respondWithMessage([
-            'content' => 'Hello, World! 👋'
-        ]);
+    public function __invoke(
+        CommandInteraction $interaction,
+        #[Option(description: 'Who to greet')] string $name = 'World',
+    ): void {
+        $interaction->reply("Hello, {$name}! 👋");
     }
 }
 ```
 
-## Usage
+The class name gives the command its name — `HelloCommand` becomes `/hello`. Whether an option is
+required comes from whether its parameter has a default, so `name` here is optional.
 
-### Running Your Bot
+The class can live anywhere in your application: Tempest discovers it.
 
-Use the built-in console commands to manage your bot:
+### Running the bot
 
 ```bash
-# Boot the bot
-php tempcord boot
+# Register commands with Discord, then start the bot
+./tempcord boot --register
 
-# Boot and register commands with Discord
-php tempcord boot --register
-
-# Register commands only (without starting the bot)
-php tempcord register
+# Start the bot with the commands already registered
+./tempcord boot
 ```
 
-### Creating Commands
+Registration replaces the whole set of commands, so a command deleted from your code disappears
+from Discord too. Run it when your commands change rather than on every start.
 
-Commands are defined using the `#[Command]` attribute:
+## A quick tour
+
+### Subcommands
 
 ```php
-#[Command(
-    name: 'ping',
-    description: 'Check bot latency'
-)]
-class PingCommand
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
+use Tempcord\Declare\Command\Subcommand;
+use Tempcord\Discord\Parts\User;
+
+#[Command(description: 'User tools')]
+final class UserCommand
 {
-    public function __invoke(InteractionCreate $interaction): void
-    {
-        $interaction->respondWithMessage([
-            'content' => 'Pong! 🏓'
-        ]);
+    #[Subcommand(name: 'info', description: 'Show information about a user')]
+    public function info(
+        #[Option(description: 'Target user')] User $user,
+    ): void {
+        // ...
     }
 }
 ```
 
-### Handling Events
+That registers `/user info`. Add `#[SubcommandGroup]` to the class for `/command group subcommand`.
 
-Create event handlers using the `#[Event]` attribute:
+### Buttons
 
 ```php
-use Tempcord\Attributes\Event;
-use CyberWolf\Discord\Gateway\Events\MessageCreate;
+use Tempcord\Declare\Component\Button;
+use Tempcord\Discord\Interaction\ButtonInteraction;
 
-#[Event(name: 'message_create')]
-class MessageHandler
+final class TournamentButtons
+{
+    #[Button(id: 'tournament.accept.{team}')]
+    public function accept(ButtonInteraction $interaction, int $team): void
+    {
+        $interaction->reply("Team {$team} accepted.", ephemeral: true);
+    }
+}
+```
+
+Build the matching id when you send the button with
+`CustomId::compile('tournament.accept.{team}')->build(['team' => 42])`.
+
+### Events
+
+```php
+use Tempcord\Declare\Event\Event;
+use Tempcord\Discord\Constants\Events;
+use Tempcord\Discord\Gateway\Events\MessageCreate;
+
+#[Event(name: Events::MESSAGE_CREATE)]
+final class MessageListener
 {
     public function __invoke(MessageCreate $message): void
     {
-        // Handle message events
-        if ($message->content === '!hello') {
-            // Respond to the message
-        }
+        // ...
     }
 }
 ```
 
-### Command Options and Subcommands
+Discord only sends the events your bot has intents for, and reading message content needs the
+privileged `MESSAGE_CONTENT` intent.
+
+### Middleware
 
 ```php
-#[Command(name: 'user', description: 'User management commands')]
-class UserCommand
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Subcommand;
+use Tempcord\Discord\Enums\Permission;
+use Tempcord\Discord\Interaction\CommandInteraction;
+use Tempcord\Support\Middleware\RequiresPermissions;
+
+#[Command(description: 'Suggestions from the server')]
+final class SuggestionCommand
 {
-    #[Subcommand(name: 'info', description: 'Get user information')]
-    public function info(
-        #[Option(description: 'Target user')]
-        User $user
-    ): void {
-        // Handle user info command
-    }
+    #[Subcommand(name: 'add', description: 'Suggest something')]
+    public function add(CommandInteraction $interaction): void {}
+
+    #[Subcommand(
+        name: 'close',
+        description: 'Close a suggestion',
+        middleware: [new RequiresPermissions([Permission::MANAGE_GUILD])],
+    )]
+    public function close(CommandInteraction $interaction): void {}
 }
 ```
 
-Whether an option is required comes from whether its parameter has a default, so `$user`
-above is required without saying so.
+Implement `Tempcord\Declare\Contracts\Middleware` to write your own.
+
+## Configuration
+
+The bot is configured in `app/config/tempcord.config.php` in the skeleton:
+
+```php
+use Tempcord\Discord\Bitwise\Bitwise;
+use Tempcord\Discord\Enums\Intent;
+use Tempcord\TempcordConfig;
+
+return new TempcordConfig(
+    token: env('DISCORD_TOKEN') ?? '',
+    intents: Bitwise::from(Intent::GUILDS, Intent::GUILD_MESSAGES),
+    cache: true,
+    chunkMembers: true,
+);
+```
 
 ## Documentation
 
-See [docs/](docs/README.md) — guides for getting started, commands, autocomplete, events and
-translations, plus a reference generated from the source.
+[docs/](docs/README.md) has guides for getting started, commands, autocomplete, events,
+translations, plugins, components, the cache and middleware, plus a reference generated from the
+source. Every code example in the guides is a file the test suite compiles.
 
-Run `composer docs` after changing the public API; the test suite fails if the committed
-documentation no longer matches the code.
+## Upgrading from 1.x
+
+2.0 reorganised the source into four areas, so every public class has a new namespace. Nothing
+else about the API changed. The ones a bot usually imports:
+
+| 1.x | 2.0 |
+| --- | --- |
+| `Tempcord\Attributes\{Command, Subcommand, SubcommandGroup, Option, Autocomplete}` | `Tempcord\Declare\Command\…` |
+| `Tempcord\Attributes\{Button, SelectMenu, ModalSubmit}` | `Tempcord\Declare\Component\…` |
+| `Tempcord\Attributes\Event` | `Tempcord\Declare\Event\Event` |
+| `Tempcord\Interfaces\{Middleware, Autocomplete, Choosable}` | `Tempcord\Declare\Contracts\…` |
+| `Tempcord\Plugins\Plugin` | `Tempcord\Declare\Contracts\Plugin` |
+| `Tempcord\Runtime\CustomId` | `Tempcord\Compile\Component\CustomId` |
+| `Tempcord\Cache\Cache` | `Tempcord\Support\Cache\Cache` |
+| `Tempcord\Middleware\RequiresPermissions` | `Tempcord\Support\Middleware\RequiresPermissions` |
+| `Tempcord\Messaging\DirectMessage` | `Tempcord\Support\Messaging\DirectMessage` |
+| `Tempcord\AutoCompletes\ArrayAutocomplete` | `Tempcord\Support\Autocomplete\ArrayAutocomplete` |
+| `Tempcord\Enums\DiscordLocale` | `Tempcord\Support\Localization\DiscordLocale` |
+| `Tempcord\Pagination\…` | `Tempcord\Support\Pagination\…` |
+
+The full table is in [docs/internal/architecture-review.md](docs/internal/architecture-review.md).
+After upgrading, clear Tempest's discovery cache so it stops looking for the old classes.
+
+## Project layout
+
+```
+src/
+  Tempcord.php, TempcordConfig.php, *Initializer.php
+  Declare/   what a bot author writes: attributes and contracts
+  Compile/   turns declarations into definitions at discovery time
+  Runtime/   binds definitions to the gateway, dispatches, registers commands, boots
+  Support/   optional features on top: cache, localization, logging, messaging, pagination
+```
+
+`tests/Unit/` mirrors the same layout.
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to Tempcord.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Pull request titles follow Conventional Commits, because
+they decide the release.
 
-### Development Setup
+```bash
+composer install
+composer test      # PHPUnit
+composer analyse   # PHPStan
+composer docs      # regenerate docs/ after changing the public API
+```
 
-1. Fork the repository
-2. Clone your fork: `git clone https://github.com/your-username/framework.git`
-3. Install dependencies: `composer install`
-4. Create a feature branch: `git checkout -b feature/amazing-feature`
-5. Make your changes and add tests
-6. Run the test suite: `composer test`
-7. Commit your changes: `git commit -m 'Add amazing feature'`
-8. Push to your branch: `git push origin feature/amazing-feature`
-9. Open a Pull Request
+The test suite fails if the committed documentation no longer matches the source.
 
-### Reporting Issues
+When reporting an issue, include your PHP and framework versions, the steps to reproduce, what
+you expected and what happened, and any error output.
 
-When reporting issues, please include:
+## Credits
 
-- PHP version
-- Framework version
-- Steps to reproduce
-- Expected vs actual behavior
-- Error messages or logs
+Tempcord does not bundle these projects; they are Composer dependencies, each under its own
+license:
 
-### Feature Requests
-
-We're always looking for ways to improve Tempcord. Feel free to:
-
-- Open an issue with the `enhancement` label
-- Discuss your ideas in our community channels
-- Submit a pull request with your implementation
-
-## Credits & Acknowledgements
-
-Tempcord stands on the shoulders of excellent open-source projects. It does not
-bundle their source code — they are pulled in as Composer dependencies at install
-time, each under its own license — but the framework would not exist without them:
-
-- **[Discord PHP](https://github.com/CyberWolf-Studio/discord-php)** by CyberWolf.Studio —
-  the underlying Discord API/gateway library Tempcord builds upon; itself a maintained
-  fork of **[Fenrir](https://github.com/dc-Ragnarok/Fenrir)** by Ragnarök (MIT License).
-- **[Tempest](https://tempestphp.com)** — the console, core, event-bus and logging
-  foundation Tempcord integrates with (MIT License).
-- **[ReactPHP](https://reactphp.org)** — the async runtime powering the gateway
-  connection (MIT License).
+- **[tempcord/discord-php](https://github.com/Tempcord/discord-php)** — the Discord API and
+  gateway library underneath, a maintained fork of
+  **[Fenrir](https://github.com/dc-Ragnarok/Fenrir)** by Ragnarök (MIT).
+- **[Tempest](https://tempestphp.com)** — the container, discovery, console and logging
+  foundation (MIT).
+- **[ReactPHP](https://reactphp.org)** — the async runtime behind the gateway connection (MIT).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE).
 
-**Built with ❤️ by [CyberWolf.Studio](https://cyberwolf.studio) team.**
-using [Tempest](https://tempestphp.com)
-
-For more information, visit our [documentation](https://tempcord.dev) or join our [Discord community](https://discord.gg/tempcord).
+Built by [CyberWolf.Studio](https://cyberwolf.studio). Documentation at
+[tempcord.dev](https://tempcord.dev), community on [Discord](https://discord.gg/tempcord).

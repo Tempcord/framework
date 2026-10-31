@@ -5,9 +5,9 @@ namespace Tempcord\Tests\Fixtures;
 use Tempcord\Discord\Parts\Channel;
 use Tempcord\Discord\Parts\Role;
 use Tempcord\Discord\Parts\User;
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
-use Tempcord\Attributes\Subcommand;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
+use Tempcord\Declare\Command\Subcommand;
 
 #[Command(description: 'Covers every supported option type')]
 final class OptionTypesCommand

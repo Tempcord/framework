@@ -2,9 +2,9 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Subcommand;
-use Tempcord\Attributes\SubcommandGroup;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Subcommand;
+use Tempcord\Declare\Command\SubcommandGroup;
 
 #[Command(description: 'Guarded through a group', middleware: [OuterMiddleware::class])]
 #[SubcommandGroup(name: 'keys', description: 'Keys', middleware: [InnerMiddleware::class])]

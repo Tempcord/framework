@@ -5,7 +5,7 @@
 Declares a method parameter as a user-supplied command option.
 
 ```php
-use Tempcord\Attributes\Option;
+use Tempcord\Declare\Command\Option;
 ```
 
 **Applies to:** parameter

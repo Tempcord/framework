@@ -6,9 +6,9 @@ A class whose methods carry `#[Subcommand]` exposes each one as a subcommand. Th
 `__invoke` in this case — the methods are the handlers.
 
 ```php
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
-use Tempcord\Attributes\Subcommand;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
+use Tempcord\Declare\Command\Subcommand;
 
 #[Command(description: 'Moderation tools')]
 final class ModerationCommand
@@ -32,10 +32,10 @@ Adding `#[SubcommandGroup]` to the class nests everything one level deeper, whic
 Discord models `/command group subcommand`.
 
 ```php
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
-use Tempcord\Attributes\Subcommand;
-use Tempcord\Attributes\SubcommandGroup;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
+use Tempcord\Declare\Command\Subcommand;
+use Tempcord\Declare\Command\SubcommandGroup;
 
 #[Command(description: 'Music controls')]
 #[SubcommandGroup(name: 'playlist', description: 'Playlist controls')]
@@ -95,8 +95,8 @@ gives the user immediate feedback.
 ```php
 use Tempcord\Discord\Enums\ChannelType;
 use Tempcord\Discord\Parts\Channel;
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
 
 #[Command(description: 'Every option constraint Discord accepts')]
 final class ConstrainedCommand
@@ -127,7 +127,7 @@ labels of its own, so each value stands in as its own.
 
 ```php
 use Tempcord\Discord\Enums\Permission;
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 #[Command(
     description: 'Only for moderators',
@@ -151,7 +151,7 @@ immediately, which makes them useful while developing; global commands can take 
 hour to propagate.
 
 ```php
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 #[Command(name: 'alpha', description: 'Alpha, scoped to guild 111', guildId: 111)]
 final class GuildAlphaCommand
@@ -172,7 +172,7 @@ shows that name verbatim, so it is not derived from the class:
 use Tempcord\Discord\Enums\ApplicationCommandTypes;
 use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Discord\Parts\User;
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 /**
  * A context menu on a user. Discord shows the name verbatim, so it is given

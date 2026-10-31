@@ -5,7 +5,7 @@
 Declares a class as a Discord application command.
 
 ```php
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 ```
 
 **Applies to:** class, method

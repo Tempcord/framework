@@ -5,7 +5,7 @@
 Declares a class or method as the handler for a submitted modal.
 
 ```php
-use Tempcord\Attributes\ModalSubmit;
+use Tempcord\Declare\Component\ModalSubmit;
 ```
 
 **Applies to:** class, method

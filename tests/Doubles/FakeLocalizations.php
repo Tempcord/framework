@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Doubles;
 
-use Tempcord\Localization\LocalizationProvider;
+use Tempcord\Support\Localization\LocalizationProvider;
 
 /**
  * A translation catalog held in memory, so localization can be exercised

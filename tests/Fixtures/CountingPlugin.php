@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Plugins\Plugin;
+use Tempcord\Declare\Contracts\Plugin;
 use Tempcord\Tempcord;
 
 /**

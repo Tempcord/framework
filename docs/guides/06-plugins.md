@@ -41,7 +41,7 @@ register a Fenrir extension, start a timer, or open a connection. That is what `
 for.
 
 ```php
-use Tempcord\Plugins\Plugin;
+use Tempcord\Declare\Contracts\Plugin;
 use Tempcord\Tempcord;
 
 final class RecordingPlugin implements Plugin

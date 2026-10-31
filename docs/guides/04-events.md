@@ -8,7 +8,7 @@ An invokable class carrying `#[Event]` becomes a listener. The event name is the
 event you want; the payload arrives as the single argument.
 
 ```php
-use Tempcord\Attributes\Event;
+use Tempcord\Declare\Event\Event;
 
 #[Event(name: 'READY')]
 final class ReadyListener

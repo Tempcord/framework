@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Button;
+use Tempcord\Declare\Component\Button;
 
 #[Button]
 final class HandlerlessButton

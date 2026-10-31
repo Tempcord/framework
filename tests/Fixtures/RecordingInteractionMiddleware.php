@@ -6,7 +6,7 @@ use Tempcord\Discord\Interaction\ButtonInteraction;
 use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Discord\Interaction\ComponentInteraction;
 use Tempcord\Discord\Interaction\ModalSubmitInteraction;
-use Tempcord\Interfaces\Middleware;
+use Tempcord\Declare\Contracts\Middleware;
 
 /**
  * Keeps the interaction it was handed, so a test can say which shape of it a

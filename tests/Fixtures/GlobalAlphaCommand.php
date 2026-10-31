@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 #[Command(name: 'alpha', description: 'Alpha, registered globally')]
 final class GlobalAlphaCommand

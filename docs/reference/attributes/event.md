@@ -5,7 +5,7 @@
 Declares an invokable class as a listener for a Discord gateway event.
 
 ```php
-use Tempcord\Attributes\Event;
+use Tempcord\Declare\Event\Event;
 ```
 
 **Applies to:** class

@@ -3,7 +3,7 @@
 namespace Tempcord\Tests\Fixtures;
 
 use RuntimeException;
-use Tempcord\Attributes\Button;
+use Tempcord\Declare\Component\Button;
 
 #[Button]
 final class ThrowingButton

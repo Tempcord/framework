@@ -4,8 +4,8 @@ namespace Tempcord\Tests\Fixtures;
 
 use Tempcord\Discord\Enums\ChannelType;
 use Tempcord\Discord\Parts\Channel;
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
 
 #[Command(description: 'Every option constraint Discord accepts')]
 final class ConstrainedCommand

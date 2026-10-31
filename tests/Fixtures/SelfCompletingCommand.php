@@ -3,9 +3,9 @@
 namespace Tempcord\Tests\Fixtures;
 
 use Tempcord\Discord\Interaction\CommandInteraction;
-use Tempcord\Attributes\Autocomplete;
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
+use Tempcord\Declare\Command\Autocomplete;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
 
 /**
  * A command that suggests its own values, using the dependencies it already has.

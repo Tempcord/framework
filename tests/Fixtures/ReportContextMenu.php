@@ -5,7 +5,7 @@ namespace Tempcord\Tests\Fixtures;
 use Tempcord\Discord\Enums\ApplicationCommandTypes;
 use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Discord\Parts\Message;
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 #[Command(name: 'Поскаржитись', type: ApplicationCommandTypes::MESSAGE)]
 final class ReportContextMenu

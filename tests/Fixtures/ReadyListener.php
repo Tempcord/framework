@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Event;
+use Tempcord\Declare\Event\Event;
 
 #[Event(name: 'READY')]
 final class ReadyListener

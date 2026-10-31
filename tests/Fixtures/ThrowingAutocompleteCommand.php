@@ -3,9 +3,9 @@
 namespace Tempcord\Tests\Fixtures;
 
 use RuntimeException;
-use Tempcord\Attributes\Autocomplete;
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Option;
+use Tempcord\Declare\Command\Autocomplete;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Option;
 
 #[Command(description: 'Its suggestions do not work')]
 final class ThrowingAutocompleteCommand

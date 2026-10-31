@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Interfaces\Choosable;
+use Tempcord\Declare\Contracts\Choosable;
 
 enum Platform: string implements Choosable
 {

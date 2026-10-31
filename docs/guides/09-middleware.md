@@ -5,7 +5,7 @@ A middleware runs before a handler and may decide it never runs. It is the answe
 handler that needs it.
 
 ```php
-use Tempcord\Interfaces\Middleware;
+use Tempcord\Declare\Contracts\Middleware;
 
 final readonly class ModerationOnly implements Middleware
 {
@@ -33,8 +33,8 @@ anyone who may not use it, before it is ever typed. They stop being enough in tw
 That second case is the one to reach for middleware over:
 
 ```php
-use Tempcord\Attributes\Command;
-use Tempcord\Attributes\Subcommand;
+use Tempcord\Declare\Command\Command;
+use Tempcord\Declare\Command\Subcommand;
 use Tempcord\Discord\Interaction\CommandInteraction;
 
 /**
@@ -76,7 +76,7 @@ use Tempcord\Discord\Interaction\ButtonInteraction;
 use Tempcord\Discord\Interaction\CommandInteraction;
 use Tempcord\Discord\Interaction\ComponentInteraction;
 use Tempcord\Discord\Interaction\ModalSubmitInteraction;
-use Tempcord\Interfaces\Middleware;
+use Tempcord\Declare\Contracts\Middleware;
 
 /**
  * Lets only a member holding the moderation role through.
@@ -114,9 +114,9 @@ not involved in reading attributes. That is the right shape for a check that onl
 its own arguments:
 
 ```php
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 use Tempcord\Discord\Enums\Permission;
-use Tempcord\Middleware\RequiresPermissions;
+use Tempcord\Support\Middleware\RequiresPermissions;
 
 /**
  * Middleware written as an object inside the attribute, which is the shape a
@@ -182,7 +182,7 @@ message) holds nothing:
 
 ```php
 use Tempcord\Discord\Enums\Permission;
-use Tempcord\Middleware\RequiresPermissions;
+use Tempcord\Support\Middleware\RequiresPermissions;
 
 #[Subcommand(
     name: 'panel',

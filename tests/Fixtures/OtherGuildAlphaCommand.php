@@ -2,7 +2,7 @@
 
 namespace Tempcord\Tests\Fixtures;
 
-use Tempcord\Attributes\Command;
+use Tempcord\Declare\Command\Command;
 
 #[Command(name: 'alpha', description: 'Alpha, scoped to a different guild', guildId: 222)]
 final class OtherGuildAlphaCommand
