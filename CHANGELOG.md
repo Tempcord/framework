@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/Tempcord/framework/compare/v2.0.0...v2.0.1) (2026-10-31)
+
+### Bug Fixes
+
+* **autocomplete:** send an empty choice list when nothing matches ([5bb6e5e](https://github.com/Tempcord/framework/commit/5bb6e5e912b303dea12a39bd72cfde7a2dbca916))
+* register extensions on the first READY only ([f59a082](https://github.com/Tempcord/framework/commit/f59a0823d207f46350eb0f05992cea0130a342df))
+
 ## [2.0.0](https://github.com/Tempcord/framework/compare/v1.3.0...v2.0.0) (2026-10-31)
 
 ### ⚠ BREAKING CHANGES
